@@ -18,9 +18,9 @@ const MOCK_USER: UserProfile = {
 };
 
 const MOCK_HISTORY: DonationHistoryItem[] = [
-    { id: '1', type: 'Whole Blood', center: 'City Center', date: '2023-10-15', amount: '1 unit' },
-    { id: '2', type: 'Platelets', center: 'Downtown Clinic', date: '2023-07-02', amount: '1 unit' },
-    { id: '3', type: 'Whole Blood', center: 'City Center', date: '2023-03-20', amount: '1 unit' },
+  { id: '1', type: 'Whole Blood', center: 'City Center', date: '2023-10-15', amount: '1 unit' },
+  { id: '2', type: 'Platelets', center: 'Downtown Clinic', date: '2023-07-02', amount: '1 unit' },
+  { id: '3', type: 'Whole Blood', center: 'City Center', date: '2023-03-20', amount: '1 unit' },
 ];
 
 const MOCK_APPOINTMENTS: Appointment[] = [
@@ -73,29 +73,29 @@ const DonateBloodPage = () => {
   return (
     <div className="container mx-auto py-12">
       {view === 'dashboard' && (
-        <Dashboard 
-          user={MOCK_USER} 
-          history={MOCK_HISTORY} 
-          onDonateClick={handleDonateClick} 
+        <Dashboard
+          user={MOCK_USER}
+          history={MOCK_HISTORY}
+          onDonateClick={handleDonateClick}
           onViewAppointmentsClick={handleViewAppointmentsClick}
         />
       )}
       {view === 'eligibility' && (
-        <EligibilityModal 
-          onClose={() => setView('dashboard')} 
-          onEligible={handleEligible} 
+        <EligibilityModal
+          onClose={() => setView('dashboard')}
+          onEligible={handleEligible}
         />
       )}
       {view === 'schedule' && (
-        <ScheduleForm 
-          onBack={() => setView('dashboard')} 
-          onConfirm={handleScheduleConfirm} 
+        <ScheduleForm
+          onBack={() => setView('dashboard')}
+          onConfirm={handleScheduleConfirm}
         />
       )}
       {view === 'success' && (
-        <SuccessView 
-          onHome={handleHome} 
-          appointment={appointmentDetails} 
+        <SuccessView
+          onHome={handleHome}
+          appointment={appointmentDetails}
         />
       )}
       {view === 'appointments' && (
@@ -103,8 +103,13 @@ const DonateBloodPage = () => {
           appointments={MOCK_APPOINTMENTS}
           onBack={() => setView('dashboard')}
           onReschedule={(appointment) => {
-            // TODO: Implement reschedule logic
             console.log('Reschedule:', appointment);
+          }}
+          onViewTicket={(appointment) => {
+            console.log('View Ticket:', appointment);
+          }}
+          onCancel={(appointment) => {
+            console.log('Cancel:', appointment);
           }}
         />
       )}

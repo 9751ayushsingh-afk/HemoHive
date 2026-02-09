@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import dbConnect from '@/lib/dbConnect';
 import Inventory from '@/models/Inventory';
 import HospitalHomeClient from './HospitalHomeClient';
@@ -16,12 +16,12 @@ const HospitalHomePage = async () => {
   // @ts-ignore
   const hospitalId = user.id;
 
-  let inventoryData = [];
+  let inventoryData: any[] = [];
   if (hospitalId) {
     try {
       await dbConnect();
       const dataFromDB = await Inventory.find({ hospital: hospitalId }).lean();
-      inventoryData = dataFromDB.map(item => ({
+      inventoryData = dataFromDB.map((item: any) => ({
         // @ts-ignore
         ...item,
         // @ts-ignore
@@ -34,7 +34,7 @@ const HospitalHomePage = async () => {
     }
   }
 
-  return <HospitalHomeClient user={user} inventory={inventoryData} />;
+  return <HospitalHomeClient user={user as any} inventory={inventoryData} />;
 };
 
 export default HospitalHomePage;

@@ -33,7 +33,7 @@ import OtherIcon from '../../components/atoms/OtherIcon';
 import PulseWheelBloodSelector from '../../components/PulseWheelBloodSelector';
 import { useRouter } from 'next/navigation';
 
-const roles = {
+const roles: any = {
     donor: {
         icon: HeartIcon,
         color: '#EC4899', // pink-500
@@ -126,14 +126,14 @@ const RegistrationForm = () => {
     const router = useRouter();
     const [selectedRole, setSelectedRole] = useState('donor');
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [submissionStatus, setSubmissionStatus] = useState(null);
+    const [submissionStatus, setSubmissionStatus] = useState<{ success: boolean, message: string } | null>(null);
     const [currentStep, setCurrentStep] = useState(0);
     const [showCamera, setShowCamera] = useState(false);
-    const [capturedImage, setCapturedImage] = useState(null);
-    const videoRef = useRef(null);
-    const canvasRef = useRef(null);
+    const [capturedImage, setCapturedImage] = useState<string | null>(null);
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    const { register, handleSubmit, watch, formState: { errors }, setValue, trigger } = useForm({
+    const { register, handleSubmit, watch, formState: { errors }, setValue, trigger } = useForm<any>({
         resolver: yupResolver(validationSchema),
         defaultValues: { role: 'donor', notificationPreference: 'Email' }
     });
@@ -169,12 +169,14 @@ const RegistrationForm = () => {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             const context = canvas.getContext('2d');
-            context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
-            const imageDataUrl = canvas.toDataURL('image/png');
-            setCapturedImage(imageDataUrl);
-            setValue('profilePicture', dataURLtoFile(imageDataUrl, 'capture.png'));
+            if (context) {
+                context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+                const imageDataUrl = canvas.toDataURL('image/png');
+                setCapturedImage(imageDataUrl);
+                setValue('profilePicture', dataURLtoFile(imageDataUrl, 'capture.png'));
+            }
             setShowCamera(false);
-            const stream = video.srcObject;
+            const stream = video.srcObject as MediaStream;
             if (stream) {
                 const tracks = stream.getTracks();
                 tracks.forEach(track => track.stop());
@@ -183,14 +185,16 @@ const RegistrationForm = () => {
         }
     };
 
-    const dataURLtoFile = (dataurl, filename) => {
-        let arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
-            bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+    const dataURLtoFile = (dataurl: string, filename: string) => {
+        let arr = dataurl.split(',');
+        let match = arr[0].match(/:(.*?);/);
+        let mime = match ? match[1] : 'image/png';
+        let bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
         while (n--) {
             u8arr[n] = bstr.charCodeAt(n);
         }
         return new File([u8arr], filename, { type: mime });
-    }
+    };
 
     useEffect(() => {
         if (showCamera) {
@@ -198,7 +202,7 @@ const RegistrationForm = () => {
         }
     }, [showCamera]);
 
-    const onSubmit = async (data) => {
+    const onSubmit = async (data: any) => {
         setIsSubmitting(true);
         setSubmissionStatus(null);
         try {
@@ -225,12 +229,12 @@ const RegistrationForm = () => {
             router.push('/login');
 
         } catch (error) {
-            setSubmissionStatus({ success: false, message: error.response?.data?.message || 'An error occurred.' });
+            setSubmissionStatus({ success: false, message: (error as any).response?.data?.message || 'An error occurred.' });
         }
         setIsSubmitting(false);
     };
 
-    const InputField = ({ name, type, placeholder, icon: Icon }) => (
+    const InputField = ({ name, type, placeholder, icon: Icon }: { name: string; type: string; placeholder: string; icon?: React.ElementType }) => (
         <div className="relative mb-4">
             {Icon && <Icon className={`absolute top-1/2 left-4 -translate-y-1/2 h-5 w-5 text-gray-400 transition-colors duration-300 ${errors[name] ? 'text-red-400' : 'group-focus-within:text-white'}`} />}
             <input
@@ -242,7 +246,7 @@ const RegistrationForm = () => {
             <AnimatePresence>
                 {errors[name] && (
                     <motion.p className="text-xs text-red-400 mt-1 ml-2" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                        {errors[name].message}
+                        {(errors[name] as any)?.message}
                     </motion.p>
                 )}
             </AnimatePresence>
@@ -349,7 +353,7 @@ const RegistrationForm = () => {
                                                             <p className="text-center text-xs mt-1">Other</p>
                                                         </div>
                                                     </div>
-                                                    {errors.gender && <p className="text-xs text-red-400 mt-1 ml-2">{errors.gender.message}</p>}
+                                                    {errors.gender && <p className="text-xs text-red-400 mt-1 ml-2">{(errors.gender as any)?.message}</p>}
                                                 </div>
                                                 <InputField name="dob" type="date" placeholder="Date of Birth" icon={CalendarIcon} />
                                                 <InputField name="mobile" type="text" placeholder="Mobile Number" icon={DevicePhoneMobileIcon} />
@@ -375,7 +379,7 @@ const RegistrationForm = () => {
                                         )}
                                         {currentStep === 3 && (
                                             <PulseWheelBloodSelector
-                                                onSelect={(bloodGroup) => setValue('bloodGroup', bloodGroup, { shouldValidate: true })}
+                                                onSelect={(bloodGroup: string) => setValue('bloodGroup', bloodGroup, { shouldValidate: true })}
                                                 onNext={nextStep}
                                             />
                                         )}
@@ -397,7 +401,7 @@ const RegistrationForm = () => {
                                                         I agree to the <a href="/terms" className="font-medium text-[#EC4899] hover:underline">Terms and Conditions</a>
                                                     </label>
                                                 </div>
-                                                {errors.agreeTerms && <p className="text-xs text-red-400 mt-1">{errors.agreeTerms.message}</p>}
+                                                {errors.agreeTerms && <p className="text-xs text-red-400 mt-1">{(errors.agreeTerms as any)?.message}</p>}
                                             </>
                                         )}
                                         {currentStep === 5 && (
@@ -496,7 +500,7 @@ const RegistrationForm = () => {
                                         <MapPinIcon className="w-5 h-5" />
                                         {watch('location') ? 'Location Captured ✅' : 'Detect Accurate Location (Required)'}
                                     </button>
-                                    {errors.location && <p className="text-xs text-red-400 mt-1 ml-2">{errors.location.message}</p>}
+                                    {errors.location && <p className="text-xs text-red-400 mt-1 ml-2">{(errors.location as any)?.message}</p>}
                                 </div>
 
                                 <InputField name="password" type="password" placeholder="Password" icon={LockClosedIcon} />

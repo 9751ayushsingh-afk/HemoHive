@@ -1,11 +1,11 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import BloodRequest from '@/models/BloodRequest';
 import { getAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
     await dbConnect();
 
     const authResult = await getAuth(request);

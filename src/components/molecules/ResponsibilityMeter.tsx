@@ -4,24 +4,29 @@ import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 
 const ResponsibilityMeter = () => {
-  const meterRef = useRef(null);
-  const daysLeftRef = useRef(null);
+  const meterRef = useRef<HTMLDivElement>(null);
+  const daysLeftRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
-    gsap.to(meterRef.current, {
-      boxShadow: '0 0 20px 5px #1D3557',
-      repeat: -1,
-      yoyo: true,
-      duration: 1,
-      ease: 'power1.inOut'
-    });
+    const meter = meterRef.current;
+    if (meter) {
+      gsap.to(meter, {
+        boxShadow: '0 0 20px 5px #1D3557',
+        repeat: -1,
+        yoyo: true,
+        duration: 1,
+        ease: 'power1.inOut'
+      });
+    }
 
     const daysLeft = { value: 8 };
     gsap.to(daysLeft, {
       value: 0,
       duration: 8 * 24 * 60 * 60, // 8 days in seconds
       onUpdate: () => {
-        daysLeftRef.current.textContent = `${Math.ceil(daysLeft.value)} Days Left`;
+        if (daysLeftRef.current) {
+          daysLeftRef.current.textContent = `${Math.ceil(daysLeft.value)} Days Left`;
+        }
       },
       ease: 'linear'
     });

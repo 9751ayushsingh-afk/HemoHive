@@ -6,6 +6,7 @@ export function checkEligibility(user: IUser): { eligible: boolean; reasons: str
   const today = new Date();
 
   // 1. Age check
+  if (!user.dob) return { eligible: false, reasons: ['Date of birth not provided'] };
   const dob = new Date(user.dob);
   let age = today.getFullYear() - dob.getFullYear();
   const m = today.getMonth() - dob.getMonth();

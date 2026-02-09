@@ -6,14 +6,21 @@ import { motion, AnimatePresence } from "framer-motion";
 
 gsap.registerPlugin(MotionPathPlugin);
 
-const SplashScreen = ({ onAnimationComplete }) => {
-  const beeRef = useRef(null);
-  const logoRef = useRef(null);
-  const taglineRef = useRef(null);
-  const gradientRef = useRef(null);
+interface SplashScreenProps {
+  onAnimationComplete?: () => void;
+}
+
+const SplashScreen: React.FC<SplashScreenProps> = ({ onAnimationComplete }) => {
+  const beeRef = useRef<HTMLImageElement>(null);
+  const logoRef = useRef<HTMLImageElement>(null);
+  const taglineRef = useRef<HTMLParagraphElement>(null);
+  const gradientRef = useRef<HTMLDivElement>(null);
 
 
   useEffect(() => {
+    // Safety check
+    if (!beeRef.current || !logoRef.current || !taglineRef.current || !gradientRef.current) return;
+
     const flySound = new Audio("/assets/sounds/bee_fly.mp3");
     const landSound = new Audio("/assets/sounds/bee_land.mp3");
 
@@ -40,30 +47,34 @@ const SplashScreen = ({ onAnimationComplete }) => {
     const tl = gsap.timeline({
       onStart: () => {
         flySound.volume = 0.3;
-        flySound.play();
+        flySound.play().catch(() => { }); // catch play error if user hasn't interacted
       },
       onComplete: () => {
         // Stop flying sound, play landing sound
         gsap.to(flySound, { volume: 0, duration: 0.6 });
         landSound.volume = 0.4;
-        landSound.play();
+        landSound.play().catch(() => { });
 
         // Reveal logo
-        gsap.to(logoRef.current, {
-          opacity: 1,
-          scale: 1,
-          duration: 1,
-          ease: "elastic.out(1, 0.75)",
-        });
+        if (logoRef.current) {
+          gsap.to(logoRef.current, {
+            opacity: 1,
+            scale: 1,
+            duration: 1,
+            ease: "elastic.out(1, 0.75)",
+          });
+        }
 
         // Reveal tagline
-        gsap.to(taglineRef.current, {
-          opacity: 1,
-          delay: 0.8,
-          duration: 1.5,
-          y: 0,
-          ease: "power2.out",
-        });
+        if (taglineRef.current) {
+          gsap.to(taglineRef.current, {
+            opacity: 1,
+            delay: 0.8,
+            duration: 1.5,
+            y: 0,
+            ease: "power2.out",
+          });
+        }
 
         // Complete splash after a short delay
         setTimeout(() => onAnimationComplete?.(), 3000);
@@ -82,10 +93,12 @@ const SplashScreen = ({ onAnimationComplete }) => {
       onUpdate: function () {
         const progress = this.progress();
         // Flip the bee for 3D realism
-        if (progress < 0.5) {
-          gsap.to(beeRef.current, { scaleX: 1, duration: 0.2 });
-        } else {
-          gsap.to(beeRef.current, { scaleX: -1, duration: 0.2 });
+        if (beeRef.current) {
+          if (progress < 0.5) {
+            gsap.to(beeRef.current, { scaleX: 1, duration: 0.2 });
+          } else {
+            gsap.to(beeRef.current, { scaleX: -1, duration: 0.2 });
+          }
         }
       },
     })

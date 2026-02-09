@@ -6,7 +6,7 @@ import { Check, X, Clock, Droplet } from 'lucide-react';
 import QrReader from 'react-qr-scanner';
 
 const DonationRequestsTable = () => {
-    const [requests, setRequests] = useState([]);
+    const [requests, setRequests] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [verifyId, setVerifyId] = useState<string | null>(null);
     const [dpnInput, setDpnInput] = useState('');
@@ -169,7 +169,7 @@ const DonationRequestsTable = () => {
                                 </div>
                                 <h4 className="text-lg font-bold text-slate-900">Verified Successfully!</h4>
                                 <p className="text-slate-600 mt-2 mb-6">
-                                    Donor: <span className="font-semibold">{requests.find((r: any) => r._id === verifyId)?.user?.fullName}</span>
+                                    Donor: <span className="font-semibold">{(requests.find((r: any) => r._id === verifyId)?.user as any)?.fullName}</span>
                                     <br />
                                     <span className="text-sm text-slate-400">ID: {dpnInput}</span>
                                 </p>
@@ -205,7 +205,7 @@ const DonationRequestsTable = () => {
                                             {request.user?.bloodGroup || '?'}
                                         </div>
                                         <div>
-                                            <p className="font-semibold text-slate-900">{request.user?.fullName || 'Unknown'}</p>
+                                            <p className="font-semibold text-slate-900">{(request.user as any)?.fullName || 'Unknown'}</p>
                                             <p className="text-xs text-slate-400">ID: {request._id.substring(request._id.length - 6)}</p>
                                             <p className="text-[10px] text-slate-300 font-mono mt-0.5">{request.qr_code}</p>
                                         </div>

@@ -40,17 +40,17 @@ export default function Lanyard({ position = [0, 0, 30], gravity = [0, -3, 0], f
 
   return (
     <div className="lanyard-wrapper">
-               <Canvas
-                 shadows
-                 gl={{ alpha: true, stencil: false, depth: false, antialias: false, powerPreference: 'high-performance' }}
-                 camera={{ position: [0, 0, 15], fov: 45, near: 1, far: 200 }}
-                 onCreated={({ gl }) =>
-                   gl.setClearColor(new THREE.Color(0x000000), 0)
-                 }
-               >
+      <Canvas
+        shadows
+        gl={{ alpha: true, stencil: false, depth: false, antialias: false, powerPreference: 'high-performance' }}
+        camera={{ position: [0, 0, 15], fov: 45, near: 1, far: 200 }}
+        onCreated={({ gl }) =>
+          gl.setClearColor(new THREE.Color(0x000000), 0)
+        }
+      >
         <ambientLight intensity={0.5} />
         <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} shadow-mapSize={[512, 512]} castShadow />
-        <Physics gravity={gravity} timeStep={1/60} paused={false}>
+        <Physics gravity={gravity} timeStep={1 / 60} paused={false}>
           <Band offsetX={offsetX} />
         </Physics>
         <Environment frames={Infinity} resolution={256} background blur={1}>
@@ -78,17 +78,17 @@ function Band({ maxSpeed = 50, minSpeed = 0, offsetX = 0 }) {
   const dir = new THREE.Vector3();
 
   const segmentProps = { type: 'dynamic' as const, canSleep: true, angularDamping: 0.3, linearDamping: 0.3 };
-  
+
   // Use fallback geometry instead of corrupted GLB file
   const cardGeometry = new THREE.BoxGeometry(4, 6, 0.2);
-  const cardMaterial = new THREE.MeshStandardMaterial({ 
+  const cardMaterial = new THREE.MeshStandardMaterial({
     color: '#ffffff',
     metalness: 0.1,
     roughness: 0.2
   });
   const nodes = { card: { geometry: cardGeometry } };
   const materials = { card: cardMaterial };
-  
+
   // Remove texture dependency to prevent loading errors
   // const texture = useTexture('/lanyard.png');
 
@@ -141,7 +141,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, offsetX = 0 }) {
       card.current?.setNextKinematicTranslation({ x: vec.x - dragged.x, y: vec.y - dragged.y, z: vec.z - dragged.z });
     }
     if (fixed.current) {
-      [j1, j2].forEach((ref:any) => {
+      [j1, j2].forEach((ref: any) => {
         if (!ref.current.lerped) ref.current.lerped = new THREE.Vector3().copy(ref.current.translation());
         const clampedDistance = Math.max(0.1, Math.min(1, ref.current.lerped.distanceTo(ref.current.translation())));
         ref.current.lerped.lerp(
@@ -153,11 +153,11 @@ function Band({ maxSpeed = 50, minSpeed = 0, offsetX = 0 }) {
       curve.points[1].copy(j2.current.lerped);
       curve.points[2].copy(j1.current.lerped);
       curve.points[3].copy(fixed.current.translation());
-      
+
       // Update tube geometry with new curve
       band.current.geometry.dispose();
       band.current.geometry = new THREE.TubeGeometry(curve, 32, 0.5, 8, false);
-      
+
       ang.copy(card.current.angvel());
       rot.copy(card.current.rotation());
       card.current.setAngvel({ x: ang.x, y: ang.y - rot.y * 0.25, z: ang.z });
@@ -187,16 +187,20 @@ function Band({ maxSpeed = 50, minSpeed = 0, offsetX = 0 }) {
         angularDamping={0.2}
         friction={0.3}
         position={[offsetX, 0, 0]}
-        onPointerOver={() => hover(true)}
-        onPointerOut={() => hover(false)}
-        onPointerUp={(e:any) => (e.target.releasePointerCapture(e.pointerId), drag(false))}
-        onPointerDown={(e:any) => (
-          e.target.setPointerCapture(e.pointerId),
-          drag(new THREE.Vector3().copy(e.point).sub(vec.copy(card.current.translation())))
-        )}
       >
         <CuboidCollider args={[2, 3, 0.1]} />
-        <mesh castShadow receiveShadow scale={isSmall ? 0.8 : 1}>
+        <mesh
+          castShadow
+          receiveShadow
+          scale={isSmall ? 0.8 : 1}
+          onPointerOver={() => hover(true)}
+          onPointerOut={() => hover(false)}
+          onPointerUp={(e: any) => (e.target.releasePointerCapture(e.pointerId), drag(false))}
+          onPointerDown={(e: any) => (
+            e.target.setPointerCapture(e.pointerId),
+            drag(new THREE.Vector3().copy(e.point).sub(vec.copy(card.current.translation())))
+          )}
+        >
           <boxGeometry args={[4, 6, 0.2]} />
           <meshStandardMaterial color="#ffffff" />
           <mesh geometry={nodes.card.geometry} material={materials.card} material-envMapIntensity={0.2} />

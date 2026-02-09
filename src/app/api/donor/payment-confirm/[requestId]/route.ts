@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import BloodRequest from '@/models/BloodRequest';
 import { getAuth } from '@/lib/auth';
 
-export async function POST(request: Request, { params }: { params: { requestId: string } }) {
+export async function POST(request: NextRequest, { params }: { params: { requestId: string } }) {
   await dbConnect();
 
   const authResult = await getAuth(request);

@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { Fade, Zoom } from "react-awesome-reveal";
 
 const HealthInsights = () => {
@@ -10,7 +10,7 @@ const HealthInsights = () => {
     { title: 'BMI Tracker', value: '21.4 Normal', animation: 'zoom' },
   ];
 
-  const getAnimation = (animation, children) => {
+  const getAnimation = (animation: string, children: ReactNode) => {
     switch (animation) {
       case 'fade':
         return <Fade triggerOnce>{children}</Fade>;
@@ -30,7 +30,7 @@ const HealthInsights = () => {
         <div className="insights-grid">
           {insights.map((insight, index) => (
             <div key={index} className={`insight-card ${insight.animation}`}>
-              {getAnimation(insight.animation, 
+              {getAnimation(insight.animation,
                 <>
                   <h3 className="insight-title">{insight.title}</h3>
                   <p className="insight-value">{insight.value}</p>

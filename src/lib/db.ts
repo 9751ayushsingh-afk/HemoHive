@@ -1,7 +1,12 @@
 // hemohive/src/lib/db.ts
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI;
+// Declare global mongoose
+declare global {
+  var mongoose: any;
+}
+
+const MONGODB_URI = process.env.MONGODB_URI as string;
 
 if (!MONGODB_URI) {
   throw new Error(

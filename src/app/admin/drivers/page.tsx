@@ -20,6 +20,7 @@ interface Driver {
         plateNumber: string;
         model: string;
     };
+    rating?: number;
 }
 
 export default function AllDriversPage() {

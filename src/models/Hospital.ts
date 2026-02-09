@@ -6,6 +6,10 @@ export interface IHospital extends Document {
   gps: { lat: number; lng: number };
   contact: string;
   email: string;
+  coordinates?: {
+    type: string;
+    coordinates: number[];
+  };
 }
 
 const HospitalSchema: Schema<IHospital> = new Schema({

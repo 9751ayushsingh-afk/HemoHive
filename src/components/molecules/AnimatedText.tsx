@@ -1,8 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 
-const quote = {
+const quote: Variants = {
   initial: {
     opacity: 1,
   },
@@ -15,7 +15,7 @@ const quote = {
   },
 };
 
-const singleLetter = {
+const singleLetter: Variants = {
   initial: {
     opacity: 0,
   },

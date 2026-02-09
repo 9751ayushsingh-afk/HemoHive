@@ -30,7 +30,7 @@ export async function POST(request: Request) {
             // 2. Decrement Aggregated Inventory for Stats
             if (delivery.requestId) {
                 await Inventory.findOneAndUpdate(
-                    { hospital: delivery.requestId.hospitalId, bloodGroup: delivery.requestId.bloodGroup },
+                    { hospital: (delivery.requestId as any).hospitalId, bloodGroup: (delivery.requestId as any).bloodGroup },
                     { $inc: { quantity: -1 } }
                 );
             }

@@ -8,4 +8,6 @@ export interface CreditObligation {
   currentObligationUnits: number; // Calculated based on elapsed time (e.g. +25%, +50%)
   depositAmount: number; // PRD (Platform Responsibility Deposit)
   status: CreditLifeCycleState;
+  deadline?: string;
+  refundEligiblePercentage?: number;
 }

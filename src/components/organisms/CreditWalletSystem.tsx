@@ -154,13 +154,15 @@ const CreditWalletSystem = () => {
     }
   };
 
-  const balanceCardRef = useRef(null);
-  const responsibilityMeterRef = useRef(null);
-  const alertSectionRef = useRef(null);
-  const transactionHistoryRefs = useRef([]);
-  const badgeRefs = useRef([]);
+  const balanceCardRef = useRef<HTMLDivElement>(null);
+  const responsibilityMeterRef = useRef<HTMLDivElement>(null);
+  const alertSectionRef = useRef<HTMLDivElement>(null);
+  const transactionHistoryRefs = useRef<(HTMLLIElement | null)[]>([]);
+  const badgeRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
+    if (!balanceCardRef.current || !responsibilityMeterRef.current || !alertSectionRef.current) return;
+
     gsap.fromTo(balanceCardRef.current, { scale: 0.5, opacity: 0 }, { scale: 1, opacity: 1, duration: 1, ease: 'power3.out' });
     gsap.fromTo(responsibilityMeterRef.current, { rotation: -180, opacity: 0 }, { rotation: 0, opacity: 1, duration: 1.5, ease: 'elastic.out(1, 0.75)' });
 
@@ -189,6 +191,7 @@ const CreditWalletSystem = () => {
 
     // Animate badges on scroll
     badgeRefs.current.forEach((badge, index) => {
+      if (!badge) return;
       gsap.fromTo(badge, { scale: 0, opacity: 0 }, {
         scale: 1, opacity: 1, duration: 1, delay: 0.2 * index, ease: 'elastic.out(1, 0.75)', scrollTrigger: {
           trigger: badge,
@@ -205,11 +208,11 @@ const CreditWalletSystem = () => {
   }, []);
 
   const handleBalanceCardHover = () => {
-    gsap.to(balanceCardRef.current, { scale: 1.05, boxShadow: '0 10px 30px rgba(230, 57, 70, 0.5)', duration: 0.3 });
+    if (balanceCardRef.current) gsap.to(balanceCardRef.current, { scale: 1.05, boxShadow: '0 10px 30px rgba(230, 57, 70, 0.5)', duration: 0.3 });
   };
 
   const handleBalanceCardLeave = () => {
-    gsap.to(balanceCardRef.current, { scale: 1, boxShadow: '0 8px 20px rgba(0,0,0,0.1)', duration: 0.3 });
+    if (balanceCardRef.current) gsap.to(balanceCardRef.current, { scale: 1, boxShadow: '0 8px 20px rgba(0,0,0,0.1)', duration: 0.3 });
   };
 
   const onCreditDischarge = () => {
@@ -218,7 +221,9 @@ const CreditWalletSystem = () => {
   };
 
   const onOverdueAlert = (index: number) => {
-    gsap.fromTo(transactionHistoryRefs.current[index], { x: -10 }, { x: 10, repeat: 5, yoyo: true, duration: 0.1, ease: 'power1.inOut' });
+    if (transactionHistoryRefs.current[index]) {
+      gsap.fromTo(transactionHistoryRefs.current[index], { x: -10 }, { x: 10, repeat: 5, yoyo: true, duration: 0.1, ease: 'power1.inOut' });
+    }
   };
 
   const handleObligationAction = (id: string) => {

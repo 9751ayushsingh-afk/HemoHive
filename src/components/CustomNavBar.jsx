@@ -111,7 +111,7 @@ const MobileMenu = ({ items, isOpen, onClose, session, status }) => {
   );
 };
 
-const CustomNavBar = ({ items, theme }) => {
+const CustomNavBar = ({ items, theme = 'light' }) => {
   const { data: session, status } = useSession();
   const [scrolled, setScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);

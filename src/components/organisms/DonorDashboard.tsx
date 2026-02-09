@@ -7,7 +7,7 @@ import MyDonations from '../molecules/MyDonations';
 import BloodDetails from '../molecules/BloodDetails';
 import HealthInsights from '../molecules/HealthInsights';
 import AwarenessRewards from '../molecules/AwarenessRewards';
-import { BloodRequestModule } from './BloodRequestModule'; // Import the new module
+import BloodRequestModule from '../donor/BloodRequestModule'; // Import the new module
 import './CreditWalletSystem.css';
 
 const DonorDashboard = () => {

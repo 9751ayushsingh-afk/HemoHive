@@ -771,7 +771,6 @@ export default function DriverDashboard() {
                                                         }
                                                     }}
                                                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                                     constraints={useMemo(() => ({
                                                         audio: false,
                                                         video: { facingMode: facingMode }

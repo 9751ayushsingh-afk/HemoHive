@@ -1,0 +1,245 @@
+﻿src/components/BeeLoader.tsx(9,22): error TS7031: Binding element 'onAnimationComplete' implicitly has an 'any' type.
+src/components/BeeLoader.tsx(28,28): error TS18047: 'trailRef.current' is possibly 'null'.
+src/components/BeeLoader.tsx(30,9): error TS18047: 'trailRef.current' is possibly 'null'.
+src/components/BeeLoader.tsx(31,9): error TS18047: 'trailRef.current' is possibly 'null'.
+src/components/blood-literacy/BloodFlowNetwork.tsx(54,31): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
+  No index signature with a parameter of type 'string' was found on type '{}'.
+src/components/blood-literacy/BloodFlowNetwork.tsx(56,23): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ "O-": string[]; "O+": string[]; "A-": string[]; "A+": string[]; "B-": string[]; "B+": string[]; "AB-": string[]; "AB+": string[]; }'.
+  No index signature with a parameter of type 'string' was found on type '{ "O-": string[]; "O+": string[]; "A-": string[]; "A+": string[]; "B-": string[]; "B+": string[]; "AB-": string[]; "AB+": string[]; }'.
+src/components/blood-literacy/BloodFlowNetwork.tsx(57,7): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+src/components/blood-literacy/BloodFlowNetwork.tsx(63,27): error TS7006: Parameter 'cx' implicitly has an 'any' type.
+src/components/blood-literacy/BloodFlowNetwork.tsx(63,31): error TS7006: Parameter 'cy' implicitly has an 'any' type.
+src/components/blood-literacy/BloodFlowNetwork.tsx(63,35): error TS7006: Parameter 'radius' implicitly has an 'any' type.
+src/components/blood-literacy/BloodFlowNetwork.tsx(63,43): error TS7006: Parameter 'angleDeg' implicitly has an 'any' type.
+src/components/blood-literacy/BloodFlowNetwork.tsx(71,25): error TS7006: Parameter 'x1' implicitly has an 'any' type.
+src/components/blood-literacy/BloodFlowNetwork.tsx(71,29): error TS7006: Parameter 'y1' implicitly has an 'any' type.
+src/components/blood-literacy/BloodFlowNetwork.tsx(71,33): error TS7006: Parameter 'x2' implicitly has an 'any' type.
+src/components/blood-literacy/BloodFlowNetwork.tsx(71,37): error TS7006: Parameter 'y2' implicitly has an 'any' type.
+src/components/blood-literacy/BloodFlowNetwork.tsx(107,9): error TS7034: Variable 'edges' implicitly has type 'any[]' in some locations where its type cannot be determined.
+src/components/blood-literacy/BloodFlowNetwork.tsx(109,21): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ "O-": string[]; "O+": string[]; "A-": string[]; "A+": string[]; "B-": string[]; "B+": string[]; "AB-": string[]; "AB+": string[]; }'.
+  No index signature with a parameter of type 'string' was found on type '{ "O-": string[]; "O+": string[]; "A-": string[]; "A+": string[]; "B-": string[]; "B+": string[]; "AB-": string[]; "AB+": string[]; }'.
+src/components/blood-literacy/BloodFlowNetwork.tsx(110,22): error TS7006: Parameter 't' implicitly has an 'any' type.
+src/components/blood-literacy/BloodFlowNetwork.tsx(122,22): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
+  No index signature with a parameter of type 'string' was found on type '{}'.
+src/components/blood-literacy/BloodFlowNetwork.tsx(133,5): error TS7005: Variable 'edges' implicitly has an 'any[]' type.
+src/components/blood-literacy/BloodFlowNetwork.tsx(134,17): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+src/components/blood-literacy/BloodFlowNetwork.tsx(135,21): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+src/components/blood-literacy/BloodFlowNetwork.tsx(155,5): error TS7005: Variable 'edges' implicitly has an 'any[]' type.
+src/components/blood-literacy/BloodFlowNetwork.tsx(156,17): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+src/components/blood-literacy/BloodFlowNetwork.tsx(157,21): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+src/components/blood-literacy/BloodFlowNetwork.tsx(188,18): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
+  No index signature with a parameter of type 'string' was found on type '{}'.
+src/components/blood-literacy/BloodFlowNetwork.tsx(204,43): error TS2339: Property 'includes' does not exist on type 'never'.
+src/components/blood-literacy/BloodFlowNetwork.tsx(215,39): error TS2339: Property 'includes' does not exist on type 'never'.
+src/components/blood-literacy/BloodFlowNetwork.tsx(227,43): error TS2339: Property 'includes' does not exist on type 'never'.
+src/components/blood-literacy/BloodFlowNetwork.tsx(227,80): error TS2339: Property 'includes' does not exist on type 'never'.
+src/components/blood-literacy/BloodFlowNetwork.tsx(238,24): error TS7006: Parameter 'evt' implicitly has an 'any' type.
+src/components/blood-literacy/BloodFlowNetwork.tsx(238,29): error TS7006: Parameter 'id' implicitly has an 'any' type.
+src/components/blood-literacy/BloodFlowNetwork.tsx(239,18): error TS18047: 'svgRef.current' is possibly 'null'.
+src/components/blood-literacy/BloodFlowNetwork.tsx(243,23): error TS7006: Parameter 'evt' implicitly has an 'any' type.
+src/components/blood-literacy/BloodFlowNetwork.tsx(245,18): error TS18047: 'svgRef.current' is possibly 'null'.
+src/components/blood-literacy/BloodFlowNetwork.tsx(310,16): error TS7005: Variable 'edges' implicitly has an 'any[]' type.
+src/components/blood-literacy/BloodFlowNetwork.tsx(314,21): error TS2322: Type '(el: SVGPathElement | null) => SVGPathElement | null' is not assignable to type 'LegacyRef<SVGPathElement> | undefined'.
+  Type '(el: SVGPathElement | null) => SVGPathElement | null' is not assignable to type '(instance: SVGPathElement | null) => void | (() => VoidOrUndefinedOnly)'.
+    Type 'SVGPathElement | null' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+      Type 'null' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+src/components/blood-literacy/BloodFlowNetwork.tsx(314,35): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+src/components/blood-literacy/BloodFlowNetwork.tsx(324,27): error TS2322: Type '(el: SVGCircleElement | null) => SVGCircleElement | null' is not assignable to type 'LegacyRef<SVGCircleElement> | undefined'.
+  Type '(el: SVGCircleElement | null) => SVGCircleElement | null' is not assignable to type '(instance: SVGCircleElement | null) => void | (() => VoidOrUndefinedOnly)'.
+    Type 'SVGCircleElement | null' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+      Type 'null' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+src/components/blood-literacy/BloodFlowNetwork.tsx(324,41): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+src/components/blood-literacy/BloodFlowNetwork.tsx(334,19): error TS2322: Type '(el: SVGGElement | null) => SVGGElement | null' is not assignable to type 'LegacyRef<SVGGElement> | undefined'.
+  Type '(el: SVGGElement | null) => SVGGElement | null' is not assignable to type '(instance: SVGGElement | null) => void | (() => VoidOrUndefinedOnly)'.
+    Type 'SVGGElement | null' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+      Type 'null' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+src/components/blood-literacy/BloodFlowNetwork.tsx(334,33): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
+  No index signature with a parameter of type 'string' was found on type '{}'.
+src/components/blood-literacy/BloodFlowNetwork.tsx(373,57): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ "O-": string[]; "O+": string[]; "A-": string[]; "A+": string[]; "B-": string[]; "B+": string[]; "AB-": string[]; "AB+": string[]; }'.
+  No index signature with a parameter of type 'string' was found on type '{ "O-": string[]; "O+": string[]; "A-": string[]; "A+": string[]; "B-": string[]; "B+": string[]; "AB-": string[]; "AB+": string[]; }'.
+src/components/blood-literacy/BloodFlowNetwork.tsx(376,60): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
+  No index signature with a parameter of type 'string' was found on type '{}'.
+src/components/delivery/DriverDashboard.tsx(774,53): error TS17001: JSX elements cannot have multiple attributes with the same name.
+src/components/donor/BloodRequestModule.tsx(84,5): error TS2322: Type 'Resolver<{ bloodGroup: string; units: unknown; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, any, { ...; }>' is not assignable to type 'Resolver<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, any, { ...; }>'.
+  Types of parameters 'options' and 'options' are incompatible.
+    Type 'ResolverOptions<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }>' is not assignable to type 'ResolverOptions<{ bloodGroup: string; units: unknown; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }>'.
+      Type 'unknown' is not assignable to type 'number'.
+src/components/donor/BloodRequestModule.tsx(139,45): error TS2345: Argument of type '(values: z.infer<typeof formSchema>) => void' is not assignable to parameter of type 'SubmitHandler<TFieldValues>'.
+  Types of parameters 'values' and 'data' are incompatible.
+    Type 'TFieldValues' is not assignable to type '{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }'.
+      Type 'FieldValues' is missing the following properties from type '{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }': bloodGroup, units, urgency, patientHospital
+src/components/donor/BloodRequestModule.tsx(142,17): error TS2322: Type 'Control<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, any, TFieldValues>' is not assignable to type 'Control<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, any, { ...; }>'.
+  The types of '_options.resolver' are incompatible between these types.
+    Type 'Resolver<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, any, TFieldValues> | undefined' is not assignable to type 'Resolver<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, any, { ...; }> | undefined'.
+      Type 'Resolver<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, any, TFieldValues>' is not assignable to type 'Resolver<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, any, { ...; }>'.
+        Type 'ResolverResult<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, TFieldValues> | Promise<...>' is not assignable to type 'ResolverResult<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, { ...; }> | Promise<...>'.
+          Type 'ResolverSuccess<TFieldValues>' is not assignable to type 'ResolverResult<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, { ...; }> | Promise<...>'.
+            Type 'ResolverSuccess<TFieldValues>' is not assignable to type 'ResolverSuccess<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }>'.
+              Type 'TFieldValues' is not assignable to type '{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }'.
+                Type 'FieldValues' is missing the following properties from type '{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }': bloodGroup, units, urgency, patientHospital
+src/components/donor/BloodRequestModule.tsx(166,17): error TS2322: Type 'Control<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, any, TFieldValues>' is not assignable to type 'Control<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, any, { ...; }>'.
+  The types of '_options.resolver' are incompatible between these types.
+    Type 'Resolver<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, any, TFieldValues> | undefined' is not assignable to type 'Resolver<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, any, { ...; }> | undefined'.
+      Type 'Resolver<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, any, TFieldValues>' is not assignable to type 'Resolver<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, any, { ...; }>'.
+        Type 'ResolverResult<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, TFieldValues> | Promise<...>' is not assignable to type 'ResolverResult<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, { ...; }> | Promise<...>'.
+          Type 'ResolverSuccess<TFieldValues>' is not assignable to type 'ResolverResult<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, { ...; }> | Promise<...>'.
+            Type 'ResolverSuccess<TFieldValues>' is not assignable to type 'ResolverSuccess<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }>'.
+              Type 'TFieldValues' is not assignable to type '{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }'.
+                Type 'FieldValues' is missing the following properties from type '{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }': bloodGroup, units, urgency, patientHospital
+src/components/donor/BloodRequestModule.tsx(179,17): error TS2322: Type 'Control<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, any, TFieldValues>' is not assignable to type 'Control<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, any, { ...; }>'.
+  The types of '_options.resolver' are incompatible between these types.
+    Type 'Resolver<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, any, TFieldValues> | undefined' is not assignable to type 'Resolver<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, any, { ...; }> | undefined'.
+      Type 'Resolver<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, any, TFieldValues>' is not assignable to type 'Resolver<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, any, { ...; }>'.
+        Type 'ResolverResult<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, TFieldValues> | Promise<...>' is not assignable to type 'ResolverResult<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, { ...; }> | Promise<...>'.
+          Type 'ResolverSuccess<TFieldValues>' is not assignable to type 'ResolverResult<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, { ...; }> | Promise<...>'.
+            Type 'ResolverSuccess<TFieldValues>' is not assignable to type 'ResolverSuccess<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }>'.
+              Type 'TFieldValues' is not assignable to type '{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }'.
+                Type 'FieldValues' is missing the following properties from type '{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }': bloodGroup, units, urgency, patientHospital
+src/components/donor/BloodRequestModule.tsx(204,17): error TS2322: Type 'Control<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, any, TFieldValues>' is not assignable to type 'Control<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, any, { ...; }>'.
+  The types of '_options.resolver' are incompatible between these types.
+    Type 'Resolver<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, any, TFieldValues> | undefined' is not assignable to type 'Resolver<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, any, { ...; }> | undefined'.
+      Type 'Resolver<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, any, TFieldValues>' is not assignable to type 'Resolver<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, any, { ...; }>'.
+        Type 'ResolverResult<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, TFieldValues> | Promise<...>' is not assignable to type 'ResolverResult<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, { ...; }> | Promise<...>'.
+          Type 'ResolverSuccess<TFieldValues>' is not assignable to type 'ResolverResult<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }, { ...; }> | Promise<...>'.
+            Type 'ResolverSuccess<TFieldValues>' is not assignable to type 'ResolverSuccess<{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }>'.
+              Type 'TFieldValues' is not assignable to type '{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }'.
+                Type 'FieldValues' is missing the following properties from type '{ bloodGroup: string; units: number; urgency: "Emergency" | "Normal" | "Urgent"; patientHospital: string; recipientHospitalId?: string | undefined; reason?: string | undefined; }': bloodGroup, units, urgency, patientHospital
+src/components/donor/BloodRequestModule.tsx(210,39): error TS7006: Parameter 'value' implicitly has an 'any' type.
+src/components/donor/DonateBloodCard.tsx(52,39): error TS2339: Property 'querySelector' does not exist on type 'never'.
+src/components/donor/DonateBloodCard.tsx(60,39): error TS2339: Property 'querySelectorAll' does not exist on type 'never'.
+src/components/donor/DonateBloodCard.tsx(61,21): error TS7006: Parameter 'd' implicitly has an 'any' type.
+src/components/donor/DonateBloodCard.tsx(61,24): error TS7006: Parameter 'i' implicitly has an 'any' type.
+src/components/donor/DonateBloodCard.tsx(79,27): error TS7006: Parameter 'clientX' implicitly has an 'any' type.
+src/components/donor/DonateBloodCard.tsx(79,36): error TS7006: Parameter 'clientY' implicitly has an 'any' type.
+src/components/donor/DonateBloodCard.tsx(82,18): error TS18047: 'cardRef.current' is possibly 'null'.
+src/components/donor/DonateBloodCard.tsx(103,17): error TS2339: Property 'appendChild' does not exist on type 'never'.
+src/components/donor/DonateBloodCard.tsx(122,28): error TS7006: Parameter 'event' implicitly has an 'any' type.
+src/components/donor/DonateBloodCard.tsx(124,39): error TS18047: 'cardRef.current' is possibly 'null'.
+src/components/donor/DonateBloodCard.tsx(124,86): error TS18047: 'cardRef.current' is possibly 'null'.
+src/components/donor/DonateBloodCard.tsx(125,39): error TS18047: 'cardRef.current' is possibly 'null'.
+src/components/donor/DonateBloodCard.tsx(125,85): error TS18047: 'cardRef.current' is possibly 'null'.
+src/components/donor/DonateBloodCard.tsx(138,26): error TS7006: Parameter 'e' implicitly has an 'any' type.
+src/components/donor/DonateBloodCard.tsx(162,9): error TS2322: Type '{ initial: { opacity: number; y: number; scale: number; }; enter: { opacity: number; y: number; scale: number; transition: { type: string; stiffness: number; damping: number; }; }; hover: { y: number; boxShadow: string; transition: { ...; }; }; tap: { ...; }; }' is not assignable to type 'Variants'.
+  Property 'enter' is incompatible with index signature.
+    Type '{ opacity: number; y: number; scale: number; transition: { type: string; stiffness: number; damping: number; }; }' is not assignable to type 'Variant'.
+      Type '{ opacity: number; y: number; scale: number; transition: { type: string; stiffness: number; damping: number; }; }' is not assignable to type 'TargetAndTransition'.
+        Type '{ opacity: number; y: number; scale: number; transition: { type: string; stiffness: number; damping: number; }; }' is not assignable to type '{ transition?: Transition<any> | undefined; transitionEnd?: ResolvedValues | undefined; }'.
+          Types of property 'transition' are incompatible.
+            Type '{ type: string; stiffness: number; damping: number; }' is not assignable to type 'Transition<any> | undefined'.
+              Type '{ type: string; stiffness: number; damping: number; }' is not assignable to type 'TransitionWithValueOverrides<any>'.
+                Type '{ type: string; stiffness: number; damping: number; }' is not assignable to type 'ValueAnimationTransition<any>'.
+                  Types of property 'type' are incompatible.
+                    Type 'string' is not assignable to type 'AnimationGeneratorType | undefined'.
+src/components/donor/DonateBloodCard.tsx(178,46): error TS2322: Type '{ display: string; position: string; left: string; top: string; width: number; height: number; borderRadius: string; background: string; boxShadow: string; }' is not assignable to type 'Properties<string | number, string & {}>'.
+  Types of property 'position' are incompatible.
+    Type 'string' is not assignable to type 'Position | undefined'.
+src/components/donor/DonateBloodCard.tsx(179,46): error TS2322: Type '{ left: number; display: string; position: string; top: string; width: number; height: number; borderRadius: string; background: string; boxShadow: string; }' is not assignable to type 'Properties<string | number, string & {}>'.
+  Types of property 'position' are incompatible.
+    Type 'string' is not assignable to type 'Position | undefined'.
+src/components/donor/DonateBloodCard.tsx(180,46): error TS2322: Type '{ left: number; top: number; display: string; position: string; width: number; height: number; borderRadius: string; background: string; boxShadow: string; }' is not assignable to type 'Properties<string | number, string & {}>'.
+  Types of property 'position' are incompatible.
+    Type 'string' is not assignable to type 'Position | undefined'.
+src/components/donor/DonateBloodCard.tsx(275,15): error TS2322: Type '(el: HTMLDivElement | null) => HTMLDivElement | null' is not assignable to type 'LegacyRef<HTMLDivElement> | undefined'.
+  Type '(el: HTMLDivElement | null) => HTMLDivElement | null' is not assignable to type '(instance: HTMLDivElement | null) => void | (() => VoidOrUndefinedOnly)'.
+    Type 'HTMLDivElement | null' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+      Type 'null' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+src/components/donor/DonateBloodCard.tsx(275,29): error TS2322: Type 'HTMLDivElement | null' is not assignable to type 'never'.
+  Type 'null' is not assignable to type 'never'.
+src/components/donor/DonateBloodCard.tsx(309,19): error TS7006: Parameter 'i' implicitly has an 'any' type.
+src/components/donor/ScheduleDonationForm.tsx(157,33): error TS7006: Parameter 'checked' implicitly has an 'any' type.
+src/components/hospital/InventoryByGroup.tsx(8,24): error TS7031: Binding element 'data' implicitly has an 'any' type.
+src/components/hospital/InventoryByGroup.tsx(13,35): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+src/components/hospital/InventoryByGroup.tsx(13,40): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/components/hospital/InventoryByGroup.tsx(28,18): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/components/hospital/InventoryByGroup.tsx(28,24): error TS7006: Parameter 'index' implicitly has an 'any' type.
+src/components/hospital/InventoryByGroup.tsx(86,30): error TS2339: Property 'bloodGroup' does not exist on type 'never'.
+src/components/hospital/InventoryByGroup.tsx(95,25): error TS2339: Property 'bloodGroup' does not exist on type 'never'.
+src/components/hospital/InventoryByGroup.tsx(95,44): error TS2339: Property 'quantity' does not exist on type 'never'.
+src/components/Lanyard/Lanyard.tsx(190,9): error TS2322: Type '{ children: Element[]; type: "dynamic" | "kinematicPosition"; linearDamping: number; angularDamping: number; friction: number; position: [number, number, number]; onPointerOver: () => void; ... 4 more ...; ref: MutableRefObject<...>; }' is not assignable to type 'IntrinsicAttributes & Omit<RigidBodyProps & RefAttributes<RigidBody>, "ref"> & { ref?: RefObject<RigidBody> | ((instance: RigidBody | null) => void | (() => VoidOrUndefinedOnly)) | null | undefined; }'.
+  Property 'onPointerOver' does not exist on type 'IntrinsicAttributes & Omit<RigidBodyProps & RefAttributes<RigidBody>, "ref"> & { ref?: RefObject<RigidBody> | ((instance: RigidBody | null) => void | (() => VoidOrUndefinedOnly)) | null | undefined; }'.
+src/components/molecules/AnimatedText.tsx(41,74): error TS2322: Type '{ initial: { opacity: number; }; animate: { opacity: number; transition: { duration: number; ease: string; }; }; }' is not assignable to type 'Variants'.
+  Property 'animate' is incompatible with index signature.
+    Type '{ opacity: number; transition: { duration: number; ease: string; }; }' is not assignable to type 'Variant'.
+      Type '{ opacity: number; transition: { duration: number; ease: string; }; }' is not assignable to type 'TargetAndTransition'.
+        Type '{ opacity: number; transition: { duration: number; ease: string; }; }' is not assignable to type '{ transition?: Transition<any> | undefined; transitionEnd?: ResolvedValues | undefined; }'.
+          Types of property 'transition' are incompatible.
+            Type '{ duration: number; ease: string; }' is not assignable to type 'Transition<any> | undefined'.
+              Type '{ duration: number; ease: string; }' is not assignable to type 'TransitionWithValueOverrides<any>'.
+                Type '{ duration: number; ease: string; }' is not assignable to type 'ValueAnimationTransition<any>'.
+                  Types of property 'ease' are incompatible.
+                    Type 'string' is not assignable to type 'Easing | Easing[] | undefined'.
+src/components/molecules/AwarenessRewards.tsx(18,25): error TS7006: Parameter 'animation' implicitly has an 'any' type.
+src/components/molecules/AwarenessRewards.tsx(18,36): error TS7006: Parameter 'children' implicitly has an 'any' type.
+src/components/molecules/CreditHealthMeter.tsx(6,30): error TS7031: Binding element 'value' implicitly has an 'any' type.
+src/components/molecules/CreditHealthMeter.tsx(12,22): error TS7006: Parameter 'value' implicitly has an 'any' type.
+src/components/molecules/CreditHealthMeter.tsx(37,9): error TS18047: 'text' is possibly 'null'.
+src/components/molecules/CreditHealthMeter.tsx(41,13): error TS18047: 'liquid' is possibly 'null'.
+src/components/molecules/CreditHealthMeter.tsx(44,18): error TS18047: 'liquid' is possibly 'null'.
+src/components/molecules/CreditHealthMeter.tsx(102,19): error TS2322: Type '(el: SVGCircleElement | null) => SVGCircleElement | null' is not assignable to type 'LegacyRef<SVGCircleElement> | undefined'.
+  Type '(el: SVGCircleElement | null) => SVGCircleElement | null' is not assignable to type '(instance: SVGCircleElement | null) => void | (() => VoidOrUndefinedOnly)'.
+    Type 'SVGCircleElement | null' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+      Type 'null' is not assignable to type 'void | (() => VoidOrUndefinedOnly)'.
+src/components/molecules/CreditHealthMeter.tsx(102,30): error TS2322: Type 'SVGCircleElement | null' is not assignable to type 'never'.
+  Type 'null' is not assignable to type 'never'.
+src/components/molecules/CreditRequestCard.tsx(6,30): error TS7031: Binding element 'request' implicitly has an 'any' type.
+src/components/molecules/HealthInsights.tsx(13,25): error TS7006: Parameter 'animation' implicitly has an 'any' type.
+src/components/molecules/HealthInsights.tsx(13,36): error TS7006: Parameter 'children' implicitly has an 'any' type.
+src/components/molecules/MyDonations.tsx(16,15): error TS18047: 'tbodyRef.current' is possibly 'null'.
+src/components/molecules/ResponsibilityMeter.tsx(24,9): error TS18047: 'daysLeftRef.current' is possibly 'null'.
+src/components/molecules/TransactionTimeline.tsx(6,32): error TS7031: Binding element 'entries' implicitly has an 'any' type.
+src/components/molecules/TransactionTimeline.tsx(10,15): error TS18047: 'timelineRef.current' is possibly 'null'.
+src/components/molecules/TransactionTimeline.tsx(21,21): error TS7006: Parameter 'entry' implicitly has an 'any' type.
+src/components/molecules/TransactionTimeline.tsx(21,28): error TS7006: Parameter 'index' implicitly has an 'any' type.
+src/components/organisms/CreditWalletSystem.tsx(306,46): error TS2322: Type 'HTMLLIElement | null' is not assignable to type 'never'.
+  Type 'null' is not assignable to type 'never'.
+src/components/organisms/CreditWalletSystem.tsx(327,65): error TS2322: Type 'HTMLDivElement | null' is not assignable to type 'never'.
+  Type 'null' is not assignable to type 'never'.
+src/components/organisms/DonorDashboard.tsx(10,36): error TS2307: Cannot find module './BloodRequestModule' or its corresponding type declarations.
+src/components/organisms/HemoHiveLoginForm.tsx(50,136): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'FieldErrors<{ email: string; password: string; }>'.
+src/components/organisms/HemoHiveLoginForm.tsx(55,172): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'FieldErrors<{ email: string; password: string; }>'.
+src/components/organisms/HemoHiveLoginForm.tsx(58,18): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'FieldErrors<{ email: string; password: string; }>'.
+src/components/organisms/HemoHiveLoginForm.tsx(60,26): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'FieldErrors<{ email: string; password: string; }>'.
+src/components/organisms/HemoHiveLoginForm.tsx(75,24): error TS2322: Type 'true' is not assignable to type 'string | number | readonly string[] | undefined'.
+src/components/PulseWheelBloodSelector.tsx(16,36): error TS7031: Binding element 'onSelect' implicitly has an 'any' type.
+src/components/PulseWheelBloodSelector.tsx(16,46): error TS7031: Binding element 'onNext' implicitly has an 'any' type.
+src/components/PulseWheelBloodSelector.tsx(28,15): error TS7034: Variable 'particles' implicitly has type 'any[]' in some locations where its type cannot be determined.
+src/components/PulseWheelBloodSelector.tsx(33,46): error TS2339: Property 'appendChild' does not exist on type 'never'.
+src/components/PulseWheelBloodSelector.tsx(35,45): error TS18047: 'containerRef.current' is possibly 'null'.
+src/components/PulseWheelBloodSelector.tsx(36,45): error TS18047: 'containerRef.current' is possibly 'null'.
+src/components/PulseWheelBloodSelector.tsx(43,17): error TS7005: Variable 'particles' implicitly has an 'any[]' type.
+src/components/PulseWheelBloodSelector.tsx(50,25): error TS2322: Type '() => gsap.core.Tween' is not assignable to type 'Callback'.
+  Type 'Tween' is not assignable to type 'void'.
+src/components/PulseWheelBloodSelector.tsx(67,27): error TS7006: Parameter 'bg' implicitly has an 'any' type.
+src/components/PulseWheelBloodSelector.tsx(67,31): error TS7006: Parameter 'index' implicitly has an 'any' type.
+src/components/PulseWheelBloodSelector.tsx(71,44): error TS18047: 'wheelRef.current' is possibly 'null'.
+src/components/PulseWheelBloodSelector.tsx(71,117): error TS2339: Property 'type' does not exist on type 'never'.
+src/components/PulseWheelBloodSelector.tsx(87,32): error TS18047: 'wheelRef.current' is possibly 'null'.
+src/components/PulseWheelBloodSelector.tsx(97,13): error TS2322: Type '() => gsap.core.Tween' is not assignable to type 'Callback'.
+  Type 'Tween' is not assignable to type 'void'.
+src/components/PulseWheelBloodSelector.tsx(103,36): error TS18047: 'wheelRef.current' is possibly 'null'.
+src/components/PulseWheelBloodSelector.tsx(103,102): error TS18047: 'selected' is possibly 'null'.
+src/components/SplashScreen.tsx(9,25): error TS7031: Binding element 'onAnimationComplete' implicitly has an 'any' type.
+src/lib/db.ts(28,39): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/lib/dbConnect.ts(35,39): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/lib/eligibility.ts(2,10): error TS2614: Module '"@/models/User"' has no exported member 'IUser'. Did you mean to use 'import IUser from "@/models/User"' instead?
+src/lib/email.ts(52,36): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(mailOptions: Options & Partial<Options>): Promise<SentMessageInfo>', gave the following error.
+    Argument of type '{ from: { name: string; address: string | undefined; }; to: string; subject: string; html: string; }' is not assignable to parameter of type 'Options & Partial<Options>'.
+      Type '{ from: { name: string; address: string | undefined; }; to: string; subject: string; html: string; }' is not assignable to type 'Options'.
+        Types of property 'from' are incompatible.
+          Type '{ name: string; address: string | undefined; }' is not assignable to type 'string | Address | undefined'.
+            Type '{ name: string; address: string | undefined; }' is not assignable to type 'Address'.
+              Types of property 'address' are incompatible.
+                Type 'string | undefined' is not assignable to type 'string'.
+                  Type 'undefined' is not assignable to type 'string'.
+  Overload 2 of 4, '(mailOptions: Options): Promise<SentMessageInfo>', gave the following error.
+    Argument of type '{ from: { name: string; address: string | undefined; }; to: string; subject: string; html: string; }' is not assignable to parameter of type 'Options'.
+      Types of property 'from' are incompatible.
+        Type '{ name: string; address: string | undefined; }' is not assignable to type 'string | Address | undefined'.
+          Type '{ name: string; address: string | undefined; }' is not assignable to type 'Address'.
+            Types of property 'address' are incompatible.
+              Type 'string | undefined' is not assignable to type 'string'.
+                Type 'undefined' is not assignable to type 'string'.
+src/models/Hospital.ts(15,3): error TS2353: Object literal may only specify known properties, and 'coordinates' does not exist in type 'IHospital | { _id?: SchemaDefinitionProperty<unknown, IHospital, Document<unknown, {}, FlatRecord<IHospital>, {}, ResolveSchemaOptions<DefaultSchemaOptions>> & FlatRecord<...> & Required<...> & { ...; }> | undefined; ... 5 more ...; contact?: SchemaDefinitionProperty<...> | undefined; }'.

@@ -10,9 +10,11 @@ const MyDonations = () => {
     { date: '2024-04-05', hospital: 'Red Cross Center', bloodGroup: 'A+', status: 'Completed', certificate: 'View' },
   ];
 
-  const tbodyRef = useRef(null);
+  const tbodyRef = useRef<HTMLTableSectionElement>(null);
 
   useEffect(() => {
+    if (!tbodyRef.current) return;
+
     gsap.from(tbodyRef.current.children, {
       opacity: 0,
       y: 20,

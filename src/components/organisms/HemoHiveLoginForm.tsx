@@ -28,7 +28,7 @@ const HemoHiveLoginForm = () => {
     const onSubmit = async (data: any) => {
         setIsSubmitting(true);
         setSubmissionStatus(null);
-        
+
         const result = await signIn('credentials', {
             redirect: false,
             email: data.email,
@@ -47,17 +47,17 @@ const HemoHiveLoginForm = () => {
 
     const InputField = ({ name, type, placeholder, icon: Icon }: any) => (
         <div className="relative mb-6">
-            {Icon && <Icon className={`absolute top-1/2 left-4 -translate-y-1/2 h-5 w-5 text-gray-400 transition-colors duration-300 ${errors[name] ? 'text-red-400' : 'group-focus-within:text-white'}`} />}
+            {Icon && <Icon className={`absolute top-1/2 left-4 -translate-y-1/2 h-5 w-5 text-gray-400 transition-colors duration-300 ${errors[name as keyof typeof errors] ? 'text-red-400' : 'group-focus-within:text-white'}`} />}
             <input
                 {...register(name)}
                 type={type}
                 placeholder={placeholder}
-                className={`w-full py-3 pl-12 pr-4 bg-gray-900 bg-opacity-40 rounded-lg border transition-all duration-300 outline-none focus:ring-2 focus:bg-opacity-60 ${errors[name] ? 'border-red-500 ring-red-500' : `border-gray-600 focus:ring-[#EC4899] focus:border-[#EC4899]`}`}
+                className={`w-full py-3 pl-12 pr-4 bg-gray-900 bg-opacity-40 rounded-lg border transition-all duration-300 outline-none focus:ring-2 focus:bg-opacity-60 ${errors[name as keyof typeof errors] ? 'border-red-500 ring-red-500' : `border-gray-600 focus:ring-[#EC4899] focus:border-[#EC4899]`}`}
             />
             <AnimatePresence>
-                {errors[name] && (
+                {errors[name as keyof typeof errors] && (
                     <motion.p className="text-xs text-red-400 mt-1 ml-2" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                        {errors[name].message as string}
+                        {errors[name as keyof typeof errors]?.message as string}
                     </motion.p>
                 )}
             </AnimatePresence>
@@ -65,14 +65,14 @@ const HemoHiveLoginForm = () => {
     );
 
     return (
-        <motion.div 
+        <motion.div
             className="glass-card bg-black bg-opacity-25 backdrop-blur-xl border border-white border-opacity-10 rounded-2xl shadow-2xl p-8 w-full max-w-md"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
         >
             <div className="card">
-                <input defaultValue className="blind-check" type="checkbox" id="blind-input" name="blindcheck" hidden />
+                <input defaultChecked className="blind-check" type="checkbox" id="blind-input" name="blindcheck" hidden />
                 <label htmlFor="blind-input" className="blind_input">
                     <span className="hide">Hide</span>
                     <span className="show">Show</span>
@@ -84,13 +84,13 @@ const HemoHiveLoginForm = () => {
                     </div>
                     <InputField name="email" type="email" placeholder="Email Address" icon={EnvelopeIcon} />
                     <InputField name="password" type="password" placeholder="Password" icon={LockClosedIcon} />
-                    
+
                     <div className="text-right mb-6">
                         <a href="#" className="text-sm text-gray-400 hover:text-white hover:underline transition-colors">Forgot Password?</a>
                     </div>
 
-                    <motion.button 
-                        type="submit" 
+                    <motion.button
+                        type="submit"
                         disabled={isSubmitting}
                         className={`w-full py-3 font-bold text-white rounded-lg shadow-lg transition-all duration-300 ${isSubmitting ? 'bg-gray-600' : 'bg-gradient-to-r from-pink-500 to-fuchsia-600'}`}
                         whileHover={{ scale: 1.05, y: -2, boxShadow: '0 10px 20px #EC489940' }}
@@ -129,7 +129,7 @@ const HemoHiveLoginForm = () => {
             </div>
 
             {submissionStatus && (
-                <motion.div 
+                <motion.div
                     className={`mt-4 p-3 rounded-lg text-center text-sm ${submissionStatus.success ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}

@@ -1,7 +1,14 @@
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
+import React from 'react';
 
-const AnimatedText = ({ text, el: Wrapper = 'p', className }) => {
-  const reveal = {
+interface AnimatedTextProps {
+  text: string;
+  el?: React.ElementType;
+  className?: string;
+}
+
+const AnimatedText = ({ text, el: Wrapper = 'p', className }: AnimatedTextProps) => {
+  const reveal: Variants = {
     hidden: {
       opacity: 0,
       y: 20,

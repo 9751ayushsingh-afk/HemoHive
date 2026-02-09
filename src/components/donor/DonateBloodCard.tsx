@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, CSSProperties } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion, Variants } from 'framer-motion';
 import gsap from 'gsap';
 import { Droplet, Calendar, CheckCircle2, Award } from 'lucide-react';
 
@@ -28,16 +28,16 @@ export default function DonateBloodCard({
   const router = useRouter();
 
   // Animation refs
-  const cardRef = useRef(null);
-  const dropRef = useRef(null);
-  const neuronRef = useRef(null);
-  const cellsRef = useRef([]);
-  const particlesContainerRef = useRef(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const dropRef = useRef<HTMLDivElement>(null);
+  const neuronRef = useRef<HTMLDivElement>(null);
+  const cellsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const particlesContainerRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
 
   // GSAP looping animations (drop pulse, neuron draw, floating cells)
   useEffect(() => {
-    if (shouldReduceMotion) return; // respect reduced motion
+    if (shouldReduceMotion || !cardRef.current) return; // respect reduced motion
 
     const ctx = gsap.context(() => {
       // gentle float for card
@@ -57,10 +57,12 @@ export default function DonateBloodCard({
       }
 
       // neuron dot pulses
-      const dots = neuronRef.current?.querySelectorAll('.rse-neuron-dot') || [];
-      dots.forEach((d, i) => {
-        gsap.to(d, { y: i % 2 === 0 ? -4 : -2, scale: 1.12, duration: 2.6 + i * 0.2, yoyo: true, repeat: -1, delay: i * 0.08 });
-      });
+      const dots = neuronRef.current?.querySelectorAll('.rse-neuron-dot');
+      if (dots) {
+        dots.forEach((d, i) => {
+          gsap.to(d, { y: i % 2 === 0 ? -4 : -2, scale: 1.12, duration: 2.6 + i * 0.2, yoyo: true, repeat: -1, delay: i * 0.08 });
+        });
+      }
 
       // floating cells subtle motion
       cellsRef.current.forEach((el, i) => {
@@ -76,8 +78,8 @@ export default function DonateBloodCard({
   }, [shouldReduceMotion]);
 
   // spawn a particle burst at pointer location
-  function spawnParticles(clientX, clientY) {
-    if (!particlesContainerRef.current || shouldReduceMotion) return;
+  function spawnParticles(clientX: number, clientY: number) {
+    if (!particlesContainerRef.current || shouldReduceMotion || !cardRef.current) return;
     const container = particlesContainerRef.current;
     const rect = cardRef.current.getBoundingClientRect();
     const originX = ((clientX - rect.left) / rect.width) * 100 + '%';
@@ -98,7 +100,7 @@ export default function DonateBloodCard({
         boxShadow: `0 10px 24px ${Math.random() > 0.5 ? '#ff6b6b' : '#ff3b30'}66`,
         pointerEvents: 'none',
         transform: 'translate(-50%,-50%)',
-        zIndex: 60,
+        zIndex: '60',
       });
       container.appendChild(el);
 
@@ -119,10 +121,13 @@ export default function DonateBloodCard({
     }
   }
 
-  const handleCardClick = (event) => {
+  const handleCardClick = (event: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+
     // compute client coords (keyboard events don't have clientX/clientY)
-    const clientX = event.clientX ?? (cardRef.current.getBoundingClientRect().left + cardRef.current.clientWidth / 2);
-    const clientY = event.clientY ?? (cardRef.current.getBoundingClientRect().top + cardRef.current.clientHeight / 2);
+    const mouseEvent = event as React.MouseEvent<HTMLDivElement>;
+    const clientX = mouseEvent.clientX ?? (cardRef.current.getBoundingClientRect().left + cardRef.current.clientWidth / 2);
+    const clientY = mouseEvent.clientY ?? (cardRef.current.getBoundingClientRect().top + cardRef.current.clientHeight / 2);
 
     // tiny pop on drop
     if (!shouldReduceMotion && dropRef.current) {
@@ -135,7 +140,7 @@ export default function DonateBloodCard({
   };
 
   // small helper for keyboard accessibility (Enter/Space)
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       handleCardClick(e);
@@ -143,10 +148,19 @@ export default function DonateBloodCard({
   };
 
   // Framer Motion card micro-variants
-  const cardVariants = {
+  const cardVariants: Variants = {
     initial: { opacity: 0, y: 8, scale: 0.995 },
-    enter: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 220, damping: 18 } },
-    hover: { y: -6, boxShadow: '0 20px 45px rgba(255,75,85,0.12)', transition: { duration: 0.26 } },
+    enter: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: { type: 'spring', stiffness: 220, damping: 18 }
+    },
+    hover: {
+      y: -6,
+      boxShadow: '0 20px 45px rgba(255,75,85,0.12)',
+      transition: { duration: 0.26 }
+    },
     tap: { scale: 0.985 },
   };
 
@@ -272,7 +286,7 @@ export default function DonateBloodCard({
           ].map((c, i) => (
             <div
               key={i}
-              ref={(el) => (cellsRef.current[i] = el)}
+              ref={(el) => { cellsRef.current[i] = el; }}
               style={{
                 position: 'absolute',
                 left: c.left,
@@ -306,7 +320,7 @@ export default function DonateBloodCard({
 }
 
 // small helper for neuron dot inline styles
-function dotStyle(i) {
+function dotStyle(i: number): CSSProperties {
   return {
     display: 'inline-block',
     position: 'absolute',

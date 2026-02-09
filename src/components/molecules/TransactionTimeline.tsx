@@ -3,10 +3,22 @@
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 
-const TransactionTimeline = ({ entries }) => {
-  const timelineRef = useRef(null);
+interface TimelineEntry {
+  date: string;
+  event: string;
+  details: string;
+}
+
+interface TransactionTimelineProps {
+  entries: TimelineEntry[];
+}
+
+const TransactionTimeline: React.FC<TransactionTimelineProps> = ({ entries }) => {
+  const timelineRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!timelineRef.current) return;
+
     gsap.from(timelineRef.current.children, {
       opacity: 0,
       y: 50,

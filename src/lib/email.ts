@@ -13,13 +13,13 @@ interface UserData {
 // We will use environment variables for the configuration
 const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_SERVER_HOST,
-    port: Number(process.env.EMAIL_SERVER_PORT),
+    port: Number(process.env.EMAIL_SERVER_PORT || 587),
     secure: process.env.EMAIL_SERVER_SECURE === 'true', // true for 465, false for other ports
     auth: {
         user: process.env.EMAIL_SERVER_USER,
         pass: process.env.EMAIL_SERVER_PASSWORD,
     },
-});
+} as nodemailer.TransportOptions);
 
 // 2. Function to read the email template
 const readEmailTemplate = (): string => {
@@ -42,7 +42,7 @@ export const sendWelcomeEmail = async (userData: UserData) => {
         const mailOptions = {
             from: {
                 name: 'HemoHive',
-                address: process.env.EMAIL_SERVER_USER
+                address: process.env.EMAIL_SERVER_USER || 'noreply@hemohive.com'
             }, // sender address
             to: userData.email, // list of receivers
             subject: `Welcome to HemoHive, ${userData.userName} — Every Drop Counts`, // Subject line

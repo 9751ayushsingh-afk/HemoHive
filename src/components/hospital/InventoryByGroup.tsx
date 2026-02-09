@@ -1,11 +1,19 @@
-
 "use client";
 
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ChartBarIcon } from '@heroicons/react/24/outline';
 
-const RadialChart = ({ data }) => {
+interface InventoryItem {
+  bloodGroup: string;
+  quantity: number;
+}
+
+interface InventoryByGroupProps {
+  inventoryData?: InventoryItem[];
+}
+
+const RadialChart = ({ data }: { data: InventoryItem[] }) => {
   if (!data || data.length === 0) {
     return <div className="text-center text-gray-500">No data available</div>;
   }
@@ -56,7 +64,7 @@ const RadialChart = ({ data }) => {
       >
         {totalUnits}
       </text>
-       <text
+      <text
         x="100"
         y="125"
         textAnchor="middle"
@@ -69,7 +77,7 @@ const RadialChart = ({ data }) => {
 };
 
 
-const InventoryByGroup = ({ inventoryData = [] }) => {
+const InventoryByGroup: React.FC<InventoryByGroupProps> = ({ inventoryData = [] }) => {
   return (
     <div className="h-full flex flex-col">
       <div className="flex items-center mb-4">

@@ -25,9 +25,9 @@ const donationTypes = ["Whole Blood", "Plasma", "Platelets"];
 const timeSlots = ["9AM–11AM", "11AM–1PM", "2PM–4PM", "4PM–6PM"];
 // Placeholder for centers, in a real app this would be fetched from API
 const donationCenters = [
-    { id: '1', name: 'City Hospital Blood Bank' },
-    { id: '2', name: 'Red Cross Donation Center' },
-    { id: '3', name: 'Community Health Clinic' },
+  { id: '1', name: 'City Hospital Blood Bank' },
+  { id: '2', name: 'Red Cross Donation Center' },
+  { id: '3', name: 'Community Health Clinic' },
 ];
 
 const ScheduleDonationForm: React.FC<ScheduleDonationFormProps> = ({ isOpen, onClose, onAppointmentConfirm }) => {
@@ -154,7 +154,7 @@ const ScheduleDonationForm: React.FC<ScheduleDonationFormProps> = ({ isOpen, onC
             <Checkbox
               id="pickupRequired"
               checked={pickupRequired}
-              onCheckedChange={(checked) => setPickupRequired(!!checked)}
+              onCheckedChange={(checked: boolean | "indeterminate") => setPickupRequired(!!checked)}
               className="col-span-3"
             />
           </div>

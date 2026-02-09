@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../../auth/[...nextauth]/route';
+import { authOptions } from "@/lib/auth";
 import HemoFlux from '@/lib/hemofluxEngine';
 import BloodBag from '@/models/BloodBag';
 import Hospital from '@/models/Hospital';

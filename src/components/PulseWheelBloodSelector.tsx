@@ -2,7 +2,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 
-const bloodGroups = [
+interface BloodGroup {
+    type: string;
+    tooltip: string;
+}
+
+const bloodGroups: BloodGroup[] = [
     { type: "A+", tooltip: "Most common. You’re a universal helper!" },
     { type: "A−", tooltip: "Rare and important. Every drop counts." },
     { type: "B+", tooltip: "Strong and caring — your blood gives hope." },
@@ -13,20 +18,25 @@ const bloodGroups = [
     { type: "O−", tooltip: "Rare and precious — you’re a universal donor." },
 ];
 
-const PulseWheelBloodSelector = ({ onSelect, onNext }) => {
-    const [selected, setSelected] = useState(null);
+interface PulseWheelBloodSelectorProps {
+    onSelect: (bloodGroup: string) => void;
+    onNext: () => void;
+}
+
+const PulseWheelBloodSelector = ({ onSelect, onNext }: PulseWheelBloodSelectorProps) => {
+    const [selected, setSelected] = useState<BloodGroup | null>(null);
     const [confirmed, setConfirmed] = useState(false);
-    const containerRef = useRef(null);
-    const wheelRef = useRef(null);
-    const buttonRef = useRef(null);
-    const rippleRef = useRef(null);
-    const particleContainerRef = useRef(null);
-    const pulseTl = useRef(gsap.timeline());
+    const containerRef = useRef<HTMLDivElement>(null);
+    const wheelRef = useRef<HTMLDivElement>(null);
+    const buttonRef = useRef<HTMLButtonElement>(null);
+    const rippleRef = useRef<HTMLDivElement>(null);
+    const particleContainerRef = useRef<HTMLDivElement>(null);
+    const pulseTl = useRef<gsap.core.Timeline>(gsap.timeline());
 
     useEffect(() => {
         // Particle Background
-        const particles = [];
-        if (particleContainerRef.current) {
+        const particles: HTMLDivElement[] = [];
+        if (particleContainerRef.current && containerRef.current) {
             for (let i = 0; i < 30; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'absolute w-1 h-1 bg-red-500 rounded-full';
@@ -45,9 +55,8 @@ const PulseWheelBloodSelector = ({ onSelect, onNext }) => {
                         x: `+=${gsap.utils.random(-50, 50)}`,
                         y: `+=${gsap.utils.random(-50, 50)}`,
                         opacity: gsap.utils.random(0.1, 0.5),
-                        duration: gsap.utils.random(5, 10),
                         ease: 'sine.inOut',
-                        onComplete: () => gsap.to(p, { opacity: 0, duration: 1 }),
+                        onComplete: () => { gsap.to(p, { opacity: 0, duration: 1 }); },
                     });
                 });
             };
@@ -58,19 +67,28 @@ const PulseWheelBloodSelector = ({ onSelect, onNext }) => {
 
     useEffect(() => {
         // On-load animation
-        gsap.fromTo(wheelRef.current,
-            { opacity: 0, scale: 0.8, rotation: -180 },
-            { opacity: 1, scale: 1, rotation: 0, duration: 3, ease: 'power3.out', delay: 0.5 }
-        );
+        if (wheelRef.current) {
+            gsap.fromTo(wheelRef.current,
+                { opacity: 0, scale: 0.8, rotation: -180 },
+                { opacity: 1, scale: 1, rotation: 0, duration: 3, ease: 'power3.out', delay: 0.5 }
+            );
+        }
     }, []);
 
-    const handleSelect = (bg, index) => {
+    const handleSelect = (bg: BloodGroup, index: number) => {
+        if (!wheelRef.current || !rippleRef.current) return;
+
         pulseTl.current.clear().time(0); // Stop any existing pulse animation
 
         if (selected) {
-            const previousSelectedBubble = wheelRef.current.children[bloodGroups.findIndex(b => b.type === selected.type)];
-            const previousFillElement = previousSelectedBubble.querySelector('.liquid-fill');
-            gsap.to(previousFillElement, { height: '0%', duration: 0.5, ease: 'power2.out' });
+            const prevIndex = bloodGroups.findIndex(b => b.type === selected.type);
+            if (prevIndex !== -1 && wheelRef.current.children[prevIndex]) {
+                const previousSelectedBubble = wheelRef.current.children[prevIndex] as HTMLElement;
+                const previousFillElement = previousSelectedBubble.querySelector('.liquid-fill');
+                if (previousFillElement) {
+                    gsap.to(previousFillElement, { height: '0%', duration: 0.5, ease: 'power2.out' });
+                }
+            }
         }
 
         setSelected(bg);
@@ -84,30 +102,41 @@ const PulseWheelBloodSelector = ({ onSelect, onNext }) => {
 
         tl.to(wheelRef.current, { rotation: `${rotation}_short`, duration: 1.5, ease: 'power4.out' });
 
-        const selectedBubble = wheelRef.current.children[index];
+        const selectedBubble = wheelRef.current.children[index] as HTMLElement;
         const fillElement = selectedBubble.querySelector('.liquid-fill');
 
-        tl.to(fillElement, { height: '100%', duration: 1, ease: 'power2.inOut' }, "-=1");
+        if (fillElement) {
+            tl.to(fillElement, { height: '100%', duration: 1, ease: 'power2.inOut' }, "-=1");
+        }
 
         gsap.to(rippleRef.current, {
             scale: 3,
             opacity: 0,
             duration: 1.2,
             ease: 'expo.out',
-            onComplete: () => gsap.set(rippleRef.current, { scale: 0, opacity: 0.5 })
+            onComplete: () => {
+                if (rippleRef.current) {
+                    gsap.set(rippleRef.current, { scale: 0, opacity: 0.5 });
+                }
+            }
         });
     };
 
     useEffect(() => {
-        if (confirmed) {
-            const selectedBubble = wheelRef.current.children[bloodGroups.findIndex(bg => bg.type === selected.type)];
-            pulseTl.current = gsap.timeline({ repeat: -1, yoyo: true });
-            pulseTl.current.to(selectedBubble, { scale: 1.1, duration: 0.6, ease: 'sine.inOut' });
+        if (confirmed && wheelRef.current && selected) {
+            const index = bloodGroups.findIndex(bg => bg.type === selected.type);
+            if (index !== -1 && wheelRef.current.children[index]) {
+                const selectedBubble = wheelRef.current.children[index];
+                pulseTl.current = gsap.timeline({ repeat: -1, yoyo: true });
+                pulseTl.current.to(selectedBubble, { scale: 1.1, duration: 0.6, ease: 'sine.inOut' });
+            }
 
-            gsap.fromTo(buttonRef.current,
-                { y: 50, opacity: 0 },
-                { y: 0, opacity: 1, duration: 0.8, ease: 'power2.out', delay: 0.5 }
-            );
+            if (buttonRef.current) {
+                gsap.fromTo(buttonRef.current,
+                    { y: 50, opacity: 0 },
+                    { y: 0, opacity: 1, duration: 0.8, ease: 'power2.out', delay: 0.5 }
+                );
+            }
         }
     }, [confirmed, selected]);
 
@@ -130,13 +159,13 @@ const PulseWheelBloodSelector = ({ onSelect, onNext }) => {
                         >
                             <div className="w-full h-full rounded-full flex items-center justify-center text-2xl font-bold cursor-pointer transition-all duration-300 border-2 border-red-500/30 bg-red-900/20 hover:bg-red-500/40 hover:scale-110 hover:shadow-[0_0_20px_rgba(255,0,0,0.6)] relative overflow-visible">
                                 <div className="absolute inset-0 rounded-full overflow-hidden">
-  <div className="absolute bottom-0 left-0 w-full h-0 bg-gradient-to-t from-red-600 to-red-500 liquid-fill" />
-</div>
+                                    <div className="absolute bottom-0 left-0 w-full h-0 bg-gradient-to-t from-red-600 to-red-500 liquid-fill" />
+                                </div>
 
                                 <span className="relative z-10">{bg.type}</span>
-                               <div className="absolute hidden group-hover:flex justify-center items-center bottom-full mb-2 left-1/2 -translate-x-1/2 w-max max-w-[8rem] px-3 py-1 bg-gray-800 text-white text-xs rounded-md shadow-lg whitespace-normal text-center z-50">
-    {bg.tooltip}
-</div>
+                                <div className="absolute hidden group-hover:flex justify-center items-center bottom-full mb-2 left-1/2 -translate-x-1/2 w-max max-w-[8rem] px-3 py-1 bg-gray-800 text-white text-xs rounded-md shadow-lg whitespace-normal text-center z-50">
+                                    {bg.tooltip}
+                                </div>
                             </div>
                         </div>
                     );

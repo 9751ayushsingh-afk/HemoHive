@@ -3,7 +3,7 @@ import dbConnect from '@/lib/dbConnect';
 import User from '@/models/User';
 import DonationAppointment from '@/models/DonationAppointment';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../../auth/[...nextauth]/route'; // Adjust path as necessary
+import { authOptions } from "@/lib/auth";
 
 export async function GET(request: Request) {
   await dbConnect();

@@ -1,10 +1,10 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import BloodRequest from '@/models/BloodRequest';
 import Inventory from '@/models/Inventory'; // Import Inventory model
 import { getAuth } from '@/lib/auth';
 
-export async function PUT(request: Request, { params }: { params: { requestId: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: { requestId: string } }) {
   await dbConnect();
 
   const authResult = await getAuth(request);
@@ -54,9 +54,9 @@ export async function PUT(request: Request, { params }: { params: { requestId: s
 
     // If the request is being approved and payment is completed, decrement inventory
     if (status === 'Approved' && bloodRequest.paymentStatus === 'Completed') {
-      const inventoryItem = await Inventory.findOne({ 
-        bloodGroup: bloodRequest.bloodGroup, 
-        hospital: bloodRequest.hospitalId 
+      const inventoryItem = await Inventory.findOne({
+        bloodGroup: bloodRequest.bloodGroup,
+        hospital: bloodRequest.hospitalId
       });
 
       if (!inventoryItem) {

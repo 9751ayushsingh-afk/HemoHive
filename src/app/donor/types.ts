@@ -12,11 +12,12 @@ export interface DonationHistoryItem {
   center: string;
   date: string;
   amount: string;
+  status?: 'pending' | 'confirmed' | 'scheduled' | 'rejected' | 'completed' | 'cancelled';
 }
 
 export interface Appointment {
   id: string;
-  status: 'scheduled' | 'completed' | 'cancelled';
+  status: 'scheduled' | 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'rejected';
   donationType: string;
   centerId: string;
   centerName?: string;

@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { Fade, Zoom, Slide } from "react-awesome-reveal";
 
 const AwarenessRewards = () => {
@@ -15,7 +15,7 @@ const AwarenessRewards = () => {
     { badge: 'Frequent Saver', points: 250 },
   ];
 
-  const getAnimation = (animation, children) => {
+  const getAnimation = (animation: string, children: ReactNode) => {
     switch (animation) {
       case 'fade':
         return <Fade triggerOnce>{children}</Fade>;

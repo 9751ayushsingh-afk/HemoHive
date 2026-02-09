@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import dbConnect from '@/lib/dbConnect';
 import Inventory from '@/models/Inventory';
 import OverviewCards from './components/OverviewCards';
@@ -19,13 +19,13 @@ const HospitalDashboardPage = async () => {
   // @ts-ignore
   const hospitalId = session?.user?.id;
 
-  let inventoryData = [];
+  let inventoryData: any[] = [];
   if (hospitalId) {
     try {
       await dbConnect();
       const dataFromDB = await Inventory.find({ hospital: hospitalId }).lean();
       // Ensure _id is converted to string for client component
-      inventoryData = dataFromDB.map(item => ({
+      inventoryData = dataFromDB.map((item: any) => ({
         ...item,
         _id: item._id.toString(),
         hospital: item.hospital.toString(),
@@ -43,14 +43,14 @@ const HospitalDashboardPage = async () => {
       <div className="col-span-12 lg:col-span-7">
         <OverviewCards />
         <div className="mt-6">
-          <LiveBloodRequests />
+          <LiveBloodRequests inventory={inventoryData} />
         </div>
         <div className="mt-6">
-          <PendingReturnsBoard hospitalId={hospitalId} />
+          <PendingReturnsBoard hospitalId={hospitalId || ''} />
         </div>
       </div>
       <div className="col-span-12 lg:col-span-5">
-        <InventoryByGroup inventoryData={inventoryData} />
+        <InventoryByGroup />
         <div className="mt-6">
           <FleetAndDeliveries />
         </div>

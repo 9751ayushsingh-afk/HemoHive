@@ -29,6 +29,8 @@ export interface IDelivery extends Document {
     endTime?: Date;
     distance?: number; // in meters
     bloodBagId?: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const DeliverySchema: Schema<IDelivery> = new Schema(

@@ -151,7 +151,7 @@ export async function POST(request: Request) {
 
         if (existingDelivery) {
             delivery = existingDelivery;
-            delivery.proposedDriverId = nearestDriver._id;
+            delivery.proposedDriverId = nearestDriver._id as mongoose.Types.ObjectId;
             delivery.acceptanceDeadline = deadline;
             delivery.status = 'SEARCHING';
             await delivery.save();

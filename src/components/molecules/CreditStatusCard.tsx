@@ -46,7 +46,7 @@ const CreditStatusCard: React.FC<CreditStatusCardProps> = ({ obligation, onActio
                 </div>
                 <div className="text-right">
                     <p className="text-sm font-semibold">Deadline in</p>
-                    <p className="text-xl font-bold">{30 - obligation.daysElapsed > 0 ? 30 - obligation.daysElapsed : 0} Days</p>
+                    <p className="text-xl font-bold">{obligation.deadline ? Math.max(0, Math.ceil((new Date(obligation.deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))) : 0} Days</p>
                 </div>
             </div>
 
@@ -66,7 +66,7 @@ const CreditStatusCard: React.FC<CreditStatusCardProps> = ({ obligation, onActio
                 <div>
                     <p className="text-xs uppercase opacity-70">Deposit Refund</p>
                     <div className="flex items-baseline gap-1">
-                        <span className="text-xl font-bold">{obligation.refundEligiblePercentage}%</span>
+                        <span className="text-xl font-bold">{obligation.refundEligiblePercentage || 0}%</span>
                         <span className="text-sm text-xs">Eligible</span>
                     </div>
                 </div>
@@ -80,8 +80,8 @@ const CreditStatusCard: React.FC<CreditStatusCardProps> = ({ obligation, onActio
                     onClick={() => onAction && onAction(obligation.id)}
                     disabled={isBlocked}
                     className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${isBlocked
-                            ? 'bg-gray-700 cursor-not-allowed opacity-50'
-                            : 'bg-white/10 hover:bg-white/20'
+                        ? 'bg-gray-700 cursor-not-allowed opacity-50'
+                        : 'bg-white/10 hover:bg-white/20'
                         }`}
                 >
                     {isBlocked ? 'Contact Support' : 'Fulfill Obligation'}
@@ -92,7 +92,7 @@ const CreditStatusCard: React.FC<CreditStatusCardProps> = ({ obligation, onActio
                 <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-[1px]">
                     <div className="bg-red-900/90 p-3 rounded text-white text-center shadow-xl border border-red-500">
                         <p className="font-bold">SYSTEM LOCKED</p>
-                        <p className="text-xs mt-1">Obligation Timed Out (>21 Days)</p>
+                        <p className="text-xs mt-1">Obligation Timed Out (&gt;21 Days)</p>
                     </div>
                 </div>
             )}

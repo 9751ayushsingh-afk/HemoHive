@@ -17,7 +17,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useQuery } from '@tanstack/react-query'; // Restore useQuery
+import { useQuery } from '@tanstack/react-query';
 import {
   Select,
   SelectContent,
@@ -25,7 +25,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { useNotification } from '@/contexts/NotificationContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -55,11 +54,13 @@ const formSchema = z.object({
   units: z.coerce.number().min(1, 'At least one unit is required'),
   urgency: z.enum(['Normal', 'Urgent', 'Emergency']),
   patientHospital: z.string().min(3, 'Please select a hospital'),
-  recipientHospitalId: z.string().optional(), // [NEW] Hidden ID field
+  recipientHospitalId: z.string().optional(),
   reason: z.string().optional(),
 });
 
-const createBloodRequest = async (data: z.infer<typeof formSchema>) => {
+type FormValues = z.infer<typeof formSchema>;
+
+const createBloodRequest = async (data: FormValues) => {
   console.log('Broadcasting blood request:', data);
   const res = await fetch('/api/donor/blood-requests', {
     method: 'POST',
@@ -80,8 +81,8 @@ export default function BloodRequestModule() {
   const { showNotification } = useNotification();
   const queryClient = useQueryClient();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema) as any,
     defaultValues: {
       bloodGroup: '',
       units: 1,
@@ -101,7 +102,6 @@ export default function BloodRequestModule() {
     enabled: !!bloodGroup,
   });
 
-  // [NEW] Fetch All Registered Hospitals for Dropdown
   const { data: allHospitals, isLoading: isLoadingAllHospitals } = useQuery({
     queryKey: ['allHospitals'],
     queryFn: fetchAllHospitals
@@ -120,7 +120,7 @@ export default function BloodRequestModule() {
     }
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = (values: FormValues) => {
     mutation.mutate(values);
   };
 
@@ -207,7 +207,7 @@ export default function BloodRequestModule() {
                   <FormItem>
                     <FormLabel>Patient Location (Select Registered Hospital)</FormLabel>
                     <Select
-                      onValueChange={(value) => {
+                      onValueChange={(value: string) => {
                         const selectedHospital = allHospitals?.find((h: any) => h._id === value);
                         field.onChange(selectedHospital?.fullName || value); // Store Name for display
                         form.setValue('recipientHospitalId', value); // Store ID for logic

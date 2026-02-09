@@ -6,12 +6,19 @@ import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 
 gsap.registerPlugin(MotionPathPlugin);
 
-const BeeLoader = ({ onAnimationComplete }) => {
-  const beeRef = useRef(null);
-  const trailRef = useRef(null);
-  const logoRef = useRef(null);
+interface BeeLoaderProps {
+  onAnimationComplete?: () => void;
+}
+
+const BeeLoader: React.FC<BeeLoaderProps> = ({ onAnimationComplete }) => {
+  const beeRef = useRef<SVGGElement>(null);
+  const trailRef = useRef<SVGPathElement>(null);
+  const logoRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Safety check for refs
+    if (!beeRef.current || !trailRef.current || !logoRef.current) return;
+
     const tl = gsap.timeline({
       defaults: { duration: 2, ease: "power2.inOut" },
     });
@@ -25,10 +32,12 @@ const BeeLoader = ({ onAnimationComplete }) => {
         autoRotate: true,
       },
       onUpdate: () => {
-        const pathLength = trailRef.current.getTotalLength();
-        const progress = tl.progress();
-        trailRef.current.style.strokeDasharray = pathLength;
-        trailRef.current.style.strokeDashoffset = pathLength * (1 - progress);
+        if (trailRef.current) {
+          const pathLength = trailRef.current.getTotalLength();
+          const progress = tl.progress();
+          trailRef.current.style.strokeDasharray = `${pathLength}`;
+          trailRef.current.style.strokeDashoffset = `${pathLength * (1 - progress)}`;
+        }
       },
     });
 
@@ -54,7 +63,11 @@ const BeeLoader = ({ onAnimationComplete }) => {
       delay: 1,
       onComplete: onAnimationComplete,
     });
-  }, []);
+
+    return () => {
+      tl.kill();
+    };
+  }, [onAnimationComplete]);
 
   return (
     <motion.div

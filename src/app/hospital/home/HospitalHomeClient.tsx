@@ -18,7 +18,7 @@ const cardData = [
   { title: "Settings & Profile", icon: "⚙️", link: "/hospital/settings" },
 ];
 
-const HospitalHomeClient = ({ user, inventory }) => {
+const HospitalHomeClient = ({ user, inventory }: { user: any, inventory: any[] }) => {
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {

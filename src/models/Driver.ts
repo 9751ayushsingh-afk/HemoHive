@@ -17,6 +17,8 @@ export interface IDriver extends Document {
   isVerified: boolean;
   totalDeliveries: number;
   rating: number;
+  isBlocked?: boolean;
+  blockReason?: string;
 }
 
 const DriverSchema: Schema<IDriver> = new Schema(

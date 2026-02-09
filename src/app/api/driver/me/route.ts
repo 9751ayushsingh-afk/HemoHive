@@ -1,7 +1,7 @@
 
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import dbConnect from '@/lib/dbConnect';
 import Driver from '@/models/Driver';
 import Delivery from '@/models/Delivery';
@@ -50,9 +50,9 @@ export async function GET() {
         return NextResponse.json({
             profile: {
                 id: driver._id, // [FIX] Include Driver Document ID
-                userId: driver.userId._id, // [FIX] Include User ID ref
-                name: driver.userId.fullName,
-                email: driver.userId.email,
+                userId: (driver.userId as any)._id,
+                name: (driver.userId as any).fullName,
+                email: (driver.userId as any).email,
                 status: driver.status,
                 isOnline: driver.status === 'ONLINE'
             },

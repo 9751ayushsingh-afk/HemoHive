@@ -3,7 +3,7 @@ import dbConnect from '@/lib/dbConnect';
 import DonationAppointment from '@/models/DonationAppointment';
 import User from '@/models/User';
 import { getServerSession } from "next-auth"; // Should be used for real user ID
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"; // Assuming auth options export
+import { authOptions } from "@/lib/auth"; // Assuming auth options export
 
 export async function POST(request: Request) {
   try {

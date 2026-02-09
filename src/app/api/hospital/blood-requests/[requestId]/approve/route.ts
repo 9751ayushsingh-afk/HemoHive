@@ -1,11 +1,11 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
 import BloodRequest from '@/models/BloodRequest';
 import Inventory from '@/models/Inventory';
 import { getAuth } from '@/lib/auth';
 
 export async function POST(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { requestId: string } }
 ) {
   await dbConnect();

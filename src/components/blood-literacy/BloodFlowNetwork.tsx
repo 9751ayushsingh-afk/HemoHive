@@ -24,7 +24,9 @@ import BloodFlowNetwork from "./BloodFlowNetwork";
 Customize: colors, node positions, theme or convert to Three.js for 3D effects.
 */
 
-const BLOOD_TYPES = [
+type BloodType = "O-" | "O+" | "A-" | "A+" | "B-" | "B+" | "AB-" | "AB+";
+
+const BLOOD_TYPES: BloodType[] = [
   "O-",
   "O+",
   "A-",
@@ -37,7 +39,7 @@ const BLOOD_TYPES = [
 
 // Compatibility map (donation targets)
 // Source -> array of recipients
-const COMPATIBILITY = {
+const COMPATIBILITY: Record<BloodType, BloodType[]> = {
   "O-": ["O-", "O+", "A-", "A+", "B-", "B+", "AB-", "AB+"], // universal donor
   "O+": ["O+", "A+", "B+", "AB+"],
   "A-": ["A-", "A+", "AB-", "AB+"],
@@ -49,18 +51,18 @@ const COMPATIBILITY = {
 };
 
 // We also compute reverse mapping for receiving
-const RECEIVERS = (() => {
-  const map = {};
+const RECEIVERS: Record<BloodType, BloodType[]> = (() => {
+  const map: Record<string, BloodType[]> = {};
   BLOOD_TYPES.forEach((t) => (map[t] = []));
-  for (const src of Object.keys(COMPATIBILITY)) {
+  for (const src of Object.keys(COMPATIBILITY) as BloodType[]) {
     for (const tgt of COMPATIBILITY[src]) {
       map[tgt].push(src);
     }
   }
-  return map;
+  return map as Record<BloodType, BloodType[]>;
 })();
 
-function polarToCartesian(cx, cy, radius, angleDeg) {
+function polarToCartesian(cx: number, cy: number, radius: number, angleDeg: number) {
   const angleRad = ((angleDeg - 90) * Math.PI) / 180.0;
   return {
     x: cx + radius * Math.cos(angleRad),
@@ -68,7 +70,7 @@ function polarToCartesian(cx, cy, radius, angleDeg) {
   };
 }
 
-function buildCurvePath(x1, y1, x2, y2, curvature = 0.5) {
+function buildCurvePath(x1: number, y1: number, x2: number, y2: number, curvature = 0.5) {
   // Quadratic Bezier control point placed perpendicular to midpoint
   const mx = (x1 + x2) / 2;
   const my = (y1 + y2) / 2;
@@ -82,14 +84,28 @@ function buildCurvePath(x1, y1, x2, y2, curvature = 0.5) {
   return `M ${x1} ${y1} Q ${cpX} ${cpY} ${x2} ${y2}`;
 }
 
-export default function BloodFlowNetwork({ size = 720 }) {
-  const svgRef = useRef(null);
-  const groupRefs = useRef({});
-  const pathRefs = useRef({});
-  const pulseRefs = useRef({});
-  const [hovered, setHovered] = useState(null);
-  const [mode, setMode] = useState("both"); // donate | receive | both
-  const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0, text: "" });
+interface Edge {
+  from: BloodType;
+  to: BloodType;
+  id: string;
+  curve: string;
+}
+
+interface TooltipState {
+  visible: boolean;
+  x: number;
+  y: number;
+  text: string;
+}
+
+export default function BloodFlowNetwork({ size = 720 }: { size?: number }) {
+  const svgRef = useRef<SVGSVGElement>(null);
+  const groupRefs = useRef<Record<string, SVGGElement | null>>({});
+  const pathRefs = useRef<Record<string, SVGPathElement | null>>({});
+  const pulseRefs = useRef<Record<string, SVGCircleElement | null>>({});
+  const [hovered, setHovered] = useState<BloodType | null>(null);
+  const [mode, setMode] = useState<"donate" | "receive" | "both">("both"); // donate | receive | both
+  const [tooltip, setTooltip] = useState<TooltipState>({ visible: false, x: 0, y: 0, text: "" });
 
   // layout: circle
   const cx = size / 2;
@@ -104,7 +120,7 @@ export default function BloodFlowNetwork({ size = 720 }) {
   });
 
   // build list of edges
-  const edges = [];
+  const edges: Edge[] = [];
   nodes.forEach((n) => {
     const targets = COMPATIBILITY[n.id] || [];
     targets.forEach((t) => {
@@ -135,8 +151,8 @@ export default function BloodFlowNetwork({ size = 720 }) {
       const pulse = pulseRefs.current[e.id];
       if (!p || !pulse) return;
       const total = p.getTotalLength();
-      p.style.strokeDasharray = total;
-      p.style.strokeDashoffset = total;
+      p.style.strokeDasharray = `${total}`;
+      p.style.strokeDashoffset = `${total}`;
 
       // small, infinite pulse for visibility
       gsap.to(p, { strokeDashoffset: 0, duration: 6 + Math.random() * 3, repeat: -1, ease: "none" });
@@ -235,13 +251,14 @@ export default function BloodFlowNetwork({ size = 720 }) {
     });
   }, [hovered, mode]);
 
-  const onNodeEnter = (evt, id) => {
+  const onNodeEnter = (evt: React.MouseEvent, id: BloodType) => {
+    if (!svgRef.current) return;
     const rect = svgRef.current.getBoundingClientRect();
     setHovered(id);
     setTooltip({ visible: true, x: evt.clientX - rect.left + 12, y: evt.clientY - rect.top + 12, text: id });
   };
-  const onNodeMove = (evt) => {
-    if (!tooltip.visible) return;
+  const onNodeMove = (evt: React.MouseEvent) => {
+    if (!tooltip.visible || !svgRef.current) return;
     const rect = svgRef.current.getBoundingClientRect();
     setTooltip((t) => ({ ...t, x: evt.clientX - rect.left + 12, y: evt.clientY - rect.top + 12 }));
   };
@@ -311,7 +328,7 @@ export default function BloodFlowNetwork({ size = 720 }) {
                 <g key={e.id}>
                   <path
                     d={e.curve}
-                    ref={(el) => (pathRefs.current[e.id] = el)}
+                    ref={(el) => { pathRefs.current[e.id] = el; }}
                     stroke="url(#redGradient)"
                     strokeWidth={2}
                     fill="none"
@@ -321,7 +338,7 @@ export default function BloodFlowNetwork({ size = 720 }) {
                   />
 
                   {/* moving pulse marker use small circle placed on path using <path> + getPointAtLength in animation if needed. We add a static circle that is animated by GSAP by changing its 'cx' and 'cy' attributes in timeline. */}
-                  <circle ref={(el) => (pulseRefs.current[e.id] = el)} r={0} cx={0} cy={0} opacity={0} />
+                  <circle ref={(el) => { pulseRefs.current[e.id] = el; }} r={0} cx={0} cy={0} opacity={0} />
                 </g>
               ))}
             </g>
@@ -331,7 +348,7 @@ export default function BloodFlowNetwork({ size = 720 }) {
               {nodes.map((n) => (
                 <g
                   key={n.id}
-                  ref={(el) => (groupRefs.current[n.id] = el)}
+                  ref={(el) => { groupRefs.current[n.id] = el; }}
                   transform={`translate(${n.x}, ${n.y})`}
                   className="cursor-pointer"
                   onMouseEnter={(e) => onNodeEnter(e, n.id)}
@@ -370,10 +387,10 @@ export default function BloodFlowNetwork({ size = 720 }) {
             >
               <div className="font-medium">{tooltip.text}</div>
               <div className="text-gray-300 text-[11px] mt-1">
-                Donates to: <span className="text-sm">{(COMPATIBILITY[tooltip.text] || []).join(", ")}</span>
+                Donates to: <span className="text-sm">{(COMPATIBILITY[tooltip.text as BloodType] || []).join(", ")}</span>
               </div>
               <div className="text-gray-300 text-[11px] mt-0.5">
-                Receives from: <span className="text-sm">{(RECEIVERS[tooltip.text] || []).join(", ")}</span>
+                Receives from: <span className="text-sm">{(RECEIVERS[tooltip.text as BloodType] || []).join(", ")}</span>
               </div>
             </div>
           )}

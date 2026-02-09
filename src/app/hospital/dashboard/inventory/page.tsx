@@ -40,7 +40,7 @@ const HospitalInventoryDashboard = () => {
     fetchInventory();
   }, []);
 
-  const getStatusColor = (quantity) => {
+  const getStatusColor = (quantity: number) => {
     if (quantity > 20) return 'bg-green-500';
     if (quantity > 10) return 'bg-yellow-500';
     return 'bg-red-500';
@@ -109,12 +109,14 @@ const HospitalInventoryDashboard = () => {
                 dataKey="quantity"
                 nameKey="bloodGroup"
                 label={({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
+                  const safeMidAngle = midAngle || 0;
+                  const safePercent = percent || 0;
                   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-                  const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
-                  const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
+                  const x = cx + radius * Math.cos(-safeMidAngle * (Math.PI / 180));
+                  const y = cy + radius * Math.sin(-safeMidAngle * (Math.PI / 180));
                   return (
                     <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
-                      {`${inventory[index].bloodGroup} (${(percent * 100).toFixed(0)}%)`}
+                      {`${inventory[index].bloodGroup} (${(safePercent * 100).toFixed(0)}%)`}
                     </text>
                   );
                 }}

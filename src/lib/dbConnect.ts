@@ -4,11 +4,11 @@ import mongoose from 'mongoose';
 // This is a workaround for a bug in the Next.js development server that causes the mongoose connection to be closed and reopened on every request.
 // We cache the connection in a global variable so that it can be reused across requests.
 declare global {
-  var mongoose: any; 
+  var mongoose: any;
 }
 
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI = process.env.MONGODB_URI as string;
 
 if (!MONGODB_URI) {
   throw new Error(

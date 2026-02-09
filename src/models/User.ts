@@ -1,5 +1,45 @@
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 import bcrypt from 'bcryptjs';
+
+export interface IUser extends Document {
+    fullName: string;
+    email: string;
+    password?: string;
+    role: 'donor' | 'hospital' | 'admin' | 'driver';
+    hospitalId?: mongoose.Types.ObjectId;
+    gender?: string;
+    dob?: Date;
+    mobile?: string;
+    aadhaar?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    pincode?: string;
+    lastDonationDate?: Date;
+    weight?: number;
+    hemoglobin?: number;
+    next_eligible_date?: Date;
+    medicalConditions?: string;
+    preferredDonationType?: string;
+    bloodGroup?: string;
+    agreeTerms?: boolean;
+    notificationPreference?: string;
+    profilePicture?: string;
+    emergencyContactName?: string;
+    emergencyContactNumber?: string;
+    preferredBloodBank?: string;
+    status?: 'Pending' | 'Approved' | 'Rejected' | 'Returned' | 'Blocked';
+    qty?: number;
+    credit?: number;
+    amount?: number;
+    location?: {
+        type: string;
+        coordinates: number[];
+    };
+    fcmToken?: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+}
 
 const UserSchema = new mongoose.Schema({
     fullName: {

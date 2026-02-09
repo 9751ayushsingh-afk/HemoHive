@@ -15,7 +15,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ message: 'Delivery not found' }, { status: 404 });
         }
 
-        if (delivery.verificationCode !== code) {
+        if (delivery.dropoffCode !== code) {
             return NextResponse.json({ message: 'Invalid verification code' }, { status: 400 });
         }
 
