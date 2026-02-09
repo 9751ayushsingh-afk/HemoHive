@@ -1,8 +1,8 @@
 
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
-import User from '@/models/User';
-import Inventory from '@/models/Inventory';
+import dbConnect from '../../../../lib/dbConnect';
+import User from '../../../../models/User';
+import Inventory from '../../../../models/Inventory';
 
 export async function GET() {
   await dbConnect();
