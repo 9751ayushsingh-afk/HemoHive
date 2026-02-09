@@ -1,9 +1,10 @@
+
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
-import DonationAppointment from '@/models/DonationAppointment';
-import User from '@/models/User';
+import dbConnect from '../../../../lib/dbConnect';
+import DonationAppointment from '../../../../models/DonationAppointment';
+import User from '../../../../models/User';
 import { getServerSession } from "next-auth"; // Should be used for real user ID
-import { authOptions } from "@/lib/auth"; // Assuming auth options export
+import { authOptions } from "../../../../lib/auth"; // Assuming auth options export
 
 export async function POST(request: Request) {
   try {
@@ -77,4 +78,3 @@ function calculateNextEligibleDate(lastDonationDate: string, donationType: strin
   // Add logic for Plasma, Platelets if needed
   return date;
 }
-
