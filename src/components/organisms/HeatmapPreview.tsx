@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 
 import dynamic from "next/dynamic";
 
-const Antigravity = dynamic(() => import("@/components/Antigravity"), { ssr: false });
+const Antigravity = dynamic(() => import("../Antigravity"), { ssr: false });
 
 const HeatmapPreview = () => {
   return (
