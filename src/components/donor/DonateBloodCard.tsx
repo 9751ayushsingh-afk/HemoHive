@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useEffect, useRef, useState, CSSProperties } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
+import { Button } from '../../components/ui/button';
 import { useRouter } from 'next/navigation';
 import { motion, useReducedMotion, Variants } from 'framer-motion';
 import gsap from 'gsap';

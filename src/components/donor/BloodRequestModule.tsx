@@ -7,7 +7,7 @@ import * as z from 'zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '../../components/ui/button';
 import {
   Form,
   FormControl,
@@ -15,8 +15,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+} from '../../components/ui/form';
+import { Input } from '../../components/ui/input';
 import { useQuery } from '@tanstack/react-query';
 import {
   Select,
@@ -24,9 +24,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { useNotification } from '@/contexts/NotificationContext';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+} from '../../components/ui/select';
+import { useNotification } from '../../contexts/NotificationContext';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 
 const MotionButton = motion(Button);
 
