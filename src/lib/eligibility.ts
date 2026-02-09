@@ -1,5 +1,5 @@
 
-import { IUser } from '@/models/User'; // Assuming IUser is exported from your User model
+import { IUser } from '../models/User'; // Assuming IUser is exported from your User model
 
 export function checkEligibility(user: IUser): { eligible: boolean; reasons: string[] } {
   const reasons: string[] = [];
