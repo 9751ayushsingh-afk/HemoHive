@@ -1,8 +1,8 @@
 import { NextResponse, NextRequest } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
-import BloodRequest from '@/models/BloodRequest';
-import Credit from '@/models/Credit';
-import { getAuth } from '@/lib/auth';
+import dbConnect from '../../../lib/dbConnect';
+import BloodRequest from '../../../models/BloodRequest';
+import Credit from '../../../models/Credit';
+import { getAuth } from '../../../lib/auth';
 
 export async function POST(request: NextRequest) {
   await dbConnect();

@@ -1,8 +1,8 @@
 
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
-import User from '@/models/User';
-import Driver from '@/models/Driver';
+import dbConnect from '../../../lib/dbConnect';
+import User from '../../../models/User';
+import Driver from '../../../models/Driver';
 import bcrypt from 'bcryptjs';
 
 export async function POST(request: Request) {
@@ -29,10 +29,6 @@ export async function POST(request: Request) {
         // However, sometimes it's safer to hash here if the hook is flaky or we want explicit control.
         // Looking at User.ts provided earlier: "UserSchema.pre('save'...". It does hash.
         // So we can just pass the plain password. 
-
-        // Wait, let's look at Step 36. 
-        // "UserSchema.pre('save', async function (next) { ... if (this.isModified('password')) { ... bcrypt.hash ... } })"
-        // Yes, it hashes.
 
         const newUser = await User.create({
             fullName,
