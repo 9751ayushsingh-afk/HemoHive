@@ -1,0 +1,15 @@
+.custom-stack-container {
+  position: relative;
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+}
+
+.custom-stack-card {
+  position: sticky;
+  top: 0;
+  padding: 2rem;
+  border-radius: 1rem;
+  margin-bottom: 2rem;
+  background-color: white;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}

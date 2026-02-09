@@ -1,0 +1,16 @@
+.ai-assistant-bubble {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: linear-gradient(135deg, #1D3557, #457B9D);
+    color: #fff;
+    padding: 1rem 1.5rem;
+    border-radius: 30px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    cursor: pointer;
+    z-index: 1000;
+}
+
+.ai-assistant-text {
+    font-size: 0.9rem;
+}

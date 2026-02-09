@@ -1,0 +1,389 @@
+[
+  {
+    "id": "TC001",
+    "title": "Main Landing Page Load and Interaction",
+    "description": "Verify that the main landing page loads correctly with hero section, animated text, and call-to-action buttons fully functional.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the main landing page URL"
+      },
+      {
+        "type": "assertion",
+        "description": "Validate that the hero section is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Check animated text plays smoothly without glitches"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify call-to-action buttons are displayed and clickable"
+      },
+      {
+        "type": "action",
+        "description": "Click each call-to-action button"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm corresponding actions or navigation events occur"
+      }
+    ]
+  },
+  {
+    "id": "TC002",
+    "title": "Liquid Ether Background Rendering and Performance",
+    "description": "Ensure the WebGL Liquid Ether background component renders fluid simulations smoothly and efficiently across supported devices.",
+    "category": "performance",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to a page with the Liquid Ether background component"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm the WebGL fluid simulation background is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify fluid simulation animations run smoothly without lag or dropped frames"
+      },
+      {
+        "type": "assertion",
+        "description": "Test performance metrics to ensure resource usage stays within acceptable limits"
+      }
+    ]
+  },
+  {
+    "id": "TC003",
+    "title": "Interactive 3D Lanyard Animation Functionality",
+    "description": "Verify the 3D lanyard animation loads, renders properly, and responds to physics-based interactions using React Three Fiber and Rapier.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the page or component containing the 3D lanyard animation"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm the 3D lanyard model is rendered and visible"
+      },
+      {
+        "type": "action",
+        "description": "Interact with the lanyard element (e.g., drag, rotate, or apply forces if supported)"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify physics-based behaviors update correctly, showing realistic movement and collision"
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure animation runs without glitches or frame drops"
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "Developer Portfolio Page Load and Interactivity",
+    "description": "Confirm that both pages of the developer portfolio load fully and display interactive lanyards and detailed content correctly.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the developer portfolio pages"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify all interactive lanyards are displayed and responsive"
+      },
+      {
+        "type": "assertion",
+        "description": "Check that detailed content sections are loaded with correct information"
+      },
+      {
+        "type": "action",
+        "description": "Interact with portfolio elements (e.g., expand content, hover or click animations)"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm interactions trigger expected responses without errors"
+      }
+    ]
+  },
+  {
+    "id": "TC005",
+    "title": "Scroll Stack 3D Scroll Effect and Particle Animation",
+    "description": "Verify that scroll stack component triggers 3D scroll effects and particle animations correctly during user scrolling.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the section containing the Scroll Stack component"
+      },
+      {
+        "type": "action",
+        "description": "Scroll through the component vertically"
+      },
+      {
+        "type": "assertion",
+        "description": "Validate that 3D scroll effects activate and image cards respond with correct animations"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm particle animations play consistently and enhance the visual effect"
+      }
+    ]
+  },
+  {
+    "id": "TC006",
+    "title": "Horizontal Scroll 'How It Works' Section Functionality",
+    "description": "Test horizontal scrolling behavior of the 'How It Works' section, ensuring smooth scrolling and content visibility.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the 'How It Works' horizontal scroll section"
+      },
+      {
+        "type": "action",
+        "description": "Perform horizontal scroll gesture or use scroll controls if available"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify each step or card in the section scrolls into view smoothly"
+      },
+      {
+        "type": "assertion",
+        "description": "Check that animations or visual transitions trigger at correct scroll positions"
+      }
+    ]
+  },
+  {
+    "id": "TC007",
+    "title": "Feature Cards Interaction and Hover Animation",
+    "description": "Confirm that feature cards display properly and hover animations are triggered to enhance user engagement.",
+    "category": "ui",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the feature cards section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify all feature cards are displayed correctly with appropriate content"
+      },
+      {
+        "type": "action",
+        "description": "Hover over each feature card"
+      },
+      {
+        "type": "assertion",
+        "description": "Check that hover animations are smooth and visually appealing"
+      }
+    ]
+  },
+  {
+    "id": "TC008",
+    "title": "Live Heatmap Preview Dynamic Data and Animation",
+    "description": "Validate the live demand heatmap displays animated pulses accurately representing dynamic data updates.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the heatmap preview component"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the heatmap is visible and initially rendered correctly"
+      },
+      {
+        "type": "assertion",
+        "description": "Observe the animated pulses and confirm they represent changing data points fluidly"
+      },
+      {
+        "type": "action",
+        "description": "Simulate or provide sample data input to the heatmap component"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm the heatmap updates and animations correspond to input data changes"
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "Animated Counter Component Number Transitions",
+    "description": "Test the animated counter for smooth and accurate number transitions reflecting statistical data values.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Locate the animated counter component on a page"
+      },
+      {
+        "type": "action",
+        "description": "Trigger counter updates with different numerical values"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the number animates smoothly without abrupt jumps or freezes"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm the final displayed number matches the input value"
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "Typing Text Effect Animation",
+    "description": "Verify the typewriter style typing text effect displays text progressively and visually correctly.",
+    "category": "ui",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to component or section with the typing text effect"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm the text appears character-by-character in timed sequence"
+      },
+      {
+        "type": "assertion",
+        "description": "Check for consistent timing and no overlaps or skips in text rendering"
+      }
+    ]
+  },
+  {
+    "id": "TC011",
+    "title": "Animated Text Reveal Effects using Framer Motion",
+    "description": "Ensure text reveal animations powered by Framer Motion trigger on scroll or load as designed.",
+    "category": "ui",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the animated text component in the page"
+      },
+      {
+        "type": "action",
+        "description": "Scroll or interact to trigger reveal animations"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text reveal animations occur smoothly and match design timing"
+      }
+    ]
+  },
+  {
+    "id": "TC012",
+    "title": "Footer Component Display and Interaction",
+    "description": "Validate footer component renders contact information and call-to-action buttons correctly and handles interactions.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Scroll to or navigate to the footer section"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm all contact info elements are visible and correctly formatted"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify presence and visibility of call-to-action buttons"
+      },
+      {
+        "type": "action",
+        "description": "Click each call-to-action button"
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure expected navigation or actions occur without error"
+      }
+    ]
+  },
+  {
+    "id": "TC013",
+    "title": "Error Boundary Catch and Fallback UI",
+    "description": "Test React Error Boundary captures runtime errors gracefully and displays user-friendly fallback UI without crashing.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Intentionally throw an error inside a component wrapped by the Error Boundary"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that the error boundary catches the error"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm fallback UI is rendered with user-friendly error message"
+      },
+      {
+        "type": "assertion",
+        "description": "Check that the application remains functional and interactive despite the error"
+      }
+    ]
+  },
+  {
+    "id": "TC014",
+    "title": "Global Styles and Tailwind CSS Theming Consistency",
+    "description": "Verify global styles apply correctly with Tailwind configuration and theme colors and fonts without conflicts or visual issues.",
+    "category": "ui",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Load pages and components using global styles"
+      },
+      {
+        "type": "assertion",
+        "description": "Validate that theme colors, fonts, and animation styles match the HemoHive design specification"
+      },
+      {
+        "type": "assertion",
+        "description": "Check for absence of style conflicts or unexpected overrides"
+      }
+    ]
+  },
+  {
+    "id": "TC015",
+    "title": "Webpack Configuration Loads Three.js, GLSL, and GLB Files Properly",
+    "description": "Verify that Webpack configuration supports importing and rendering Three.js assets, GLSL shaders, and GLB models without build or runtime errors.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Build the application with Webpack using next.config.js"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm build completes without errors related to Three.js, GLSL, or GLB imports"
+      },
+      {
+        "type": "action",
+        "description": "Load components that utilize these assets, such as 3D Lanyard Animation and WebGL backgrounds"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify 3D models and shaders are rendered correctly on the page at runtime"
+      }
+    ]
+  }
+]

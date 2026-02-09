@@ -1,0 +1,18 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:3001",
+  "loginUser": "9751ayushsingh@gmail.com",
+  "loginPassword": "G96OR0Lg",
+  "executionArgs": {
+    "projectName": "hemohive",
+    "projectPath": "C:\\Users\\9751a\\Desktop\\Shri_ji\\hemohive",
+    "testIds": [],
+    "additionalInstruction": "Focus on testing the 3D Lanyard component length and positioning. The lanyard should hang from the top of the screen and be visible in the middle of the page. Test that both lanyards are visible side-by-side and that the rope length is appropriate (not too long or too short). Verify that the lanyard is interactive and can be dragged. Test the developer page navigation between the lanyard view and content view.",
+    "envs": {
+      "API_KEY": "sk-user-kvG0sJqFqvAHWpU7NdosaYeXL-1K1a6SQazTiz8n8derFWj94vUdomD-m5pAY5GFQQC0BzFC4aBq5JDYkBiUKAciP29AUpOR0-RdW8OYByvBw76ErkxTPvmbyuS572D6aDk"
+    }
+  },
+  "proxy": "http://20a6140a-298c-4136-bbf6-1836b3a6748e:xrtnFYTaL46FapyGEok2n0XGwLV3c2H7@tun.testsprite.com:8080"
+}

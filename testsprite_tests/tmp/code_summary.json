@@ -1,0 +1,105 @@
+{
+  "tech_stack": [
+    "TypeScript",
+    "Next.js 14",
+    "React 18",
+    "Tailwind CSS 4",
+    "Three.js",
+    "React Three Fiber",
+    "React Three Drei",
+    "React Three Rapier",
+    "Framer Motion",
+    "WebGL",
+    "GLSL",
+    "Rapier Physics Engine"
+  ],
+  "features": [
+    {
+      "name": "Main Landing Page",
+      "description": "HemoHive main landing page with hero section, animated text, and call-to-action buttons",
+      "files": ["src/app/page.tsx"]
+    },
+    {
+      "name": "Liquid Ether Background",
+      "description": "WebGL-based fluid simulation background component with customizable colors",
+      "files": ["src/components/LiquidEther.tsx", "src/components/LiquidEther.css"]
+    },
+    {
+      "name": "3D Lanyard Animation",
+      "description": "Interactive 3D lanyard with physics simulation using React Three Fiber and Rapier",
+      "files": ["src/components/Lanyard/Lanyard.tsx", "src/components/Lanyard/Lanyard.css"]
+    },
+    {
+      "name": "Developer Portfolio Page",
+      "description": "Two-page developer portfolio with interactive lanyards and detailed content sections",
+      "files": ["src/app/developer/page.tsx"]
+    },
+    {
+      "name": "Scroll Stack Component",
+      "description": "3D scroll effect with image cards and particle animations",
+      "files": ["src/components/ScrollStack.tsx"]
+    },
+    {
+      "name": "How It Works Section",
+      "description": "Horizontal scroll component explaining the HemoHive process",
+      "files": ["src/components/organisms/HowItWorks.tsx"]
+    },
+    {
+      "name": "Feature Cards",
+      "description": "Interactive feature showcase cards with hover effects",
+      "files": ["src/components/organisms/FeatureCards.tsx"]
+    },
+    {
+      "name": "Heatmap Preview",
+      "description": "Live demand heatmap component with animated pulses",
+      "files": ["src/components/organisms/HeatmapPreview.tsx"]
+    },
+    {
+      "name": "Animated Counter",
+      "description": "Number animation component for statistics display",
+      "files": ["src/components/atoms/AnimatedCounter.tsx"]
+    },
+    {
+      "name": "Typing Text Effect",
+      "description": "Typewriter-style text animation component",
+      "files": ["src/components/atoms/TypingText.tsx"]
+    },
+    {
+      "name": "Animated Text Component",
+      "description": "Text animation with reveal effects using Framer Motion",
+      "files": ["src/components/molecules/AnimatedText.tsx"]
+    },
+    {
+      "name": "Footer Component",
+      "description": "Footer with call-to-action and contact information",
+      "files": ["src/components/organisms/Footer.tsx"]
+    },
+    {
+      "name": "Error Boundary",
+      "description": "React error boundary for graceful error handling",
+      "files": ["src/components/ErrorBoundary.tsx"]
+    },
+    {
+      "name": "Global Styles",
+      "description": "Global CSS with Tailwind imports, custom variables, and animations",
+      "files": ["src/app/globals.css"]
+    },
+    {
+      "name": "Root Layout",
+      "description": "Next.js root layout with font configuration and global styles",
+      "files": ["src/app/layout.tsx"]
+    },
+    {
+      "name": "Tailwind Configuration",
+      "description": "Custom Tailwind CSS configuration with HemoHive theme colors and fonts",
+      "files": ["tailwind.config.ts"]
+    },
+    {
+      "name": "Next.js Configuration",
+      "description": "Webpack configuration for Three.js, GLSL, and GLB file handling",
+      "files": ["next.config.js"]
+    }
+  ]
+}
+
+

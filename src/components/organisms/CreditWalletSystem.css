@@ -1,0 +1,180 @@
+.credit-wallet-system-theme {
+    --primary-color: #E63946;
+    --secondary-color: #F1FAEE;
+    --accent-color: #1D3557;
+    --success-color: #06D6A0;
+    --warning-color: #FFD166;
+    --error-color: #EF233C;
+    font-family: 'Poppins', sans-serif;
+}
+
+.donor-dashboard-container {
+    padding: 2rem;
+}
+
+.dashboard-title {
+    color: var(--accent-color);
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+}
+
+.card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.card-header {
+    margin-bottom: 1.5rem;
+}
+
+.card-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--accent-color);
+}
+
+.profile-overview {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.credit-health-meter {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: #f1faee;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.meter-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.credit-wallet-overview {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+}
+
+.balance-card, .responsibility-meter {
+    padding: 2rem;
+    border-radius: 20px;
+    width: 45%;
+}
+
+.balance-card {
+    background: linear-gradient(135deg, #E63946, #FF6B6B);
+    color: #fff;
+}
+
+.balance {
+    font-size: 3rem;
+    font-weight: 700;
+}
+
+.responsibility-meter {
+    background: #f1faee;
+}
+
+.deadline {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent-color);
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.request-card {
+    padding: 1.5rem;
+    border-radius: 15px;
+    background: #f1faee;
+}
+
+.request-card.pending-return {
+    border-left: 5px solid var(--success-color);
+}
+
+.request-card.penalty-warning {
+    border-left: 5px solid var(--warning-color);
+}
+
+.timeline {
+    list-style: none;
+    padding: 0;
+}
+
+.timeline li {
+    display: flex;
+    margin-bottom: 1rem;
+}
+
+.timeline-date {
+    width: 100px;
+    font-weight: 600;
+    color: var(--accent-color);
+}
+
+.timeline-event {
+    border-left: 2px solid var(--primary-color);
+    padding-left: 1rem;
+}
+
+.alert-section {
+    background: rgba(239, 35, 60, 0.1);
+    border-left: 5px solid var(--error-color);
+}
+
+.cta-button {
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.cta-button:hover {
+  background: #d62828;
+}
+
+.badge-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.badge {
+    background: #f1faee;
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    border: 2px solid var(--accent-color);
+}
+
+.badge-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--accent-color);
+}
+
+.badge-criteria {
+    font-size: 0.9rem;
+    color: #666;
+}

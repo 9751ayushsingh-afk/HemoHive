@@ -1,0 +1,194 @@
+{
+  "meta": {
+    "project": "HemoHive Interactive Web Experience",
+    "date": "2025-10-04",
+    "prepared_by": "Product Management Team"
+  },
+  "product_overview": "HemoHive is a cutting-edge interactive web experience featuring dynamic 3D animations, WebGL fluid backgrounds, and physics-simulated components built to showcase the brand's innovative approach and developer portfolio.",
+  "core_goals": [
+    "Create an engaging and visually stunning landing page that captures user attention with animation and interactive content.",
+    "Implement advanced WebGL-based background effects to provide a unique user experience.",
+    "Develop interactive 3D components using React Three Fiber and physics simulations to demonstrate technical sophistication.",
+    "Provide a multi-page developer portfolio that highlights projects with interactive elements and detailed content.",
+    "Ensure smooth and intuitive user navigation through interactive scrolling and visual storytelling components.",
+    "Offer real-time data visualizations such as heatmaps and animated counters to communicate demand and statistics effectively.",
+    "Maintain high performance and accessibility with responsive design and error handling mechanisms."
+  ],
+  "key_features": [
+    "Main Landing Page with hero section, animated text, and call-to-action buttons.",
+    "Liquid Ether Background component with customizable WebGL fluid simulation.",
+    "Interactive 3D Lanyard Animation using React Three Fiber and Rapier physics engine.",
+    "Two-page Developer Portfolio showcasing interactive lanyards and content.",
+    "Scroll Stack component featuring 3D scroll effects with image cards and particle animations.",
+    "Horizontal scroll 'How It Works' section explaining the service or product process.",
+    "Interactive Feature Cards with hover animations for better user engagement.",
+    "Live Demand Heatmap Preview with animated pulses for dynamic data display.",
+    "Animated Counter component for smooth number transitions in statistics.",
+    "Typing Text Effect for typewriter-style text animations.",
+    "Animated Text reveal effects utilizing Framer Motion.",
+    "Footer component including contact info and call-to-action buttons.",
+    "React Error Boundary for robust and graceful error handling.",
+    "Custom global styles using Tailwind CSS configured with HemoHive theme colors and fonts.",
+    "Support for Three.js, GLSL, and physics simulations through custom Webpack configuration in Next.js."
+  ],
+  "user_flow_summary": [
+    "User lands on the Main Landing Page, greeted by an animated hero section and clear call-to-action buttons.",
+    "Background fluid animation provides an immersive visual experience while navigating the site.",
+    "Users can explore interactive 3D lanyard animations, engaging with physics-based elements.",
+    "Users navigate to the Developer Portfolio page to view detailed interactive content and project showcases.",
+    "Scrolling triggers animated scroll stack and horizontal scroll components that articulate the HemoHive process and features.",
+    "Users interact with feature cards to learn about key product capabilities, reinforced by live heatmap and animated statistics.",
+    "The footer encourages users to take action with contact options after reviewing content.",
+    "Error boundary components capture and display user-friendly messages in case of runtime issues."
+  ],
+  "validation_criteria": [
+    "All interactive 3D components must operate smoothly with no visible glitches across supported devices.",
+    "WebGL Liquid Ether background must render fluid simulations efficiently without performance drops.",
+    "Animation timings and transitions must be consistent and visually appealing as per design specifications.",
+    "Scrolling animations including Scroll Stack and How It Works sections must trigger correctly and respond to user input.",
+    "Developer portfolio pages must load fully with interactive elements functional and displaying correct content.",
+    "Heatmap and Animated Counter components must reflect real or sample data accurately with fluid animations.",
+    "Error boundaries must catch errors and display fallback UI without crashing the application.",
+    "Global styles and theming must be consistent, adhering to Tailwind CSS configuration with no style conflicts.",
+    "Webpack configuration must properly handle Three.js, GLSL, and GLB file imports enabling all 3D assets to load correctly."
+  ],
+  "code_summary": {
+    "tech_stack": [
+      "TypeScript",
+      "Next.js 14",
+      "React 18",
+      "Tailwind CSS 4",
+      "Three.js",
+      "React Three Fiber",
+      "React Three Drei",
+      "React Three Rapier",
+      "Framer Motion",
+      "WebGL",
+      "GLSL",
+      "Rapier Physics Engine"
+    ],
+    "features": [
+      {
+        "name": "Main Landing Page",
+        "description": "HemoHive main landing page with hero section, animated text, and call-to-action buttons",
+        "files": [
+          "src/app/page.tsx"
+        ]
+      },
+      {
+        "name": "Liquid Ether Background",
+        "description": "WebGL-based fluid simulation background component with customizable colors",
+        "files": [
+          "src/components/LiquidEther.tsx",
+          "src/components/LiquidEther.css"
+        ]
+      },
+      {
+        "name": "3D Lanyard Animation",
+        "description": "Interactive 3D lanyard with physics simulation using React Three Fiber and Rapier",
+        "files": [
+          "src/components/Lanyard/Lanyard.tsx",
+          "src/components/Lanyard/Lanyard.css"
+        ]
+      },
+      {
+        "name": "Developer Portfolio Page",
+        "description": "Two-page developer portfolio with interactive lanyards and detailed content sections",
+        "files": [
+          "src/app/developer/page.tsx"
+        ]
+      },
+      {
+        "name": "Scroll Stack Component",
+        "description": "3D scroll effect with image cards and particle animations",
+        "files": [
+          "src/components/ScrollStack.tsx"
+        ]
+      },
+      {
+        "name": "How It Works Section",
+        "description": "Horizontal scroll component explaining the HemoHive process",
+        "files": [
+          "src/components/organisms/HowItWorks.tsx"
+        ]
+      },
+      {
+        "name": "Feature Cards",
+        "description": "Interactive feature showcase cards with hover effects",
+        "files": [
+          "src/components/organisms/FeatureCards.tsx"
+        ]
+      },
+      {
+        "name": "Heatmap Preview",
+        "description": "Live demand heatmap component with animated pulses",
+        "files": [
+          "src/components/organisms/HeatmapPreview.tsx"
+        ]
+      },
+      {
+        "name": "Animated Counter",
+        "description": "Number animation component for statistics display",
+        "files": [
+          "src/components/atoms/AnimatedCounter.tsx"
+        ]
+      },
+      {
+        "name": "Typing Text Effect",
+        "description": "Typewriter-style text animation component",
+        "files": [
+          "src/components/atoms/TypingText.tsx"
+        ]
+      },
+      {
+        "name": "Animated Text Component",
+        "description": "Text animation with reveal effects using Framer Motion",
+        "files": [
+          "src/components/molecules/AnimatedText.tsx"
+        ]
+      },
+      {
+        "name": "Footer Component",
+        "description": "Footer with call-to-action and contact information",
+        "files": [
+          "src/components/organisms/Footer.tsx"
+        ]
+      },
+      {
+        "name": "Error Boundary",
+        "description": "React error boundary for graceful error handling",
+        "files": [
+          "src/components/ErrorBoundary.tsx"
+        ]
+      },
+      {
+        "name": "Global Styles",
+        "description": "Global CSS with Tailwind imports, custom variables, and animations",
+        "files": [
+          "src/app/globals.css"
+        ]
+      },
+      {
+        "name": "Root Layout",
+        "description": "Next.js root layout with font configuration and global styles",
+        "files": [
+          "src/app/layout.tsx"
+        ]
+      },
+      {
+        "name": "Tailwind Configuration",
+        "description": "Custom Tailwind CSS configuration with HemoHive theme colors and fonts",
+        "files": [
+          "tailwind.config.ts"
+        ]
+      },
+      {
+        "name": "Next.js Configuration",
+        "description": "Webpack configuration for Three.js, GLSL, and GLB file handling",
+        "files": [
+          "next.config.js"
+        ]
+      }
+    ]
+  }
+}

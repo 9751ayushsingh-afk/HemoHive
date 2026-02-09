@@ -1,0 +1,10 @@
+
+import React from 'react';
+
+const MaleIcon = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" className={className}>
+    <path fill="currentColor" d="M35.262 5.292l.986 5.919L48.611 9.15l-15.77 15.769a20.078 20.078 0 1 0 4.243 4.242l15.77-15.768-2.06 12.364 5.918.986L61 1zM21 55a14 14 0 1 1 14-14 14.016 14.016 0 0 1-14 14z"/>
+  </svg>
+);
+
+export default MaleIcon;

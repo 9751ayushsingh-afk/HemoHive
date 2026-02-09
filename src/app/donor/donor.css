@@ -1,0 +1,43 @@
+body {
+  background: linear-gradient(135deg, #0F0C29, #302B63, #24243E) !important;
+  color: #ededed !important;
+}
+
+.profile-card {
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+}
+
+.profile-card .card-glow::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle at var(--mouse-x) var(--mouse-y),
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0) 25%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.profile-card:hover .card-glow::before {
+  opacity: 1;
+}
+
+.overdue-card-glow {
+  box-shadow: 0 0 25px 5px rgba(239, 68, 68, 0.4);
+  animation: pulse-glow 2s infinite alternate;
+}
+
+@keyframes pulse-glow {
+  from {
+    box-shadow: 0 0 15px 3px rgba(239, 68, 68, 0.3);
+  }
+  to {
+    box-shadow: 0 0 30px 8px rgba(239, 68, 68, 0.5);
+  }
+}

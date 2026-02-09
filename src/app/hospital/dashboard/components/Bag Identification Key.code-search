@@ -1,0 +1,9 @@
+# Query: Bag Identification Key
+# ContextLines: 1
+
+1 result - 1 file
+
+hemohive\src\app\hospital\dashboard\components\PendingReturnsBoard.tsx:
+  244                    <div className="group/input">
+  245:                     <label className="block text-xs font-bold text-slate-500 uppercase mb-2 pl-1">Bag Identification </label>
+  246                      <div className="relative">

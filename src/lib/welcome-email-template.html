@@ -1,0 +1,198 @@
+<!-- HemoHive - Premium Welcome Email (Animated Greeting + Feature Cards) -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Welcome to HemoHive</title>
+  <style>
+    /* Minimal animation for greeting (many clients support basic keyframes) */
+    @media screen and (prefers-reduced-motion: no-preference) {
+      @keyframes greetFade {
+        0% { opacity: 0; transform: translateY(-6px); }
+        5% { opacity: 1; transform: translateY(0); }
+        20% { opacity: 1; transform: translateY(0); }
+        25% { opacity: 0; transform: translateY(6px); }
+        100% { opacity: 0; }
+      }
+      .greet-item {
+        display:block;
+        position:relative;
+        opacity:0;
+        animation: greetFade 8s linear infinite;
+      }
+      .greet-item.g1 { animation-delay: 0s; }
+      .greet-item.g2 { animation-delay: 2s; }
+      .greet-item.g3 { animation-delay: 4s; }
+      .greet-item.g4 { animation-delay: 6s; }
+    }
+
+    /* Responsive stacking for feature cards */
+    @media only screen and (max-width: 600px) {
+      .wrap { width: 100% !important; }
+      .feature-column { display:block !important; width:100% !important; max-width:100% !important; }
+      .header-table td { display:block !important; width:100% !important; text-align:center !important; }
+      .greeting-cell { padding-top:12px !important; }
+      .card-image { height: 130px !important; object-fit:cover; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background:#f6f6f6;font-family: 'Helvetica Neue', Arial, sans-serif;">
+
+  <!-- Outer container -->
+  <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#f6f6f6;padding:24px 12px;">
+    <tr>
+      <td align="center">
+
+        <!-- Centered main card -->
+        <table role="presentation" cellpadding="0" cellspacing="0" width="700" style="width:700px;max-width:700px;background:#ffffff;border-radius:10px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.08);">
+          
+          <!-- Header: logo (left) + animated greeting (right) -->
+          <tr>
+            <td style="padding:18px 22px 6px 22px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" class="header-table" style="width:100%;">
+                <tr>
+                  <td colspan="2" style="vertical-align:middle;text-align:center;padding:6px 8px 6px 8px;">
+                    <!-- Logo in circular section -->
+                    <div style="width: 80px; height: 80px; border-radius: 50%; overflow: hidden; margin: 0 auto 10px auto; background-color: #ffffff; border: 2px solid #b71c1c; display: flex; align-items: center; justify-content: center;">
+                      <img src="https://i.ibb.co/DPs4v12r/11zon-cropped.png" alt="HemoHive" width="100%" style="display:block;border:none;outline:none;text-decoration:none;object-fit:contain;">
+                    </div>
+                    <!-- Greeting text -->
+                    <div style="font-size:16px;color:#9b1f1f;font-weight:600;line-height:1.05;">
+                      <span style="display:inline-block;">||नमस्ते||Hello||வணக்கம்||ナマステ</span>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Hero image -->
+          <tr>
+            <td style="padding:0; text-align:center; background-color:#000000;">
+              <!-- Use a pre-made banner image that already contains the subtle red overlay for best compatibility -->
+              <img src="https://i.ibb.co/35FbQ75w/unnamed-4.jpg" alt="HemoHive banner" width="700" style="width:100%;max-width:700px;height:auto;display:block;">
+            </td>
+          </tr>
+
+          <!-- Headline + subtext -->
+          <tr>
+            <td style="padding:22px 28px 6px 28px;text-align:center;">
+              <h1 style="margin:0;font-size:22px;color:#b71c1c;font-weight:700;">Welcome to HemoHive, {{userName}}</h1>
+              <p style="margin:10px 0 0 0;color:#555;font-size:14px;line-height:1.5;">
+                Blood Group: <strong style="color:#b71c1c;">{{bloodGroup}}</strong> • Registered on: <strong>{{date}}</strong>
+              </p>
+            </td>
+          </tr>
+
+          <!-- Intro paragraph -->
+          <tr>
+            <td style="padding:12px 36px 6px 36px;text-align:center;">
+              <p style="margin:0;color:#444;font-size:15px;line-height:1.6;max-width:620px;margin-left:auto;margin-right:auto;">
+                At <strong>HemoHive</strong>, we believe every drop matters. Thank you for joining our mission — together we move faster, smarter, and more compassionately to save lives.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Feature cards (horizontal row of 4) -->
+          <tr>
+            <td style="padding:20px 18px 10px 18px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;">
+                <tr>
+                  <!-- Card 1 -->
+                  <td class="feature-column" style="width:25%;padding:8px;vertical-align:top;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-radius:8px;border:1px solid rgba(0,0,0,0.06);overflow:hidden;">
+                      <tr>
+                        <td style="padding:0;">
+                          <img src="https://i.ibb.co/F4tHf020/unnamed-3.jpg" alt="Credit-Based Blood Exchange" width="100%" class="card-image" style="display:block;height:140px;object-fit:cover;">
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:12px;text-align:left;">
+                          <h3 style="margin:0;font-size:15px;color:#b71c1c;">Credit-Based Exchange</h3>
+                          <p style="margin:8px 0 0 0;font-size:13px;color:#555;line-height:1.4;">Take when you need ,Give when you have — credits keep the flow going.</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+
+                  <!-- Card 2 -->
+                  <td class="feature-column" style="width:25%;padding:8px;vertical-align:top;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-radius:8px;border:1px solid rgba(0,0,0,0.06);overflow:hidden;">
+                      <tr>
+                        <td style="padding:0;">
+                          <img src="https://i.ibb.co/ycXdhrM3/unnamed-1.jpg" alt="AI Demand Forecasting" width="100%" class="card-image" style="display:block;height:140px;object-fit:cover;">
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:12px;text-align:left;">
+                          <h3 style="margin:0;font-size:15px;color:#b71c1c;">AI Demand Forecasting</h3>
+                          <p style="margin:8px 0 0 0;font-size:13px;color:#555;line-height:1.4;">Predict demand, reduce shortages — smarter distribution across the city.</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+
+                  <!-- Card 3 -->
+                  <td class="feature-column" style="width:25%;padding:8px;vertical-align:top;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-radius:8px;border:1px solid rgba(0,0,0,0.06);overflow:hidden;">
+                      <tr>
+                        <td style="padding:0;">
+                          <img src="https://i.ibb.co/1YfW5fwB/unnamed-2.jpg" alt="Real-Time Tracking" width="100%" class="card-image " style="display:block;height:140px;object-fit:cover;">
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:12px;text-align:left;">
+                          <h3 style="margin:0;font-size:15px;color:#b71c1c;">Real-Time Tracking</h3>
+                          <p style="margin:8px 0 0 0;font-size:13px;color:#555;line-height:1.4;">Track each unit from pickup to delivery with full transparency.</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+
+                  <!-- Card 4 -->
+                  <td class="feature-column" style="width:25%;padding:8px;vertical-align:top;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-radius:8px;border:1px solid rgba(0,0,0,0.06);overflow:hidden;">
+                      <tr>
+                        <td style="padding:0;">
+                            <img src="https://i.ibb.co/ht0Qc6P/unnamed.jpg" alt="Aadhar based authentication" width="100%" class="card-image " style="display:block;height:140px;object-fit:cover;">
+                            </td>
+                      </tr> 
+                      <tr>
+                        <td style="padding:12px;text-align:left;">
+                          <h3 style="margin:0;font-size:15px;color:#b71c1c;">Aadhar based authentication</h3>
+                          <p style="margin:8px 0 0 0;font-size:13px;color:#555;line-height:1.4;">Authenticate Once, Trust Always.</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- CTA -->
+          <tr>
+            <td style="padding:8px 28px 20px 28px;text-align:center;">
+              <a href="{{dashboardLink}}" style="display:inline-block;background:linear-gradient(90deg,#e03131,#ff5252);color:#fff;padding:12px 26px;border-radius:28px;text-decoration:none;font-weight:700;">Visit Your Dashboard</a>
+            </td>
+          </tr>
+
+          <!-- Closing note & footer -->
+          <tr>
+            <td style="padding:14px 28px 26px 28px;text-align:center;color:#777;font-size:13px;">
+              <p style="margin:0 0 8px 0;font-weight:600;color:#333;">When Every Second Matters, We Deliver.</p>
+              <p style="margin:0 0 8px 0;">© 2025 HemoHive • support@hemohive.in</p>
+            </td>
+          </tr>
+
+        </table>
+        <!-- spacer -->
+        <div style="height:18px;line-height:18px;font-size:18px;">&nbsp;</div>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>
