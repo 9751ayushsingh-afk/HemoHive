@@ -148,7 +148,7 @@ const HemoHiveInvoice = () => {
     alert('📄 Generating PDF...\nThis may take a moment.');
 
     try {
-      const canvas = await html2canvas(invoiceContentRef.current, { scale: 2 });
+      const canvas = await html2canvas(invoiceContentRef.current, { scale: 2 } as any);
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
       const imgWidth = 210; // A4 width in mm
