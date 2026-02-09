@@ -1,5 +1,5 @@
-import BloodBag, { IBloodBag } from '@/models/BloodBag';
-import User from '@/models/User';
+import BloodBag, { IBloodBag } from '../models/BloodBag';
+import User from '../models/User';
 import mongoose from 'mongoose';
 import dbConnect from './dbConnect';
 

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Poppins, Playfair_Display, JetBrains_Mono } from "next/font/google";
 import AppWithLoader from "../components/AppWithLoader";
-import { Providers } from "@/app/providers";
-import { NotificationProvider } from "@/contexts/NotificationContext";
+import { Providers } from "./providers";
+import { NotificationProvider } from "../contexts/NotificationContext";
 import "./globals.css";
 
 const inter = Inter({

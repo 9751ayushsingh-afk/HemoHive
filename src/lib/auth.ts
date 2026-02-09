@@ -1,8 +1,8 @@
 import { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import dbConnect from '@/lib/dbConnect';
-import User from '@/models/User';
+import dbConnect from './dbConnect';
+import User from '../models/User';
 import bcrypt from 'bcryptjs';
 import { NextAuthOptions } from 'next-auth';
 
