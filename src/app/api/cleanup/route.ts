@@ -1,7 +1,7 @@
 
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
-import BloodBag from '@/models/BloodBag';
+import dbConnect from '../../lib/dbConnect';
+import BloodBag from '../../models/BloodBag';
 
 export async function POST(req: Request) {
     try {
