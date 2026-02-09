@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import BloodFlowNetwork from '@/components/blood-literacy/BloodFlowNetwork';
+import BloodFlowNetwork from '../../components/blood-literacy/BloodFlowNetwork';
 
 const BloodLiteracyPage = () => {
   return (
