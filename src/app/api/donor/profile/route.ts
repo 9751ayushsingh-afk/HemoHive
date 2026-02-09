@@ -1,10 +1,10 @@
 
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
-import User from '@/models/User';
-import DonationAppointment from '@/models/DonationAppointment';
+import dbConnect from '../../../../lib/dbConnect';
+import User from '../../../../models/User';
+import DonationAppointment from '../../../../models/DonationAppointment';
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { authOptions } from "../../../../lib/auth";
 
 export async function GET(req: Request) {
     try {

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
-import BloodRequest from '@/models/BloodRequest';
-import User from '@/models/User';
+import dbConnect from '../../../../../lib/dbConnect';
+import BloodRequest from '../../../../../models/BloodRequest';
+import User from '../../../../../models/User';
 
 export async function GET(request: Request, { params }: { params: { requestId: string } }) {
   const { requestId } = params;
@@ -66,7 +66,7 @@ export async function GET(request: Request, { params }: { params: { requestId: s
     };
 
     // [NEW] Check for active delivery
-    const Delivery = (await import('@/models/Delivery')).default;
+    const Delivery = (await import('../../../../../models/Delivery')).default;
     const activeDelivery = await Delivery.findOne({
       requestId: bloodRequest._id,
       status: { $ne: 'CANCELLED' } // Get any non-cancelled delivery
