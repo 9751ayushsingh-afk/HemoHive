@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
-import Credit from '@/models/Credit';
-import BloodRequest from '@/models/BloodRequest';
-import User from '@/models/User';
+import dbConnect from '../../../../../lib/dbConnect';
+import Credit from '../../../../../models/Credit';
+import BloodRequest from '../../../../../models/BloodRequest';
+import User from '../../../../../models/User';
 
 const MAX_EXTENSIONS = 3;
 
@@ -49,7 +49,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
     }
 
     // Fetch pending return requests for this user
-    const returnRequests = await import('@/models/ReturnRequest').then(mod => mod.default.find({
+    const returnRequests = await import('../../../../../models/ReturnRequest').then(mod => mod.default.find({
       userId: userId,
       status: 'pending'
     }));
@@ -72,10 +72,12 @@ export async function GET(request: Request, { params }: { params: { id: string }
       .filter(c => c.status === 'active' || c.status === 'extended')
       .map(formatCredit);
 
+    // Overdue credits
     const overdueCredits = credits
       .filter(c => c.status === 'overdue')
       .map(formatCredit);
 
+    // Cleared credits
     const clearedCredits = credits
       .filter(c => c.status === 'cleared')
       .map(formatCredit);

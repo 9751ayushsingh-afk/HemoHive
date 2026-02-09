@@ -1,7 +1,7 @@
 
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
-import Driver from '@/models/Driver';
+import dbConnect from '../../../lib/dbConnect';
+import Driver from '../../../models/Driver';
 
 export async function GET() {
     await dbConnect();

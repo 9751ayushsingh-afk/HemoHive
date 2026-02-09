@@ -1,10 +1,10 @@
 
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
-import Delivery from '@/models/Delivery';
-import Driver from '@/models/Driver';
-import BloodRequest from '@/models/BloodRequest';
-import User from '@/models/User'; // Ensure User model is loaded
+import dbConnect from '../../../lib/dbConnect';
+import Delivery from '../../../models/Delivery';
+import Driver from '../../../models/Driver';
+import BloodRequest from '../../../models/BloodRequest';
+import User from '../../../models/User'; // Ensure User model is loaded
 import mongoose from 'mongoose';
 
 // Helper to generate 4-digit code

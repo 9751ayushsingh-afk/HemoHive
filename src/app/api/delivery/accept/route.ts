@@ -1,8 +1,8 @@
 
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
-import Delivery from '@/models/Delivery';
-import Driver from '@/models/Driver';
+import dbConnect from '../../../lib/dbConnect';
+import Delivery from '../../../models/Delivery';
+import Driver from '../../../models/Driver';
 import mongoose from 'mongoose';
 
 export async function POST(request: Request) {
