@@ -2,10 +2,10 @@
 import React, { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
-import BloodGroupCard from '../../components/hospital/inventory/BloodGroupCard';
-import InventoryControlPanel from '../../components/hospital/inventory/InventoryControlPanel';
-import AnimatedChartsPanel from '../../components/hospital/inventory/AnimatedChartsPanel';
-import BagListModal from '../../components/hospital/inventory/BagListModal';
+import BloodGroupCard from '../../../components/hospital/inventory/BloodGroupCard';
+import InventoryControlPanel from '../../../components/hospital/inventory/InventoryControlPanel';
+import AnimatedChartsPanel from '../../../components/hospital/inventory/AnimatedChartsPanel';
+import BagListModal from '../../../components/hospital/inventory/BagListModal';
 import { IBloodBag } from '@/models/BloodBag';
 
 const fetchInventory = async () => {
