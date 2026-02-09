@@ -2,7 +2,7 @@
 import React from 'react';
 import { getServerSession } from 'next-auth/next';
 import { redirect } from 'next/navigation';
-import { authOptions } from '@/lib/auth';
+import { authOptions } from '../../../lib/auth';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 

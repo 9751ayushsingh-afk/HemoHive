@@ -1,7 +1,7 @@
 
 import { getServerSession } from 'next-auth/next';
 import { redirect } from 'next/navigation';
-import { authOptions } from '@/lib/auth';
+import { authOptions } from '../../../lib/auth';
 
 const RedirectPage = async () => {
   const session = await getServerSession(authOptions);

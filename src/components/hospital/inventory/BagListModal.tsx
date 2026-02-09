@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { motion } from 'framer-motion';
-import { IBloodBag } from '@/models/BloodBag';
+import { IBloodBag } from '../../../models/BloodBag';
 import ListConfirmationModal from './ListConfirmationModal';
 import { useState } from 'react';
 

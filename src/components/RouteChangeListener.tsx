@@ -3,7 +3,7 @@
 
 import { useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useLoading } from '@/contexts/LoadingContext';
+import { useLoading } from '../contexts/LoadingContext';
 
 const RouteChangeListener = () => {
   const pathname = usePathname();

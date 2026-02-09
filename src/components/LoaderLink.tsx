@@ -2,7 +2,7 @@
 'use client';
 
 import Link, { LinkProps } from 'next/link';
-import { useLoading } from '@/contexts/LoadingContext';
+import { useLoading } from '../contexts/LoadingContext';
 import { ReactNode } from 'react';
 
 interface LoaderLinkProps extends LinkProps {

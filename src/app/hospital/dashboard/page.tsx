@@ -1,9 +1,9 @@
 
 import React from 'react';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth';
-import dbConnect from '@/lib/dbConnect';
-import Inventory from '@/models/Inventory';
+import { authOptions } from '../../../lib/auth';
+import dbConnect from '../../../lib/dbConnect';
+import Inventory from '../../../models/Inventory';
 import OverviewCards from './components/OverviewCards';
 import LiveBloodRequests from './components/LiveBloodRequests';
 import PendingReturnsBoard from './components/PendingReturnsBoard';

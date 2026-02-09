@@ -2,9 +2,9 @@
 import React from 'react';
 import Link from 'next/link';
 import { UserPlus, Users, Truck, Activity } from 'lucide-react';
-import dbConnect from '@/lib/dbConnect';
-import Driver from '@/models/Driver';
-import User from '@/models/User';
+import dbConnect from '../../lib/dbConnect';
+import Driver from '../../models/Driver';
+import User from '../../models/User';
 
 export default async function AdminDashboard() {
     await dbConnect();

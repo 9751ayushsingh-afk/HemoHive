@@ -1,8 +1,8 @@
 
 import DeliveryTracking from '../../../../components/delivery/DeliveryTracking';
-import dbConnect from '@/lib/dbConnect';
-import Delivery from '@/models/Delivery';
-import Driver from '@/models/Driver';
+import dbConnect from '../../../../lib/dbConnect';
+import Delivery from '../../../../models/Delivery';
+import Driver from '../../../../models/Driver';
 
 export default async function TrackDeliveryPage({ params }: { params: { deliveryId: string } }) {
     await dbConnect();

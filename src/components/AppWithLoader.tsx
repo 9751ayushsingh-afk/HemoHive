@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import SplashScreen from './SplashScreen';
-import { Providers } from '@/app/providers';
+import { Providers } from '../app/providers';
 import CustomNavBar from './CustomNavBar';
 
 const navItems = [

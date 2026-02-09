@@ -1,8 +1,9 @@
+
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth';
-import dbConnect from '@/lib/dbConnect';
-import Inventory from '@/models/Inventory';
+import { authOptions } from '../../../lib/auth';
+import dbConnect from '../../../lib/dbConnect';
+import Inventory from '../../../models/Inventory';
 import HospitalHomeClient from './HospitalHomeClient';
 
 const HospitalHomePage = async () => {

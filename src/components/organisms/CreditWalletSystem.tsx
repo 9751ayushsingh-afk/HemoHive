@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lottie from 'lottie-react';
-import confettiAnimation from '@/../public/confetti.json';
+import confettiAnimation from '../../../public/confetti.json';
 import AIAssistant from './AIAssistant';
 import CreditHealthMeter from '../molecules/CreditHealthMeter';
 import CreditStatusCard from '../molecules/CreditStatusCard';

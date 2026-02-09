@@ -6,7 +6,7 @@ import BloodGroupCard from '../../../components/hospital/inventory/BloodGroupCar
 import InventoryControlPanel from '../../../components/hospital/inventory/InventoryControlPanel';
 import AnimatedChartsPanel from '../../../components/hospital/inventory/AnimatedChartsPanel';
 import BagListModal from '../../../components/hospital/inventory/BagListModal';
-import { IBloodBag } from '@/models/BloodBag';
+import { IBloodBag } from '../../../models/BloodBag';
 
 const fetchInventory = async () => {
   const res = await fetch('/api/inventory');
