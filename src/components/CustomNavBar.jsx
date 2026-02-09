@@ -9,8 +9,8 @@ import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 
-import { useMobile } from '@/hooks/use-mobile';
-import { AnimatedLogo } from '@/components/atoms/AnimatedLogo';
+import { useMobile } from '../hooks/use-mobile';
+import { AnimatedLogo } from './atoms/AnimatedLogo';
 
 const MobileMenu = ({ items, isOpen, onClose, session, status }) => {
   useEffect(() => {
