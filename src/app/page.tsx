@@ -1,20 +1,20 @@
 "use client";
 import React from "react";
 import dynamic from "next/dynamic";
-import AnimatedText from '@/components/AnimatedText';
+import AnimatedText from '../components/AnimatedText';
 import Link from "next/link";
 import { motion } from "framer-motion";
 
 // Dynamically import components
 
-const StickyScrollReveal = dynamic(() => import("@/components/StickyScrollReveal"), { ssr: false });
-const ChaosScroll = dynamic(() => import("@/components/organisms/ChaosScroll"), { ssr: false });
-const HowItWorks = dynamic(() => import("@/components/organisms/HowItWorks"), { ssr: false });
-const HeatmapPreview = dynamic(() => import("@/components/organisms/HeatmapPreview"), { ssr: false });
-const Footer = dynamic(() => import("@/components/organisms/Footer"), { ssr: false });
+const StickyScrollReveal = dynamic(() => import("../components/StickyScrollReveal"), { ssr: false });
+const ChaosScroll = dynamic(() => import("../components/organisms/ChaosScroll"), { ssr: false });
+const HowItWorks = dynamic(() => import("../components/organisms/HowItWorks"), { ssr: false });
+const HeatmapPreview = dynamic(() => import("../components/organisms/HeatmapPreview"), { ssr: false });
+const Footer = dynamic(() => import("../components/organisms/Footer"), { ssr: false });
 import { useMobile } from "@/hooks/use-mobile";
-const MobileHero = dynamic(() => import("@/components/MobileHero"), { ssr: false });
-const LiquidEther = dynamic(() => import("@/components/LiquidEther"), { ssr: false });
+const MobileHero = dynamic(() => import("../components/MobileHero"), { ssr: false });
+const LiquidEther = dynamic(() => import("../components/LiquidEther"), { ssr: false });
 
 const Home = () => {
   const isMobile = useMobile();
