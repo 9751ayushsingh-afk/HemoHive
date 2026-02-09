@@ -1,8 +1,8 @@
 import { NextResponse, NextRequest } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
-import BloodRequest from '@/models/BloodRequest';
-import Inventory from '@/models/Inventory'; // Import Inventory model
-import { getAuth } from '@/lib/auth';
+import dbConnect from '../../../../../lib/dbConnect';
+import BloodRequest from '../../../../../models/BloodRequest';
+import Inventory from '../../../../../models/Inventory'; // Import Inventory model
+import { getAuth } from '../../../../../lib/auth';
 
 export async function PUT(request: NextRequest, { params }: { params: { requestId: string } }) {
   await dbConnect();
