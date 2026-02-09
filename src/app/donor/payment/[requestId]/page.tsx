@@ -5,7 +5,7 @@ import { Download, Truck, AlertCircle, CheckCircle, Receipt, Calendar, User, Pho
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas-pro';
+import html2canvas from 'html2canvas';
 import { toast } from 'react-hot-toast';
 
 interface InvoiceData {
