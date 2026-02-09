@@ -1,6 +1,6 @@
 "use client";
 
-import HemoHiveLoginForm from "@/components/organisms/HemoHiveLoginForm";
+import HemoHiveLoginForm from "../../components/organisms/HemoHiveLoginForm";
 
 const LoginPage = () => {
   return (
