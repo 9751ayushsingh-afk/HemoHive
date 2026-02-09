@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import UserProfileCard from '@/components/donor/UserProfileCard';
-import DonateBloodCard from '@/components/donor/DonateBloodCard';
-import BloodRequestModule from '@/components/donor/BloodRequestModule';
-import CreditWallet from '@/components/donor/CreditWallet';
-import BloodRequestHistory from '@/components/donor/BloodRequestHistory';
-import LockedFeature from '@/components/donor/LockedFeature';
+import UserProfileCard from '../../components/donor/UserProfileCard';
+import DonateBloodCard from '../../components/donor/DonateBloodCard';
+import BloodRequestModule from '../../components/donor/BloodRequestModule';
+import CreditWallet from '../../components/donor/CreditWallet';
+import BloodRequestHistory from '../../components/donor/BloodRequestHistory';
+import LockedFeature from '../../components/donor/LockedFeature';
 
 const DonorDashboardPage = () => {
   const { data: session } = useSession();
