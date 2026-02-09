@@ -1,4 +1,4 @@
-import MissionPage from '@/components/pages/MissionPage';
+import MissionPage from '../../components/pages/MissionPage';
 
 export const metadata = {
     title: 'Our Mission | HemoHive',

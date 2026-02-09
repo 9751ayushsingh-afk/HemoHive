@@ -1,5 +1,5 @@
 import React from 'react';
-import Sidebar from '@/components/donor/Sidebar';
+import Sidebar from '../../components/donor/Sidebar';
 
 export default function DonorLayout({
   children,

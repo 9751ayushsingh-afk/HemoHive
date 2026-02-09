@@ -1,5 +1,5 @@
 
-import DriverDashboard from '@/components/delivery/DriverDashboard';
+import DriverDashboard from '../../../components/delivery/DriverDashboard';
 
 export default function DriverPage() {
     return (
