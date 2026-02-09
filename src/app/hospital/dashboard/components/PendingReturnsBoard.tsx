@@ -5,7 +5,7 @@ import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
-import QrScannerModal from '@/components/hospital/inventory/QrScannerModal';
+import QrScannerModal from '../../../../components/hospital/inventory/QrScannerModal';
 
 interface ReturnRequest {
   _id: string;

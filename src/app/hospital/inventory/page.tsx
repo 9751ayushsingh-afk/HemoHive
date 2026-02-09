@@ -2,10 +2,10 @@
 import React, { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
-import BloodGroupCard from '@/components/hospital/inventory/BloodGroupCard';
-import InventoryControlPanel from '@/components/hospital/inventory/InventoryControlPanel';
-import AnimatedChartsPanel from '@/components/hospital/inventory/AnimatedChartsPanel';
-import BagListModal from '@/components/hospital/inventory/BagListModal';
+import BloodGroupCard from '../../components/hospital/inventory/BloodGroupCard';
+import InventoryControlPanel from '../../components/hospital/inventory/InventoryControlPanel';
+import AnimatedChartsPanel from '../../components/hospital/inventory/AnimatedChartsPanel';
+import BagListModal from '../../components/hospital/inventory/BagListModal';
 import { IBloodBag } from '@/models/BloodBag';
 
 const fetchInventory = async () => {
@@ -61,7 +61,7 @@ const InventoryPage = () => {
     } else if (activeFilter === 'expiring_7d') {
       const sevenDaysFromNow = new Date();
       sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
-      
+
       const expiringGroupUnits: { [key: string]: number } = {};
 
       const expiringBags = bagsForModal.filter((bag: IBloodBag) => {
@@ -94,8 +94,8 @@ const InventoryPage = () => {
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="lg:w-2/3 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {bloodGroups.map(group => (
-              <BloodGroupCard 
-                key={group.bloodGroup} 
+              <BloodGroupCard
+                key={group.bloodGroup}
                 {...group}
                 onClick={() => setSelectedGroup(group.bloodGroup)}
               />
@@ -109,9 +109,9 @@ const InventoryPage = () => {
       </div>
       <AnimatePresence>
         {selectedGroup && (
-          <BagListModal 
-            bloodGroup={selectedGroup} 
-            onClose={() => setSelectedGroup(null)} 
+          <BagListModal
+            bloodGroup={selectedGroup}
+            onClose={() => setSelectedGroup(null)}
             bags={bagsForModal.filter((bag: IBloodBag) => bag.bloodGroup === selectedGroup)}
           />
         )}
