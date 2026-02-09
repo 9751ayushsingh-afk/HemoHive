@@ -11,7 +11,7 @@ import { io } from 'socket.io-client'; // Import Socket.IO
 import dynamic from 'next/dynamic';
 const QrReader = dynamic(() => import('react-qr-scanner'), { ssr: false });
 
-const LiveMap = dynamic(() => import('@/components/delivery/LiveMap'), { ssr: false });
+const LiveMap = dynamic(() => import('./LiveMap'), { ssr: false });
 
 
 export default function DriverDashboard() {

@@ -12,7 +12,7 @@ const ChaosScroll = dynamic(() => import("../components/organisms/ChaosScroll"),
 const HowItWorks = dynamic(() => import("../components/organisms/HowItWorks"), { ssr: false });
 const HeatmapPreview = dynamic(() => import("../components/organisms/HeatmapPreview"), { ssr: false });
 const Footer = dynamic(() => import("../components/organisms/Footer"), { ssr: false });
-import { useMobile } from "@/hooks/use-mobile";
+import { useMobile } from "../hooks/use-mobile";
 const MobileHero = dynamic(() => import("../components/MobileHero"), { ssr: false });
 const LiquidEther = dynamic(() => import("../components/LiquidEther"), { ssr: false });
 
