@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import SplashScreen from '@/components/SplashScreen';
+import SplashScreen from './SplashScreen';
 import { Providers } from '@/app/providers';
-import CustomNavBar from '@/components/CustomNavBar';
+import CustomNavBar from './CustomNavBar';
 
 const navItems = [
     { href: "/", label: "Home" },
