@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/db';
-import BloodBag from '@/models/BloodBag';
-import InventoryChangeLog from '@/models/InventoryChangeLog';
-import Inventory from '@/models/Inventory';
-import { getAuth } from '@/lib/auth';
+import dbConnect from '../../../../lib/db';
+import BloodBag from '../../../../models/BloodBag';
+import InventoryChangeLog from '../../../../models/InventoryChangeLog';
+import Inventory from '../../../../models/Inventory';
+import { getAuth } from '../../../../lib/auth';
 
 export async function POST(req: NextRequest) {
   await dbConnect();

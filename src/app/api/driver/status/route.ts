@@ -1,9 +1,9 @@
 
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import dbConnect from '@/lib/dbConnect';
-import Driver from '@/models/Driver';
+import { authOptions } from '../../../../lib/auth';
+import dbConnect from '../../../../lib/dbConnect';
+import Driver from '../../../../models/Driver';
 
 export async function POST(request: Request) {
     await dbConnect();

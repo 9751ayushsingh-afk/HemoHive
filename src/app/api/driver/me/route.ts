@@ -1,11 +1,11 @@
 
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import dbConnect from '@/lib/dbConnect';
-import Driver from '@/models/Driver';
-import Delivery from '@/models/Delivery';
-import User from '@/models/User';
+import { authOptions } from '../../../../lib/auth';
+import dbConnect from '../../../../lib/dbConnect';
+import Driver from '../../../../models/Driver';
+import Delivery from '../../../../models/Delivery';
+import User from '../../../../models/User';
 
 export async function GET() {
     await dbConnect();

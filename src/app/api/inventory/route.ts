@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
-import Inventory from '@/models/Inventory';
-import BloodBag from '@/models/BloodBag';
-import { getAuth } from '@/lib/auth';
+import dbConnect from '../../../lib/dbConnect';
+import Inventory from '../../../models/Inventory';
+import BloodBag from '../../../models/BloodBag';
+import { getAuth } from '../../../lib/auth';
 
 export async function GET(req: NextRequest) {
   await dbConnect();
