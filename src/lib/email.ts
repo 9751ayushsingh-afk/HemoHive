@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import fs from 'fs';
 import path from 'path';
 
@@ -9,33 +9,8 @@ interface UserData {
     bloodGroup: string;
 }
 
-// 1. Create a Nodemailer transporter
-// We will use environment variables for the configuration
-// Helper to safely parse boolean env vars
-const envPort = process.env.EMAIL_SERVER_PORT ? process.env.EMAIL_SERVER_PORT.trim() : '587';
-const port = Number(envPort);
-const isSecure = process.env.EMAIL_SERVER_SECURE?.toLowerCase() === 'true' || port === 465;
-const host = process.env.EMAIL_SERVER_HOST?.trim();
-
-const transportConfig: any = {
-    auth: {
-        user: process.env.EMAIL_SERVER_USER,
-        pass: process.env.EMAIL_SERVER_PASSWORD,
-    },
-    debug: true,
-    logger: true,
-    connectionTimeout: 10000,
-};
-
-if (host === 'smtp.gmail.com') {
-    transportConfig.service = 'gmail';
-} else {
-    transportConfig.host = host;
-    transportConfig.port = port;
-    transportConfig.secure = isSecure;
-}
-
-const transporter = nodemailer.createTransport(transportConfig);
+// 1. Initialize Resend
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // 2. Function to read the email template
 const readEmailTemplate = (): string => {
@@ -55,22 +30,21 @@ export const sendWelcomeEmail = async (userData: UserData) => {
             .replace('{{bloodGroup}}', userData.bloodGroup)
             .replace('{{date}}', registrationDate);
 
-        const mailOptions = {
-            from: {
-                name: 'HemoHive',
-                address: process.env.EMAIL_SERVER_USER || 'noreply@hemohive.com'
-            }, // sender address
-            to: userData.email, // list of receivers
-            subject: `Welcome to HemoHive, ${userData.userName} — Every Drop Counts`, // Subject line
-            html: htmlToSend, // html body
-        };
+        // Send via Resend
+        // Note: 'onboarding@resend.dev' works for testing if sending to the registered Resend account email.
+        // For production, a verified domain is required.
+        const fromEmail = process.env.EMAIL_FROM || 'onboarding@resend.dev';
 
-        await transporter.sendMail(mailOptions);
+        await resend.emails.send({
+            from: fromEmail,
+            to: userData.email,
+            subject: `Welcome to HemoHive, ${userData.userName} — Every Drop Counts`,
+            html: htmlToSend,
+        });
+
         console.log('Welcome email sent successfully to:', userData.email);
     } catch (error) {
         console.error('Error sending welcome email:', error);
-        // We throw the error so the calling function knows something went wrong.
-        // In the registration API, we will catch this to prevent the registration from failing.
         throw new Error('Failed to send welcome email.');
     }
 };
