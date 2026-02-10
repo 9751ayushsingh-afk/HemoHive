@@ -45,6 +45,16 @@ const nextConfig = {
     esmExternals: 'loose',
   },
   transpilePackages: ['three', '@react-three/fiber', '@react-three/drei', '@react-three/rapier'],
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
+  },
 };
 
 module.exports = nextConfig;
