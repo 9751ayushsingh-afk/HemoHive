@@ -9,19 +9,46 @@ interface UserData {
     bloodGroup: string;
 }
 
-// 1. Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY);
+// 1. Lazy Initialization of Resend to prevent build-time errors
+let resend: Resend | null = null;
+
+const getResendClient = () => {
+    if (!resend) {
+        const apiKey = process.env.RESEND_API_KEY;
+        if (apiKey) {
+            resend = new Resend(apiKey);
+        } else {
+            console.warn("RESEND_API_KEY is missing. Email sending will be disabled.");
+        }
+    }
+    return resend;
+};
 
 // 2. Function to read the email template
 const readEmailTemplate = (): string => {
-    const templatePath = path.join(process.cwd(), 'src', 'lib', 'welcome-email-template.html');
-    return fs.readFileSync(templatePath, 'utf-8');
+    try {
+        const templatePath = path.join(process.cwd(), 'src', 'lib', 'welcome-email-template.html');
+        return fs.readFileSync(templatePath, 'utf-8');
+    } catch (error) {
+        console.error("Failed to read email template:", error);
+        return "";
+    }
 };
 
 // 3. Function to send the welcome email
 export const sendWelcomeEmail = async (userData: UserData) => {
     try {
+        const client = getResendClient();
+        if (!client) {
+            console.log("Mock Email Sent (Missing API Key):", userData.email);
+            return;
+        }
+
         const htmlTemplate = readEmailTemplate();
+        if (!htmlTemplate) {
+            console.error("Email template not found. Skipping email.");
+            return;
+        }
 
         // Replace placeholders with actual data
         const registrationDate = new Date().toLocaleDateString();
@@ -31,11 +58,9 @@ export const sendWelcomeEmail = async (userData: UserData) => {
             .replace('{{date}}', registrationDate);
 
         // Send via Resend
-        // Note: 'onboarding@resend.dev' works for testing if sending to the registered Resend account email.
-        // For production, a verified domain is required.
         const fromEmail = process.env.EMAIL_FROM || 'onboarding@resend.dev';
 
-        await resend.emails.send({
+        await client.emails.send({
             from: fromEmail,
             to: userData.email,
             subject: `Welcome to HemoHive, ${userData.userName} — Every Drop Counts`,
@@ -45,6 +70,6 @@ export const sendWelcomeEmail = async (userData: UserData) => {
         console.log('Welcome email sent successfully to:', userData.email);
     } catch (error) {
         console.error('Error sending welcome email:', error);
-        throw new Error('Failed to send welcome email.');
+        // Do not throw, finding email errors should not block registration flow
     }
 };
