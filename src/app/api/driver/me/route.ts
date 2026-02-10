@@ -7,6 +7,8 @@ import Driver from '../../../../models/Driver';
 import Delivery from '../../../../models/Delivery';
 import User from '../../../../models/User';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
     await dbConnect();
     const session = await getServerSession(authOptions);

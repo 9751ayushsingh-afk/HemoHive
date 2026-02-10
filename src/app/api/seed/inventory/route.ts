@@ -4,6 +4,8 @@ import dbConnect from '../../../../lib/dbConnect';
 import User from '../../../../models/User';
 import Inventory from '../../../../models/Inventory';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   await dbConnect();
 

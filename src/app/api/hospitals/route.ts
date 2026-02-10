@@ -4,6 +4,8 @@ import dbConnect from '../../../lib/db';
 import Hospital from '../../../models/Hospital';
 import User from '../../../models/User'; // [FIX] Import User model
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   await dbConnect();
 

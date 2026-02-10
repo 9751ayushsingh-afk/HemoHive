@@ -4,6 +4,8 @@ import dbConnect from '../../../../../lib/dbConnect';
 import Driver from '../../../../../models/Driver';
 import User from '../../../../../models/User';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
     await dbConnect();
     try {

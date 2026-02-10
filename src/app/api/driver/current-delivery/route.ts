@@ -6,6 +6,8 @@ import dbConnect from '../../../../lib/dbConnect';
 import Delivery from '../../../../models/Delivery';
 import Driver from '../../../../models/Driver';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
     await dbConnect();
     const session = await getServerSession(authOptions);
