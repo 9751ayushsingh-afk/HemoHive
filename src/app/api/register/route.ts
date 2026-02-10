@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '../../../lib/dbConnect';
 import User from '../../../models/User';
-import { writeFile } from 'fs/promises';
-import path from 'path';
+import cloudinary from '../../../lib/cloudinary';
 import { sendWelcomeEmail } from '../../../lib/email';
 
 export async function POST(request: Request) {
@@ -16,16 +15,26 @@ export async function POST(request: Request) {
         let profilePictureUrl: string | undefined = undefined;
 
         if (profilePictureFile && profilePictureFile.size > 0) {
-            const buffer = Buffer.from(await profilePictureFile.arrayBuffer());
-            const filename = `${Date.now()}-${profilePictureFile.name.replace(/\s+/g, '-')}`;
-            const uploadDir = path.join(process.cwd(), 'public/uploads/avatars');
+            const arrayBuffer = await profilePictureFile.arrayBuffer();
+            const buffer = new Uint8Array(arrayBuffer);
 
-            await writeFile(
-                path.join(uploadDir, filename),
-                buffer
-            );
+            // Upload to Cloudinary using a stream
+            const uploadResult = await new Promise<any>((resolve, reject) => {
+                cloudinary.uploader.upload_stream(
+                    {
+                        folder: "hemohive/avatars", // Optional: organize uploads
+                    },
+                    (error: any, result: any) => {
+                        if (error) {
+                            reject(error);
+                        } else {
+                            resolve(result);
+                        }
+                    }
+                ).end(buffer);
+            });
 
-            profilePictureUrl = `/uploads/avatars/${filename}`;
+            profilePictureUrl = uploadResult.secure_url;
         }
 
         // Check if user already exists

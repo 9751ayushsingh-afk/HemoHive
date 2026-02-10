@@ -41,6 +41,7 @@
     "bcryptjs": "^3.0.2",
     "chart.js": "^4.4.3",
     "class-variance-authority": "^0.7.0",
+    "cloudinary": "^2.9.0",
     "clsx": "^2.1.1",
     "dot": "^1.1.3",
     "dotenv": "^17.2.3",
