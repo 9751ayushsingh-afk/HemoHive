@@ -16,7 +16,7 @@ export const AnimatedLogo = ({ className = "h-10" }: { className?: string }) => 
                 }}
                 className="relative z-10"
             >
-                <img src="/hemohive_logo.png" alt="HemoHive Logo" className={className} />
+                <img src="/HemoHive_logo.png" alt="HemoHive Logo" className={className} />
             </motion.div>
 
             {/* Shimmer Effect */}
