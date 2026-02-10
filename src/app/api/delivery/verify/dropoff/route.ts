@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import dbConnect from '../../../../lib/dbConnect';
-import Delivery from '../../../../models/Delivery';
-import Driver from '../../../../models/Driver';
-import BloodBag from '../../../../models/BloodBag'; // Import BloodBag Model
-import Inventory from '../../../../models/Inventory';
+import dbConnect from '../../../../../lib/dbConnect';
+import Delivery from '../../../../../models/Delivery';
+import Driver from '../../../../../models/Driver';
+import BloodBag from '../../../../../models/BloodBag'; // Import BloodBag Model
+import Inventory from '../../../../../models/Inventory';
 
 export async function POST(request: Request) {
     await dbConnect();
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
 
         // Update Blood Request Status to 'Fulfilled'
         if (delivery.requestId) {
-            const BloodRequest = (await import('../../../../models/BloodRequest')).default;
+            const BloodRequest = (await import('../../../../../models/BloodRequest')).default;
             await BloodRequest.findByIdAndUpdate(delivery.requestId._id || delivery.requestId, { status: 'Fulfilled' });
         }
 
