@@ -5,22 +5,27 @@ import { QRCodeSVG } from 'qrcode.react';
 interface SuccessViewProps {
   onHome: () => void;
   appointment: any;
+  isViewOnly?: boolean;
 }
 
-const SuccessView: React.FC<SuccessViewProps> = ({ onHome, appointment }) => {
+const SuccessView: React.FC<SuccessViewProps> = ({ onHome, appointment, isViewOnly = false }) => {
   return (
     <div className="max-w-md mx-auto text-center py-10 animate-fade-in">
-      <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 text-green-600 shadow-sm">
-        <CheckCircle size={48} />
-      </div>
+      {!isViewOnly && (
+        <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 text-green-600 shadow-sm">
+          <CheckCircle size={48} />
+        </div>
+      )}
 
-      <h1 className="text-3xl font-bold text-slate-900 mb-2">Booking Confirmed!</h1>
-      <h2 className="text-xl text-slate-600 font-medium mb-6">अपॉइंटमेंट कन्फर्म करें</h2>
+      <h1 className="text-3xl font-bold text-slate-900 mb-2">{isViewOnly ? "Donation Ticket" : "Booking Confirmed!"}</h1>
+      <h2 className="text-xl text-slate-600 font-medium mb-6">{isViewOnly ? "View Ticket Details" : "अपॉइंटमेंट कन्फर्म करें"}</h2>
 
-      <p className="text-slate-500 mb-8">
-        Thank you for choosing to save a life. <br />
-        Your appointment details have been sent via SMS.
-      </p>
+      {!isViewOnly && (
+        <p className="text-slate-500 mb-8">
+          Thank you for choosing to save a life. <br />
+          Your appointment details have been sent via SMS.
+        </p>
+      )}
 
       {/* Ticket / Pass */}
       <div className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden mb-8 text-left">
@@ -45,7 +50,9 @@ const SuccessView: React.FC<SuccessViewProps> = ({ onHome, appointment }) => {
             </div>
             <div>
               <p className="text-xs text-slate-400 uppercase font-bold">Location</p>
-              <p className="font-semibold text-slate-900">Center ID: {appointment.center}</p>
+              <p className="font-semibold text-slate-900">
+                Center: {appointment.centerName || appointment.center || 'Unknown'}
+              </p>
             </div>
           </div>
 
@@ -55,7 +62,7 @@ const SuccessView: React.FC<SuccessViewProps> = ({ onHome, appointment }) => {
             </div>
             <div>
               <p className="text-xs text-slate-400 uppercase font-bold">Donation Type</p>
-              <p className="font-semibold text-slate-900">{appointment.type}</p>
+              <p className="font-semibold text-slate-900">{appointment.donationType || appointment.type || 'Whole Blood'}</p>
             </div>
           </div>
         </div>

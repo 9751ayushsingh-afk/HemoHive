@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, Wallet, Droplets, History, User, HelpCircle } from 'lucide-react';
+import { AnimatedLogo } from '../atoms/AnimatedLogo'; // Import AnimatedLogo
 import { motion } from 'framer-motion';
 
 const navItems = [
@@ -20,14 +21,16 @@ const Sidebar = () => {
 
   return (
     <aside
-      className={`w-64 h-screen backdrop-blur-xl p-6 flex flex-col fixed top-0 left-0 shadow-2xl transition-colors duration-300
+      className={`w-64 h-screen backdrop-blur-xl p-6 flex flex-col fixed top-0 left-0 shadow-2xl transition-colors duration-300 z-[1001]
         ${isLightMode
           ? 'bg-[#FAFAF9]/90 text-stone-900 border-r border-stone-200 shadow-stone-200/50'
           : 'bg-black/30 text-white shadow-black/30'
         }`}
     >
-      <div className="text-3xl font-bold mb-12 text-center">
-        <span className={isLightMode ? "text-stone-900" : "text-white"}>Hemo</span><span className="text-red-500">Hive</span>
+      <div className="flex justify-center mb-10">
+        <Link href="/donor">
+          <AnimatedLogo className="h-12" />
+        </Link>
       </div>
       <nav className="flex-grow">
         <ul>

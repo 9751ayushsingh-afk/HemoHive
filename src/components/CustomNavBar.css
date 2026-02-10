@@ -54,9 +54,9 @@
 }
 
 .custom-nav-item {
-  font-family: var(--font-body);
+  font-family: var(--font-tech);
   font-weight: 500;
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: var(--foreground);
   text-decoration: none;
   position: relative;

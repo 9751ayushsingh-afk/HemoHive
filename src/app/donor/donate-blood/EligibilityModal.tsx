@@ -28,13 +28,13 @@ const EligibilityModal: React.FC<EligibilityModalProps> = ({ onClose, onEligible
       const age = parseInt(formData.age);
       const weight = parseInt(formData.weight);
       const hb = parseFloat(formData.hemoglobin);
-      
+
       // Simple logic based on specs
-      const isEligible = 
+      const isEligible =
         (age >= 18 && age <= 65) &&
         (weight >= 50) &&
         (hb >= 12.5);
-      
+
       setStatus(isEligible ? 'eligible' : 'not-eligible');
       setLoading(false);
     }, 800);
@@ -59,7 +59,7 @@ const EligibilityModal: React.FC<EligibilityModalProps> = ({ onClose, onEligible
                 name="age"
                 value={formData.age}
                 onChange={handleChange}
-                className="w-full border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                className="w-full border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-red-500 focus:border-red-500 text-slate-900"
                 placeholder="e.g. 25"
               />
             </div>
@@ -70,7 +70,7 @@ const EligibilityModal: React.FC<EligibilityModalProps> = ({ onClose, onEligible
                 name="weight"
                 value={formData.weight}
                 onChange={handleChange}
-                className="w-full border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                className="w-full border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-red-500 focus:border-red-500 text-slate-900"
                 placeholder="e.g. 65"
               />
             </div>
@@ -84,7 +84,7 @@ const EligibilityModal: React.FC<EligibilityModalProps> = ({ onClose, onEligible
               name="hemoglobin"
               value={formData.hemoglobin}
               onChange={handleChange}
-              className="w-full border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-red-500 focus:border-red-500"
+              className="w-full border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-red-500 focus:border-red-500 text-slate-900"
               placeholder="e.g. 13.5"
             />
           </div>
@@ -96,7 +96,7 @@ const EligibilityModal: React.FC<EligibilityModalProps> = ({ onClose, onEligible
               name="lastDonation"
               value={formData.lastDonation}
               onChange={handleChange}
-              className="w-full border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-red-500 focus:border-red-500"
+              className="w-full border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-red-500 focus:border-red-500 text-slate-900"
               placeholder="e.g. 95 (Leave 0 if first time)"
             />
           </div>
