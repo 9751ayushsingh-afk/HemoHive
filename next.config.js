@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  optimizeFonts: false,
   webpack: (config, { isServer }) => {
     // Handle Three.js and WebGL modules
     config.module.rules.push({
