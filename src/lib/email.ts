@@ -15,20 +15,27 @@ interface UserData {
 const envPort = process.env.EMAIL_SERVER_PORT ? process.env.EMAIL_SERVER_PORT.trim() : '587';
 const port = Number(envPort);
 const isSecure = process.env.EMAIL_SERVER_SECURE?.toLowerCase() === 'true' || port === 465;
+const host = process.env.EMAIL_SERVER_HOST?.trim();
 
-const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_SERVER_HOST,
-    port: port,
-    secure: isSecure,
+const transportConfig: any = {
     auth: {
         user: process.env.EMAIL_SERVER_USER,
         pass: process.env.EMAIL_SERVER_PASSWORD,
     },
-    // Debug options to help diagnose connection issues
     debug: true,
     logger: true,
-    connectionTimeout: 10000, // 10 seconds
-} as nodemailer.TransportOptions);
+    connectionTimeout: 10000,
+};
+
+if (host === 'smtp.gmail.com') {
+    transportConfig.service = 'gmail';
+} else {
+    transportConfig.host = host;
+    transportConfig.port = port;
+    transportConfig.secure = isSecure;
+}
+
+const transporter = nodemailer.createTransport(transportConfig);
 
 // 2. Function to read the email template
 const readEmailTemplate = (): string => {
