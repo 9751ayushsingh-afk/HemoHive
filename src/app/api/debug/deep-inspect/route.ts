@@ -1,9 +1,9 @@
 
 import { NextResponse } from 'next/server';
-import dbConnect from '../../../lib/dbConnect';
-import BloodBag from '../../../models/BloodBag';
+import dbConnect from '../../../../lib/dbConnect';
+import BloodBag from '../../../../models/BloodBag';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from "../../../lib/auth";
+import { authOptions } from "../../../../lib/auth";
 
 export async function GET(req: Request) {
     try {

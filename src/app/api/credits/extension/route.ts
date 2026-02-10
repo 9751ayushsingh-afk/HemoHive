@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import dbConnect from '../../../lib/dbConnect';
-import Credit from '../../../models/Credit';
+import dbConnect from '../../../../lib/dbConnect';
+import Credit from '../../../../models/Credit';
 
 const MAX_EXTENSIONS = 3;
 const EXTENSION_DAYS = 7;

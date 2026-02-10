@@ -1,8 +1,8 @@
 
 import { NextResponse } from 'next/server';
-import dbConnect from '../../../lib/dbConnect';
-import Driver from '../../../models/Driver';
-import Delivery from '../../../models/Delivery';
+import dbConnect from '../../../../lib/dbConnect';
+import Driver from '../../../../models/Driver';
+import Delivery from '../../../../models/Delivery';
 
 export async function POST(request: Request) {
     await dbConnect();

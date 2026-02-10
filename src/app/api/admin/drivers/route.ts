@@ -1,8 +1,8 @@
 
 import { NextResponse } from 'next/server';
-import dbConnect from '../../../lib/dbConnect';
-import User from '../../../models/User';
-import Driver from '../../../models/Driver';
+import dbConnect from '../../../../lib/dbConnect';
+import User from '../../../../models/User';
+import Driver from '../../../../models/Driver';
 import bcrypt from 'bcryptjs';
 
 export async function POST(request: Request) {
