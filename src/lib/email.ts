@@ -12,11 +12,13 @@ interface UserData {
 // 1. Create a Nodemailer transporter
 // We will use environment variables for the configuration
 // Helper to safely parse boolean env vars
-const isSecure = process.env.EMAIL_SERVER_SECURE?.toLowerCase() === 'true' || process.env.EMAIL_SERVER_PORT === '465';
+const envPort = process.env.EMAIL_SERVER_PORT ? process.env.EMAIL_SERVER_PORT.trim() : '587';
+const port = Number(envPort);
+const isSecure = process.env.EMAIL_SERVER_SECURE?.toLowerCase() === 'true' || port === 465;
 
 const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_SERVER_HOST,
-    port: Number(process.env.EMAIL_SERVER_PORT || 587),
+    port: port,
     secure: isSecure,
     auth: {
         user: process.env.EMAIL_SERVER_USER,
