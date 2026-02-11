@@ -88,7 +88,7 @@ const MobileMenu = ({ items, isOpen, onClose, session, status }) => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: (items.length + 1) * 0.1 }}
                   >
-                    <button onClick={() => { signOut({ callbackUrl: '/' }); onClose(); }} className="text-xl text-white/60 hover:text-white text-left">
+                    <button onClick={() => { signOut({ callbackUrl: window.location.origin }); onClose(); }} className="text-xl text-white/60 hover:text-white text-left">
                       Logout
                     </button>
                   </motion.div>
@@ -161,7 +161,7 @@ const CustomNavBar = ({ items, theme = 'light' }) => {
                 <Link href={`/${session.user.role}`} className="custom-nav-item">
                   Dashboard
                 </Link>
-                <button onClick={() => signOut({ callbackUrl: '/' })} className="custom-nav-item">
+                <button onClick={() => signOut({ callbackUrl: window.location.origin })} className="custom-nav-item">
                   Logout
                 </button>
               </>
