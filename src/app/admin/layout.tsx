@@ -17,17 +17,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     ];
 
     return (
-        <div className="min-h-screen bg-gray-100 flex">
-            {/* Sidebar */}
-            <aside className="w-64 bg-slate-900 text-white flex-shrink-0 hidden md:flex flex-col">
-                <div className="p-6 border-b border-slate-800">
-                    <h1 className="text-2xl font-bold bg-gradient-to-r from-red-500 to-rose-500 bg-clip-text text-transparent">
-                        HemoHive
-                    </h1>
-                    <p className="text-xs text-slate-400 mt-1">Admin Console</p>
-                </div>
+        <div className="min-h-screen bg-gray-100 flex flex-col md:flex-row">
+            {/* Sidebar - Fixed on Desktop */}
+            <aside className="fixed left-0 top-24 bottom-0 w-64 bg-slate-900 text-white hidden md:flex flex-col z-10 transition-transform shadow-xl">
+                {/* Removed duplicate Logo header */}
 
-                <nav className="flex-1 p-4 space-y-2">
+                <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
                     {navItems.map((item) => {
                         const isActive = pathname === item.href;
                         return (
@@ -35,8 +30,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                                 key={item.href}
                                 href={item.href}
                                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive
-                                        ? 'bg-red-600 text-white shadow-lg'
-                                        : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                                    ? 'bg-red-600 text-white shadow-lg'
+                                    : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                                     }`}
                             >
                                 <item.icon size={20} />
@@ -54,8 +49,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </div>
             </aside>
 
-            {/* Main Content */}
-            <main className="flex-1 overflow-y-auto h-screen">
+            {/* Main Content - Pushed right and flowing naturally */}
+            <main className="flex-1 min-h-screen md:ml-64 pt-24">
                 {children}
             </main>
         </div>

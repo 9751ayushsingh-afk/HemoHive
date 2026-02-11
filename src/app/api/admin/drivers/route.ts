@@ -4,13 +4,14 @@ import dbConnect from '../../../../lib/dbConnect';
 import User from '../../../../models/User';
 import Driver from '../../../../models/Driver';
 import bcrypt from 'bcryptjs';
+import cloudinary from '../../../../lib/cloudinary';
 
 export async function POST(request: Request) {
     await dbConnect();
 
     try {
         const body = await request.json();
-        const { fullName, email, password, vehicleType, plateNumber, model, contactNumber } = body;
+        const { fullName, email, password, vehicleType, plateNumber, model, contactNumber, profilePicture } = body;
 
         // 1. Check if user exists
         const existingUser = await User.findOne({ email });
@@ -24,17 +25,38 @@ export async function POST(request: Request) {
             return NextResponse.json({ message: 'Driver with this contact number already exists' }, { status: 400 });
         }
 
-        // 2. Create User (Password hashing is handled in User model pre-save hook, but let's double check)
-        // The User model in this project HAS a pre-save hook for hashing. 
-        // However, sometimes it's safer to hash here if the hook is flaky or we want explicit control.
-        // Looking at User.ts provided earlier: "UserSchema.pre('save'...". It does hash.
-        // So we can just pass the plain password. 
+        // 1.2 Check if vehicle with plate number exists
+        const existingPlate = await Driver.findOne({ 'vehicleDetails.plateNumber': plateNumber });
+        if (existingPlate) {
+            return NextResponse.json({ message: 'Vehicle with this License Plate already exists' }, { status: 400 });
+        }
 
+        // 1.2 Upload Profile Picture (if provided)
+        let profilePictureUrl = '';
+        if (profilePicture) {
+            try {
+                console.log('Attempting Cloudinary upload, base64 length:', profilePicture.length);
+                // Determine if it's base64 or URL (though usually base64 from client form)
+                // Cloudinary uploader.upload handles base64 strings automatically
+                const uploadResult = await cloudinary.uploader.upload(profilePicture, {
+                    folder: 'hemohive/avatars',
+                    transformation: [{ width: 400, height: 400, crop: 'fill' }] // Optimize - Changed crop to 'fill'
+                });
+                console.log('Cloudinary upload success:', uploadResult.secure_url);
+                profilePictureUrl = uploadResult.secure_url;
+            } catch (uploadError: any) {
+                console.error('Image upload failed:', uploadError);
+                return NextResponse.json({ message: 'Image upload failed: ' + (uploadError.message || 'Unknown error') }, { status: 500 });
+            }
+        }
+
+        // 2. Create User
         const newUser = await User.create({
             fullName,
             email,
             password, // Pre-save hook will hash this
             role: 'driver',
+            profilePicture: profilePictureUrl || undefined // Save URL if exists
         });
 
         // 3. Create Driver Profile

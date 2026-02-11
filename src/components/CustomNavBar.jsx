@@ -118,8 +118,9 @@ const CustomNavBar = ({ items, theme = 'light' }) => {
   const isMobile = useMobile();
   const pathname = usePathname();
 
-  // Force light theme (dark text) on specific pages like /our-mission and donation pages
-  const isLightPage = pathname === '/our-mission' || pathname?.startsWith('/donor/donate-blood');
+  // Force light theme (dark text) on specific pages like /our-mission and donation pages (and admin/driver)
+  const isLightPage = pathname === '/our-mission' || pathname?.startsWith('/donor/donate-blood') || pathname?.includes('/admin') || pathname?.includes('/driver');
+  console.log('CustomNavBar Debug:', { pathname, isLightPage });
   const themeClass = isLightPage ? 'light-theme' : (theme === 'dark' ? 'dark-theme' : '');
 
   useEffect(() => {

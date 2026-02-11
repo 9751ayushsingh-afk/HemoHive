@@ -18,7 +18,7 @@ export async function GET() {
     }
 
     try {
-        const driver = await Driver.findOne({ userId: session.user.id }).populate('userId', 'fullName email');
+        const driver = await Driver.findOne({ userId: session.user.id }).populate('userId', 'fullName email profilePicture');
 
         if (!driver) {
             return NextResponse.json({ message: 'Driver profile not found' }, { status: 404 });
@@ -55,8 +55,15 @@ export async function GET() {
                 userId: (driver.userId as any)._id,
                 name: (driver.userId as any).fullName,
                 email: (driver.userId as any).email,
+                profilePicture: (driver.userId as any).profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent((driver.userId as any).fullName)}&background=random`,
                 status: driver.status,
-                isOnline: driver.status === 'ONLINE'
+                isOnline: driver.status === 'ONLINE',
+                rating: driver.rating,
+                totalTrips: driver.totalDeliveries,
+                isVerified: driver.isVerified,
+                plateNumber: driver.vehicleDetails?.plateNumber || 'N/A',
+                vehicleType: driver.vehicleDetails?.type || 'Vehicle',
+                joinDate: (driver as any).createdAt,
             },
             stats: {
                 earnings: `₹ ${Math.floor(totalEarnings)}`,
