@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Navigation, MapPin, Wallet, Clock,
-    ChevronRight, Bell, LayoutGrid, RotateCcw, User, Scan, Package, LogOut, Search, Star, BadgeCheck
+    ChevronRight, Bell, LayoutGrid, RotateCcw, User, Scan, Package, LogOut, Search, Star, BadgeCheck, X, ArrowLeft, CornerUpLeft
 } from 'lucide-react';
 import OnlineButton from './OnlineButton';
 import { toast } from 'react-hot-toast';
@@ -14,6 +14,7 @@ const QrReader = dynamic(() => import('react-qr-scanner'), { ssr: false });
 
 import { PulseBackground } from './PulseBackground';
 import { SwipeToOnline } from './SwipeToOnline';
+import { SwipeToAccept } from './SwipeToAccept';
 
 // Mock Data / Types
 interface UserProfile {
@@ -112,6 +113,9 @@ export default function DriverDashboard() {
     const [recentTrips, setRecentTrips] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [currentLocation, setCurrentLocation] = useState<[number, number] | null>(null);
+    const [notifications, setNotifications] = useState<any[]>([]);
+    const [showNotifications, setShowNotifications] = useState(false);
+    const [unreadCount, setUnreadCount] = useState(0);
 
     const earningsNum = parseInt(stats.earnings.replace(/[^0-9]/g, '')) || 0;
     const animatedEarnings = useCountUp(earningsNum);
@@ -174,6 +178,12 @@ export default function DriverDashboard() {
         return () => clearInterval(interval);
     }, [isOnline]);
 
+    useEffect(() => {
+        fetchNotifications(); // Initial fetch
+        const interval = setInterval(fetchNotifications, 30000);
+        return () => clearInterval(interval);
+    }, []);
+
     const checkActiveDelivery = async () => {
         try {
             const res = await fetch('/api/driver/current-delivery');
@@ -211,6 +221,12 @@ export default function DriverDashboard() {
                             status: 'PROPOSED',
                             deadline: requestData.deadline
                         });
+                        // VISUAL & AUDIO ALERT
+                        toast('New Priority Request!', {
+                            icon: '🚨',
+                            duration: 5000,
+                            style: { background: '#FFF1F2', color: '#BE123C', fontWeight: 'bold' }
+                        });
                         const audio = new Audio('/sounds/notification.mp3');
                         audio.play().catch(e => console.log('Audio play failed', e));
                     });
@@ -228,6 +244,35 @@ export default function DriverDashboard() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const fetchNotifications = async () => {
+        try {
+            const res = await fetch('/api/notifications');
+            if (res.ok) {
+                const data = await res.json();
+                setNotifications(data.notifications);
+                setUnreadCount(data.unreadCount);
+            }
+        } catch (error) {
+            console.error('Error fetching notifications:', error);
+        }
+    };
+
+    const markNotificationsRead = async () => {
+        try {
+            await fetch('/api/notifications', { method: 'PUT' });
+            setUnreadCount(0);
+        } catch (error) {
+            console.error('Error marking notifications read:', error);
+        }
+    };
+
+    const toggleNotifications = () => {
+        if (!showNotifications) {
+            markNotificationsRead();
+        }
+        setShowNotifications(!showNotifications);
     };
 
     // Use a ref to track if we are currently toggling to prevent external updates or double-clicks
@@ -283,11 +328,20 @@ export default function DriverDashboard() {
     };
 
     const simulateIncomingRequest = () => {
+        console.log("Simulating Request...");
+        toast("New Request Incoming!", { icon: '🔔' });
+        const audio = new Audio('/sounds/notification.mp3'); // Try to play sound
+        audio.play().catch(e => console.log(e));
+
         setRequest({
-            id: 'mock_req_123',
+            id: 'mock_req_' + Date.now(),
             pickup: { address: 'City Hospital, Delhi', location: { type: 'Point', coordinates: [77.2090, 28.6139] } },
             dropoff: { address: 'Sector 62, Noida', location: { type: 'Point', coordinates: [77.3639, 28.6208] } },
-            distance: '12 km', time: '25 min', earnings: '₹ 250', status: 'ASSIGNED'
+            distance: '12 km',
+            time: '25 min',
+            earnings: '₹ 250',
+            status: 'PROPOSED', // Changed from ASSIGNED to PROPOSED to match logic
+            deadline: new Date(Date.now() + 30000).toISOString()
         });
     };
 
@@ -351,7 +405,13 @@ export default function DriverDashboard() {
         } catch (error) { console.error(error); }
     };
 
-    if (loading) return <div className="h-screen bg-gray-50 flex items-center justify-center text-zinc-400 font-bold animate-pulse">Loading...</div>;
+    if (loading) {
+        return (
+            <div className="h-screen bg-gray-50 flex items-center justify-center text-zinc-400 font-bold animate-pulse">
+                Loading...
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 text-zinc-900 font-sans flex flex-col relative selection:bg-rose-500/20 pt-24">
@@ -360,7 +420,7 @@ export default function DriverDashboard() {
             <PulseBackground isOnline={isOnline} />
 
             {/* --- MAIN CONTENT --- */}
-            <div className="flex-1 pb-32 px-6">
+            <div className="flex-1 pb-40 px-4 md:px-6 md:pb-32">
 
                 {/* 0. ULTIMATE "VITALITY" PROFILE CARD (Red-Tech Aesthetic) */}
                 <motion.div
@@ -371,7 +431,7 @@ export default function DriverDashboard() {
                 >
                     <div className="absolute inset-0 bg-rose-500/5 rounded-[2.5rem] blur-xl transform translate-y-4 scale-95 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
-                    <div className="relative overflow-hidden rounded-[2.5rem] border border-white/80 bg-gradient-to-br from-white/80 via-white/50 to-rose-50/40 backdrop-blur-3xl shadow-[0_20px_50px_-12px_rgba(225,29,72,0.15)] p-8 md:p-10 transition-all duration-500 hover:shadow-[0_30px_60px_-12px_rgba(225,29,72,0.25)]">
+                    <div className="relative overflow-hidden rounded-[2.5rem] border border-white/80 bg-gradient-to-br from-white/80 via-white/50 to-rose-50/40 backdrop-blur-3xl shadow-[0_20px_50px_-12px_rgba(225,29,72,0.15)] p-6 md:p-10 transition-all duration-500 hover:shadow-[0_30px_60px_-12px_rgba(225,29,72,0.25)]">
 
                         {/* Dynamic Background Flow */}
                         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
@@ -392,7 +452,7 @@ export default function DriverDashboard() {
                             />
                         </div>
 
-                        <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-10">
+                        <div className="relative z-10 flex flex-col items-center gap-6 md:flex-row md:items-center md:gap-10">
 
                             {/* LEFT: Hero Avatar with Pulse Ring */}
                             <div className="relative shrink-0 group/avatar cursor-pointer">
@@ -400,7 +460,7 @@ export default function DriverDashboard() {
                                 <div className="absolute inset-[-4px] rounded-full border-2 border-transparent border-t-rose-400/60 border-r-orange-400/60 animate-[spin_8s_linear_infinite] pointer-events-none" />
                                 <div className="absolute inset-[-4px] rounded-full border-2 border-transparent border-b-rose-400/30 border-l-orange-400/30 animate-[spin_8s_linear_infinite_reverse] pointer-events-none" />
 
-                                <div className="w-32 h-32 rounded-full p-2 bg-white shadow-xl shadow-rose-900/5 relative overflow-hidden ring-1 ring-black/5">
+                                <div className="w-24 h-24 md:w-32 md:h-32 rounded-full p-2 bg-white shadow-xl shadow-rose-900/5 relative overflow-hidden ring-1 ring-black/5">
                                     <div className="w-full h-full rounded-full overflow-hidden relative bg-zinc-100">
                                         {profile.profilePicture ? (
                                             <motion.img
@@ -412,7 +472,7 @@ export default function DriverDashboard() {
                                             />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center text-zinc-300">
-                                                <User size={56} strokeWidth={1.5} />
+                                                <User className="w-10 h-10 md:w-14 md:h-14" strokeWidth={1.5} />
                                             </div>
                                         )}
                                     </div>
@@ -448,7 +508,7 @@ export default function DriverDashboard() {
                                     className="mb-6 space-y-1"
                                 >
                                     <div className="flex items-center justify-center md:justify-start gap-3 mb-1">
-                                        <h2 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-zinc-900 via-zinc-800 to-rose-900 tracking-tight">
+                                        <h2 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-zinc-900 via-zinc-800 to-rose-900 tracking-tight text-center md:text-left">
                                             {profile.name}
                                         </h2>
                                     </div>
@@ -490,16 +550,19 @@ export default function DriverDashboard() {
                             </div>
 
                             {/* RIGHT: Magnetic Actions */}
-                            <div className="flex flex-row md:flex-col gap-4 pl-0 md:pl-8 md:border-l border-rose-100/50">
+                            <div className="flex flex-row justify-center w-full md:w-auto gap-4 pl-0 md:flex-col md:pl-8 md:border-l border-rose-100/50">
                                 <motion.button
                                     whileHover={{ scale: 1.05, boxShadow: "0 20px 40px -12px rgba(244,63,94,0.4)" }}
                                     whileTap={{ scale: 0.95 }}
-                                    onClick={simulateIncomingRequest}
+                                    onClick={toggleNotifications}
                                     className="w-16 h-16 rounded-[1.2rem] bg-gradient-to-br from-rose-500 to-rose-600 text-white flex items-center justify-center shadow-lg shadow-rose-200 relative overflow-hidden group/btn"
-                                    title="Simulate Request"
+                                    title="Notifications"
                                 >
                                     <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-in-out" />
                                     <Bell size={28} className="drop-shadow-md" fill="currentColor" />
+                                    {unreadCount > 0 && (
+                                        <span className="absolute top-3 right-3 w-3 h-3 bg-white rounded-full border-2 border-rose-500 animate-pulse" />
+                                    )}
                                 </motion.button>
 
                                 <motion.button
@@ -518,9 +581,24 @@ export default function DriverDashboard() {
                 </motion.div>
 
                 {/* 2. CUSTOM ONLINE BUTTON */}
-                <div className="flex justify-center mb-8">
+                <div className="flex justify-center mb-8 relative">
                     <OnlineButton isOnline={isOnline} toggleOnline={toggleOnline} />
                 </div>
+
+                {/* SECONDARY NOTIFICATION BELL (Floating Action Button) */}
+                <button
+                    onClick={toggleNotifications}
+                    className="fixed bottom-32 right-6 z-50 w-12 h-12 bg-white text-rose-500 rounded-full shadow-xl border border-rose-100 flex items-center justify-center hover:scale-110 active:scale-95 transition-transform"
+                    title="View Notifications"
+                >
+                    <Bell size={20} fill="currentColor" />
+                    {unreadCount > 0 && (
+                        <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span>
+                        </span>
+                    )}
+                </button>
 
                 {/* 2. STATS (Premium Glass Grid) */}
                 <AnimatePresence>
@@ -537,7 +615,7 @@ export default function DriverDashboard() {
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
                                 transition={{ type: "spring", stiffness: 200, damping: 20 }}
                                 whileHover={{ scale: 1.02, y: -4, boxShadow: "0 20px 40px -10px rgba(0,0,0,0.5)" }}
-                                className="col-span-2 relative overflow-hidden rounded-[2.5rem] bg-zinc-900 p-8 shadow-2xl text-white group isolate min-h-[220px] flex flex-col justify-between"
+                                className="col-span-2 relative overflow-hidden rounded-[2.5rem] bg-zinc-900 p-6 md:p-8 shadow-2xl text-white group isolate min-h-[180px] md:min-h-[220px] flex flex-col justify-between"
                             >
                                 {/* Livable Background Animation */}
                                 <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-zinc-800 to-rose-950 z-0" />
@@ -546,7 +624,7 @@ export default function DriverDashboard() {
 
                                 {/* Floating 3D Elements */}
                                 <div className="absolute top-4 right-4 p-4 opacity-20 group-hover:opacity-40 transition-opacity duration-700 transform group-hover:scale-110 group-hover:-rotate-12">
-                                    <Wallet size={140} className="text-rose-500" />
+                                    <Wallet className="w-[100px] h-[100px] md:w-[140px] md:h-[140px] text-rose-500" />
                                 </div>
 
                                 <div className="relative z-10">
@@ -568,8 +646,8 @@ export default function DriverDashboard() {
                                 </div>
 
                                 <div className="relative z-10 mt-auto">
-                                    <h3 className="text-6xl font-black tracking-tighter flex items-center gap-2">
-                                        <span className="text-4xl text-zinc-500 font-bold mb-2">₹</span>
+                                    <h3 className="text-5xl md:text-6xl font-black tracking-tighter flex items-center gap-2">
+                                        <span className="text-3xl md:text-4xl text-zinc-500 font-bold mb-2">₹</span>
                                         <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-rose-100 to-white animate-text-shimmer bg-[length:200%_auto]">
                                             {animatedEarnings}
                                         </span>
@@ -593,8 +671,8 @@ export default function DriverDashboard() {
                                     <Navigation className="text-blue-600" size={24} />
                                 </div>
                                 <div className="relative">
-                                    <h4 className="text-3xl font-black text-zinc-900">{stats.trips}</h4>
-                                    <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mt-1">Total Trips</p>
+                                    <h4 className="text-2xl md:text-3xl font-black text-zinc-900">{stats.trips}</h4>
+                                    <p className="text-[10px] md:text-xs font-bold text-zinc-400 uppercase tracking-widest mt-1">Total Trips</p>
                                 </div>
                             </motion.div>
 
@@ -613,11 +691,180 @@ export default function DriverDashboard() {
                                     <Clock className="text-amber-600" size={24} />
                                 </div>
                                 <div className="relative">
-                                    <h4 className="text-3xl font-black text-zinc-900">{stats.hours}</h4>
-                                    <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mt-1">Hours Online</p>
+                                    <h4 className="text-2xl md:text-3xl font-black text-zinc-900">{stats.hours}</h4>
+                                    <p className="text-[10px] md:text-xs font-bold text-zinc-400 uppercase tracking-widest mt-1">Hours Online</p>
                                 </div>
                             </motion.div>
                         </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* NOTIFICATIONS PANEL (Premium Bottom Sheet / Dropdown) */}
+                <AnimatePresence>
+                    {showNotifications && (
+                        <>
+                            {/* --- MOBILE: BOTTOM SHEET (Request Overlay Style) --- */}
+                            <motion.div
+                                initial={{ y: '100%', opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                exit={{ y: '100%', opacity: 0 }}
+                                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                                className="fixed inset-x-0 bottom-0 z-[200] p-4 pb-24 flex items-end justify-center pointer-events-none md:hidden"
+                            >
+                                {/* Blur Backdrop */}
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    className="absolute inset-0 bg-black/60 backdrop-blur-xl pointer-events-auto"
+                                    onClick={() => setShowNotifications(false)}
+                                />
+
+                                {/* Card Container */}
+                                <motion.div
+                                    className="relative w-full max-w-lg bg-zinc-50 rounded-[3rem] shadow-[0_0_100px_rgba(244,63,94,0.2)] overflow-hidden pointer-events-auto border border-white/20 h-[70vh] flex flex-col"
+                                >
+                                    {/* Header */}
+                                    <div className="px-8 py-8 border-b border-zinc-200/50 flex justify-between items-center shrink-0 bg-white/50 backdrop-blur-md">
+                                        <div className="flex items-center gap-4">
+                                            <div className="bg-zinc-900 p-3 rounded-full text-white shadow-xl shadow-zinc-900/20">
+                                                <Bell size={24} fill="currentColor" />
+                                            </div>
+                                            <div>
+                                                <h3 className="font-black text-zinc-900 text-2xl tracking-tighter">Notifications</h3>
+                                                <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mt-1">{notifications.length} Unread</p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => setShowNotifications(false)}
+                                            className="w-12 h-12 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center text-zinc-900 transition-colors shadow-sm"
+                                        >
+                                            <X size={24} />
+                                        </button>
+                                    </div>
+
+                                    {/* List */}
+                                    <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar bg-zinc-50/50">
+                                        {notifications.length === 0 ? (
+                                            <div className="flex flex-col items-center justify-center h-full text-center p-8">
+                                                <div className="w-24 h-24 bg-zinc-100 rounded-full flex items-center justify-center mb-6">
+                                                    <Bell size={40} className="text-zinc-300" />
+                                                </div>
+                                                <h3 className="text-xl font-bold text-zinc-900">All caught up!</h3>
+                                                <p className="text-sm text-zinc-500 mt-2 max-w-[200px]">You have no new notifications to review at the moment.</p>
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-col gap-4 pb-8">
+                                                {notifications.map((notif: any, i) => (
+                                                    <motion.div
+                                                        key={notif._id}
+                                                        initial={{ opacity: 0, y: 20 }}
+                                                        animate={{ opacity: 1, y: 0 }}
+                                                        transition={{ delay: i * 0.05 }}
+                                                        className="bg-white p-6 rounded-[2rem] border border-zinc-100 shadow-sm"
+                                                    >
+                                                        <div className="flex gap-5">
+                                                            <div className={`mt-2 w-3 h-3 rounded-full shrink-0 ${notif.read ? 'bg-zinc-200' : 'bg-rose-500 animate-pulse shadow-lg shadow-rose-500/30'}`} />
+                                                            <div className="flex-1">
+                                                                <h4 className="text-lg font-bold text-zinc-900 leading-tight mb-2">
+                                                                    {notif.title}
+                                                                </h4>
+                                                                <p className="text-sm text-zinc-500 leading-relaxed font-medium">
+                                                                    {notif.message}
+                                                                </p>
+                                                                <p className="text-xs font-bold text-zinc-300 mt-4 flex items-center gap-1.5">
+                                                                    <Clock size={14} />
+                                                                    {new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </motion.div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Footer Actions */}
+                                    {notifications.length > 0 && (
+                                        <div className="p-6 border-t border-zinc-200/50 bg-white/80 backdrop-blur-md shrink-0">
+                                            <button
+                                                onClick={markNotificationsRead}
+                                                className="w-full py-4 rounded-2xl bg-zinc-900 text-white text-sm font-bold uppercase tracking-widest shadow-xl shadow-zinc-900/20 active:scale-95 transition-transform"
+                                            >
+                                                Mark all as read
+                                            </button>
+                                        </div>
+                                    )}
+                                </motion.div>
+                            </motion.div>
+
+                            {/* --- DESKTOP: DROPDOWN (Z-Index 100) --- */}
+                            <motion.div
+                                initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                                className="hidden md:block absolute top-24 right-10 z-[100] w-96 max-w-sm"
+                            >
+                                <div className="bg-white/90 backdrop-blur-3xl rounded-[2.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.3)] border border-white/50 overflow-hidden ring-1 ring-white/60">
+                                    {/* ... Desktop Header ... */}
+                                    <div className="px-6 py-4 border-b border-zinc-100/50 flex justify-between items-center bg-white/50">
+                                        <div className="flex items-center gap-2">
+                                            <div className="bg-rose-100 p-2 rounded-xl text-rose-600">
+                                                <Bell size={18} fill="currentColor" />
+                                            </div>
+                                            <div>
+                                                <h3 className="font-extrabold text-zinc-900 text-lg leading-tight">Notifications</h3>
+                                                <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">{notifications.length} Unread</p>
+                                            </div>
+                                        </div>
+                                        <button onClick={() => setShowNotifications(false)} className="w-8 h-8 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center text-zinc-500 transition-colors"><X size={16} /></button>
+                                    </div>
+
+                                    <div className="max-h-[400px] overflow-y-auto p-3 space-y-2 custom-scrollbar">
+                                        {/* ... Desktop List Content (Reusing Logic for brevity handled via duplication or shared comp if rigorous, here inline for speed) ... */}
+                                        {notifications.length === 0 ? (
+                                            <div className="flex flex-col items-center justify-center h-full py-8 text-center">
+                                                <div className="w-16 h-16 bg-zinc-50 rounded-full flex items-center justify-center mb-3 shadow-inner">
+                                                    <Bell size={28} className="text-zinc-300" />
+                                                </div>
+                                                <p className="text-sm font-bold text-zinc-600">All caught up!</p>
+                                                <p className="text-xs text-zinc-400 mt-1 max-w-[160px]">No new notifications.</p>
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-col gap-2">
+                                                {notifications.map((notif: any, i) => (
+                                                    <motion.div
+                                                        key={notif._id}
+                                                        initial={{ opacity: 0, y: 10 }}
+                                                        animate={{ opacity: 1, y: 0 }}
+                                                        transition={{ delay: i * 0.05 }}
+                                                        className="group relative bg-zinc-50/80 hover:bg-white p-3 rounded-xl border border-zinc-100 hover:border-rose-100 hover:shadow-md hover:shadow-rose-900/5 transition-all duration-300 cursor-pointer"
+                                                    >
+                                                        <div className="flex gap-3">
+                                                            <div className={`mt-1 w-2 h-2 rounded-full shrink-0 ${notif.read ? 'bg-zinc-300' : 'bg-rose-500 animate-pulse shadow-[0_0_8px_rgba(244,63,94,0.5)]'}`} />
+                                                            <div className="flex-1">
+                                                                <h4 className="text-sm font-bold text-zinc-900 leading-tight mb-0.5 group-hover:text-rose-600 transition-colors">
+                                                                    {notif.title}
+                                                                </h4>
+                                                                <p className="text-xs text-zinc-500 leading-relaxed font-medium line-clamp-2">
+                                                                    {notif.message}
+                                                                </p>
+                                                                <p className="text-[9px] font-bold text-zinc-300 mt-2 flex items-center gap-1">
+                                                                    <Clock size={9} />
+                                                                    {new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </motion.div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {notifications.length > 0 && <div className="p-3 bg-white/50 border-t border-zinc-100/50 shrink-0"><button onClick={markNotificationsRead} className="w-full py-2 bg-zinc-900 text-white text-xs font-bold uppercase tracking-widest hover:bg-zinc-800 transition-all shadow-lg shadow-zinc-900/20 active:scale-[0.98] rounded-xl">Mark all as read</button></div>}
+                                </div>
+                            </motion.div>
+                        </>
                     )}
                 </AnimatePresence>
 
@@ -648,7 +895,7 @@ export default function DriverDashboard() {
                             animate={{ x: 0, opacity: 1 }}
                             whileHover={{ scale: 1.02, backgroundColor: '#ffffff' }}
                             transition={{ delay: i * 0.05 }}
-                            className="bg-white border border-zinc-100 p-4 rounded-3xl flex items-center justify-between shadow-sm cursor-pointer"
+                            className="bg-white border border-zinc-100 p-3 md:p-4 rounded-3xl flex items-center justify-between shadow-sm cursor-pointer"
                         >
                             <div className="flex items-center gap-4">
                                 <div className="bg-zinc-50 p-3 rounded-2xl text-zinc-500">
@@ -677,7 +924,7 @@ export default function DriverDashboard() {
                             animate={{ y: 0, opacity: 1 }}
                             exit={{ y: 100, opacity: 0 }}
                             onClick={() => setIsMinimized(false)}
-                            className="fixed bottom-24 left-6 right-6 z-40 bg-zinc-900 text-white p-4 rounded-[1.5rem] shadow-2xl flex items-center justify-between cursor-pointer ring-4 ring-white/50"
+                            className="fixed bottom-24 left-4 right-4 md:left-6 md:right-6 z-40 bg-zinc-900 text-white p-4 rounded-[1.5rem] shadow-2xl flex items-center justify-between cursor-pointer ring-4 ring-white/50"
                         >
                             <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 rounded-full bg-rose-500 flex items-center justify-center animate-pulse">
@@ -695,8 +942,12 @@ export default function DriverDashboard() {
             </AnimatePresence >
 
             {/* --- BOTTOM NAV (Wide Dark Premium Island) --- */}
-            <div className="fixed bottom-6 left-6 right-6 top-auto z-40 flex justify-center pointer-events-none">
-                <div className="bg-zinc-900/90 backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-2 pl-8 pr-8 flex items-center justify-between shadow-2xl ring-1 ring-black/5 pointer-events-auto w-full max-w-2xl relative overflow-visible group">
+            {/* HIDE NAVBAR when on Active Delivery (Fullscreen) OR Scanner is open */}
+            <div
+                className="fixed bottom-4 md:bottom-6 left-4 right-4 md:left-6 md:right-6 top-auto z-40 flex justify-center pointer-events-none"
+                style={{ display: (activeDelivery && !isMinimized) || showScanner ? 'none' : 'flex' }}
+            >
+                <div className="bg-zinc-900/90 backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-2 pl-6 pr-6 md:pl-8 md:pr-8 flex items-center justify-between shadow-2xl ring-1 ring-black/5 pointer-events-auto w-full max-w-2xl relative overflow-visible group">
 
                     {/* Ambient Glow behind navbar */}
                     <div className="absolute inset-0 bg-gradient-to-r from-rose-500/20 via-transparent to-blue-500/20 blur-3xl -z-10 rounded-[2.5rem]" />
@@ -756,7 +1007,7 @@ export default function DriverDashboard() {
                         animate={{ y: 0, opacity: 1 }}
                         exit={{ y: '100%', opacity: 0 }}
                         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                        className="fixed inset-x-0 bottom-0 z-50 p-4 pb-24 flex items-end justify-center pointer-events-none"
+                        className="fixed inset-x-0 bottom-0 z-[60] p-4 pb-24 flex items-end justify-center pointer-events-none"
                     >
                         <div className="absolute inset-0 bg-black/60 backdrop-blur-xl pointer-events-auto" onClick={() => { }} />
 
@@ -809,22 +1060,18 @@ export default function DriverDashboard() {
                                     </div>
                                 </div>
 
-                                {/* Action Buttons */}
-                                <div className="grid grid-cols-2 gap-4">
+                                {/* Action Buttons - Mobile First Stack */}
+                                <div className="flex flex-col gap-4">
+                                    <div className="w-full">
+                                        <SwipeToAccept onConfirm={acceptRequest} label="Swipe to Accept Order" />
+                                    </div>
+
                                     <motion.button
                                         whileTap={{ scale: 0.95 }}
                                         onClick={declineRequest}
-                                        className="py-5 rounded-[2rem] bg-zinc-100 text-zinc-500 font-bold text-lg hover:bg-zinc-200 transition-colors"
+                                        className="py-3 text-zinc-400 font-bold text-sm hover:text-rose-500 transition-colors uppercase tracking-widest"
                                     >
-                                        Decline
-                                    </motion.button>
-                                    <motion.button
-                                        whileTap={{ scale: 0.95 }}
-                                        onClick={acceptRequest}
-                                        className="py-5 rounded-[2rem] bg-zinc-900 text-white font-bold text-lg hover:bg-zinc-800 transition-colors shadow-xl shadow-zinc-900/20 relative overflow-hidden"
-                                    >
-                                        <span className="relative z-10">Accept Order</span>
-                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] animate-[shimmer_2s_infinite]" />
+                                        Decline Request
                                     </motion.button>
                                 </div>
                             </div>
@@ -836,8 +1083,9 @@ export default function DriverDashboard() {
             {/* --- ACTIVE DELIVERY (Real Map + Light UI) --- */}
             {
                 activeDelivery && !isMinimized && (
-                    <motion.div layoutId="active-delivery-overlay" className="fixed inset-0 z-50 bg-white flex flex-col">
-                        <div className="flex-1 bg-zinc-100 relative">
+                    <motion.div layoutId="active-delivery-overlay" className="fixed inset-0 z-[100] bg-zinc-100 flex flex-col">
+                        {/* MAP CONTAINER - Fixed Height on Mobile for split view */}
+                        <div className="relative w-full h-[45vh] md:flex-1 shrink-0">
                             <LiveMap
                                 driverLocation={currentLocation || [28.6139, 77.2090]}
                                 destination={
@@ -851,113 +1099,170 @@ export default function DriverDashboard() {
                             />
 
                             {manualLocationMode && (
-                                <div className="absolute top-24 left-1/2 -translate-x-1/2 bg-amber-100 text-amber-600 px-4 py-1 rounded-full text-xs font-bold border border-amber-200 shadow-lg z-[400]">
+                                <div className="absolute top-32 left-1/2 -translate-x-1/2 bg-amber-100 text-amber-600 px-4 py-1 rounded-full text-xs font-bold border border-amber-200 shadow-lg z-[400]">
                                     Dev Mode: Drag Marker
                                 </div>
                             )}
 
-                            <div className="absolute top-6 left-6 right-6 flex justify-between z-[400]">
-                                <div className="bg-white/90 backdrop-blur-md px-5 py-3 rounded-full text-sm font-bold shadow-lg text-zinc-800 flex items-center gap-2">
+                            {/* Top Floating Header (Status) - Increased Top Margin to top-16 for Safe Area */}
+                            <div className="absolute top-16 left-6 right-6 flex justify-between z-[400]">
+                                <div className="bg-white/90 backdrop-blur-md px-5 py-3 rounded-full text-sm font-bold shadow-lg text-zinc-800 flex items-center gap-2 border border-white/50">
                                     <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
                                     {activeDelivery.status === 'ASSIGNED' ? 'Heading to Pickup' : 'Heading to Dropoff'}
                                 </div>
-                                <button onClick={() => setIsMinimized(true)} className="bg-white/90 backdrop-blur-md p-3 rounded-full shadow-lg text-zinc-500 hover:text-zinc-900">
-                                    <ChevronRight size={20} className="rotate-90" />
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="bg-white p-8 rounded-t-[2.5rem] shadow-[0_-20px_60px_rgba(0,0,0,0.1)]">
-                            <div className="flex justify-between items-center mb-8">
-                                <div className="flex-1 pr-4">
-                                    <h3 className="text-2xl font-extrabold text-zinc-900 leading-tight mb-1">
-                                        {activeDelivery.status === 'ASSIGNED'
-                                            ? (typeof activeDelivery.pickup === 'string' ? activeDelivery.pickup : activeDelivery.pickup.address)
-                                            : (typeof activeDelivery.dropoff === 'string' ? activeDelivery.dropoff : activeDelivery.dropoff.address)
-                                        }
-                                    </h3>
-                                    <p className="text-zinc-500 text-sm font-medium">
-                                        {activeDelivery.status === 'ASSIGNED' ? 'Navigate to Hospital' : 'Navigate to Donor'}
-                                    </p>
-                                </div>
                                 <button
-                                    onClick={() => {
-                                        const dest = activeDelivery.status === 'ASSIGNED' ? activeDelivery.pickup : activeDelivery.dropoff;
-                                        const address = typeof dest === 'string' ? dest : dest.address;
-                                        window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`, '_blank');
-                                    }}
-                                    className="w-16 h-16 bg-zinc-900 rounded-2xl flex items-center justify-center text-white shadow-xl active:scale-95 transition-all"
+                                    onClick={() => setIsMinimized(true)}
+                                    className="group bg-white/90 backdrop-blur-xl px-8 py-4 rounded-full shadow-2xl text-zinc-500 hover:text-white hover:bg-zinc-900 border border-white/60 transition-all duration-300 flex items-center gap-3 active:scale-95"
                                 >
-                                    <Navigation size={28} />
+                                    <span className="text-xs font-black uppercase tracking-[0.2em] hidden md:block group-hover:text-white transition-colors">Go Back</span>
+                                    <CornerUpLeft size={20} strokeWidth={2.5} className="group-hover:-translate-x-1 transition-transform duration-300" />
                                 </button>
                             </div>
-
-                            {activeDelivery.status === 'ASSIGNED' && (
-                                <div className="mb-6">
-                                    <label className="text-[10px] text-zinc-400 uppercase font-bold block mb-3 tracking-wider">Step 1: Bag Verification</label>
-                                    <div className="relative flex items-center gap-3">
-                                        <input
-                                            type="text" placeholder="Scan Bag ID (e.g. BAG-123)"
-                                            className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl p-4 pl-12 text-zinc-900 font-bold focus:border-rose-500 focus:outline-none transition-all placeholder:text-zinc-400"
-                                            value={bloodBagId} onChange={(e) => setBloodBagId(e.target.value)}
-                                        />
-                                        <Package size={20} className="absolute left-4 text-zinc-400" />
-                                        <button className="bg-zinc-100 p-4 rounded-2xl text-zinc-600 hover:bg-zinc-200" onClick={() => setShowScanner(true)}>
-                                            <Scan size={24} />
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-
-                            <label className="text-xs text-zinc-400 uppercase font-bold block mb-2">
-                                {activeDelivery.status === 'ASSIGNED' ? 'Step 2: Pickup Code' : 'Dropoff Code'}
-                            </label>
-                            <div className="relative mb-6">
-                                <input
-                                    type="text" pattern="\d*" maxLength={4} placeholder="• • • •"
-                                    className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl p-4 text-center text-3xl font-mono font-bold tracking-[1em] text-zinc-900 focus:border-rose-500 focus:outline-none"
-                                    value={verificationInput} onChange={(e) => setVerificationInput(e.target.value.replace(/\D/g, ''))}
-                                />
-                            </div>
-
-                            <button onClick={handleVerification} className="w-full bg-rose-600 py-5 rounded-3xl font-bold text-white shadow-lg shadow-rose-200 active:scale-95 transition-transform">
-                                {activeDelivery.status === 'ASSIGNED' ? 'Verify Pickup' : 'Complete Mission'}
-                            </button>
                         </div>
 
-                        {/* QR SCANNER (Fullscreen) */}
+                        {/* CONTENT SHEET - Draggable look with negative margin to overlap map */}
+                        <div className="flex-1 bg-white rounded-t-[2.5rem] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] -mt-8 relative z-10 flex flex-col overflow-hidden">
+                            {/* Drag Handle Indicator */}
+                            <div className="w-full flex justify-center pt-3 pb-1">
+                                <div className="w-12 h-1.5 bg-zinc-200 rounded-full" />
+                            </div>
+
+                            <div className="flex-1 overflow-y-auto p-6 pt-2 pb-24 space-y-6">
+                                {/* Destination Header */}
+                                <div className="flex justify-between items-start">
+                                    <div className="flex-1 pr-4">
+                                        <h3 className="text-2xl font-extrabold text-zinc-900 leading-tight mb-1">
+                                            {activeDelivery.status === 'ASSIGNED'
+                                                ? (typeof activeDelivery.pickup === 'string' ? activeDelivery.pickup : activeDelivery.pickup.address)
+                                                : (typeof activeDelivery.dropoff === 'string' ? activeDelivery.dropoff : activeDelivery.dropoff.address)
+                                            }
+                                        </h3>
+                                        <p className="text-zinc-500 text-sm font-medium">
+                                            {activeDelivery.status === 'ASSIGNED' ? 'Navigate to Hospital' : 'Navigate to Donor'}
+                                        </p>
+                                    </div>
+                                    <button
+                                        onClick={() => {
+                                            const dest = activeDelivery.status === 'ASSIGNED' ? activeDelivery.pickup : activeDelivery.dropoff;
+                                            const address = typeof dest === 'string' ? dest : dest.address;
+                                            window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`, '_blank');
+                                        }}
+                                        className="w-16 h-16 bg-zinc-900 rounded-2xl flex items-center justify-center text-white shadow-xl active:scale-95 transition-all"
+                                    >
+                                        <Navigation size={28} />
+                                    </button>
+                                </div>
+
+                                {activeDelivery.status === 'ASSIGNED' && (
+                                    <div className="mb-6">
+                                        <label className="text-[10px] text-zinc-400 uppercase font-bold block mb-3 tracking-wider">Step 1: Bag Verification</label>
+                                        <div className="relative flex items-center gap-3">
+                                            <input
+                                                type="text" placeholder="Scan Bag ID (e.g. BAG-123)"
+                                                className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl p-4 pl-12 text-zinc-900 font-bold focus:border-rose-500 focus:outline-none transition-all placeholder:text-zinc-400"
+                                                value={bloodBagId} onChange={(e) => setBloodBagId(e.target.value)}
+                                            />
+                                            <Package size={20} className="absolute left-4 text-zinc-400" />
+                                            <button className="bg-zinc-100 p-4 rounded-2xl text-zinc-600 hover:bg-zinc-200" onClick={() => setShowScanner(true)}>
+                                                <Scan size={24} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <label className="text-xs text-zinc-400 uppercase font-bold block mb-2">
+                                    {activeDelivery.status === 'ASSIGNED' ? 'Step 2: Pickup Code' : 'Dropoff Code'}
+                                </label>
+                                <div className="relative mb-6">
+                                    <input
+                                        type="text" pattern="\d*" maxLength={4} placeholder="• • • •"
+                                        className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl p-4 text-center text-3xl font-mono font-bold tracking-[1em] text-zinc-900 focus:border-rose-500 focus:outline-none"
+                                        value={verificationInput} onChange={(e) => setVerificationInput(e.target.value.replace(/\D/g, ''))}
+                                    />
+                                </div>
+
+                                <button onClick={handleVerification} className="w-full bg-rose-600 py-5 rounded-3xl font-bold text-white shadow-lg shadow-rose-200 active:scale-95 transition-transform">
+                                    {activeDelivery.status === 'ASSIGNED' ? 'Verify Pickup' : 'Complete Mission'}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* QR SCANNER (Floating Bottom Sheet) */}
                         <AnimatePresence>
                             {showScanner && (
-                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[600] bg-black flex flex-col">
-                                    <div className="p-6 flex justify-between items-center bg-black">
-                                        <h3 className="text-white font-bold text-lg">Scan Barcode</h3>
-                                        <button onClick={() => setShowScanner(false)} className="p-2 bg-zinc-800 rounded-full text-white"><LogOut size={20} /></button>
-                                    </div>
-                                    <div className="flex-1 relative overflow-hidden bg-zinc-900">
-                                        <QrReader
-                                            delay={500} onError={() => { }}
-                                            onScan={(data: any) => {
-                                                if (data?.text && data.text !== scannedCode) {
-                                                    setScannedCode(data.text);
-                                                    toast.success("Code Found!");
-                                                }
-                                            }}
-                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                            constraints={{ video: { facingMode } }}
-                                        />
-                                        {scannedCode && (
-                                            <div className="absolute inset-0 bg-black/80 flex items-center justify-center p-8">
-                                                <div className="bg-white p-6 rounded-3xl text-center w-full">
-                                                    <p className="text-xs font-bold text-zinc-400 uppercase mb-2">Detected</p>
-                                                    <h2 className="text-3xl font-mono font-bold text-zinc-900 mb-6">{scannedCode}</h2>
-                                                    <div className="flex gap-3">
-                                                        <button onClick={() => setScannedCode(null)} className="flex-1 py-3 bg-zinc-100 rounded-xl font-bold">Retry</button>
-                                                        <button onClick={() => { setBloodBagId(scannedCode); setShowScanner(false); setScannedCode(null); }} className="flex-1 py-3 bg-rose-600 text-white rounded-xl font-bold">Confirm</button>
-                                                    </div>
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    className="fixed inset-0 z-[600] flex items-end justify-center pointer-events-none"
+                                >
+                                    {/* Blurred Backdrop */}
+                                    <div className="absolute inset-0 bg-black/60 backdrop-blur-md pointer-events-auto" onClick={() => setShowScanner(false)} />
+
+                                    {/* Scanner Card */}
+                                    <motion.div
+                                        initial={{ y: '100%' }}
+                                        animate={{ y: 0 }}
+                                        exit={{ y: '100%' }}
+                                        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                                        className="relative w-full max-w-lg bg-zinc-900 rounded-[2.5rem] overflow-hidden pointer-events-auto h-[60vh] mb-4 mx-4 shadow-2xl border border-white/10 flex flex-col"
+                                    >
+                                        {/* Header */}
+                                        <div className="p-6 pb-2 flex justify-between items-center z-20 bg-zinc-900">
+                                            <div>
+                                                <h3 className="text-white font-bold text-lg">Scan Package</h3>
+                                                <p className="text-zinc-400 text-xs">Align code within frame</p>
+                                            </div>
+                                            <div className="flex gap-3">
+                                                <button
+                                                    onClick={() => setFacingMode((prev) => (prev === 'environment' ? 'user' : 'environment'))}
+                                                    className="w-10 h-10 bg-zinc-800 rounded-full text-white flex items-center justify-center hover:bg-zinc-700 transition-colors"
+                                                    title="Flip Camera"
+                                                >
+                                                    <RotateCcw size={20} />
+                                                </button>
+                                                <button onClick={() => setShowScanner(false)} className="w-10 h-10 bg-zinc-800 rounded-full text-white flex items-center justify-center hover:bg-zinc-700 transition-colors"><X size={20} /></button>
+                                            </div>
+                                        </div>
+
+                                        {/* Camera View */}
+                                        <div className="flex-1 relative overflow-hidden bg-black rounded-[2rem] mx-2 mb-2">
+                                            <QrReader
+                                                delay={500} onError={() => { }}
+                                                onScan={(data: any) => {
+                                                    if (data?.text && data.text !== scannedCode) {
+                                                        setScannedCode(data.text);
+                                                        toast.success("Code Found!");
+                                                    }
+                                                }}
+                                                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '2rem' }}
+                                                constraints={{ video: { facingMode } }}
+                                            />
+
+                                            {/* Visual Scan Frame */}
+                                            <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                                                <div className="w-64 h-64 border-2 border-rose-500/50 rounded-3xl relative">
+                                                    <div className="absolute top-0 left-0 w-6 h-6 border-t-4 border-l-4 border-rose-500 rounded-tl-xl" />
+                                                    <div className="absolute top-0 right-0 w-6 h-6 border-t-4 border-r-4 border-rose-500 rounded-tr-xl" />
+                                                    <div className="absolute bottom-0 left-0 w-6 h-6 border-b-4 border-l-4 border-rose-500 rounded-bl-xl" />
+                                                    <div className="absolute bottom-0 right-0 w-6 h-6 border-b-4 border-r-4 border-rose-500 rounded-br-xl" />
                                                 </div>
                                             </div>
-                                        )}
-                                    </div>
+
+                                            {scannedCode && (
+                                                <div className="absolute inset-0 bg-black/80 flex items-center justify-center p-8 z-30">
+                                                    <div className="bg-white p-6 rounded-3xl text-center w-full">
+                                                        <p className="text-xs font-bold text-zinc-400 uppercase mb-2">Detected</p>
+                                                        <h2 className="text-3xl font-mono font-bold text-zinc-900 mb-6">{scannedCode}</h2>
+                                                        <div className="flex gap-3">
+                                                            <button onClick={() => setScannedCode(null)} className="flex-1 py-3 bg-zinc-100 rounded-xl font-bold">Retry</button>
+                                                            <button onClick={() => { setBloodBagId(scannedCode); setShowScanner(false); setScannedCode(null); }} className="flex-1 py-3 bg-rose-600 text-white rounded-xl font-bold">Confirm</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </motion.div>
                                 </motion.div>
                             )}
                         </AnimatePresence>

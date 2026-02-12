@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '../../../lib/dbConnect';
 import User from '../../../models/User';
+import Driver from '../../../models/Driver';
 import cloudinary from '../../../lib/cloudinary';
 import { sendWelcomeEmail } from '../../../lib/email';
 
@@ -87,6 +88,35 @@ export async function POST(request: Request) {
         }
 
         await newUser.save();
+
+        // Create Driver Profile if role is driver
+        if (newUser.role === 'driver') {
+            try {
+                // Initialize default driver fields
+                const newDriver = new Driver({
+                    userId: newUser._id,
+                    contactNumber: body.mobile, // From form
+                    status: 'OFFLINE',
+                    currentLocation: newUser.location || { type: 'Point', coordinates: [0, 0] },
+                    vehicleDetails: {
+                        type: 'Bike', // Default, to be updated by driver
+                        plateNumber: 'PENDING',
+                        model: 'Unknown'
+                    },
+                    isVerified: false,
+                    totalDeliveries: 0,
+                    rating: 5.0
+                });
+
+                await newDriver.save();
+                console.log('Driver profile created for user:', newUser._id);
+            } catch (driverError) {
+                console.error('Error creating driver profile:', driverError);
+                // Optional: Delete user if driver creation fails? 
+                // For now, we log it. User exists but dashboard might fail.
+                // ideally we should use transaction or rollback
+            }
+        }
 
         console.log('User object before sending welcome email:', newUser);
 
