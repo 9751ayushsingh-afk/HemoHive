@@ -11,7 +11,7 @@ interface SwipeToOnlineProps {
 
 export const SwipeToOnline = ({ isOnline, onToggle }: SwipeToOnlineProps) => {
     return (
-        <div className="relative h-16 w-full rounded-[2rem] overflow-hidden select-none shadow-sm border border-zinc-100">
+        <div className="relative h-16 w-full rounded-[2rem] overflow-hidden select-none touch-none shadow-sm border border-zinc-100">
             {/* Track Background */}
             <motion.div
                 className={`absolute inset-0 flex items-center justify-center transition-colors duration-500 ${isOnline ? 'bg-emerald-500' : 'bg-zinc-100'}`}

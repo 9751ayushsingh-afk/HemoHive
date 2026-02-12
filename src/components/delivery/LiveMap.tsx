@@ -1,7 +1,7 @@
 'use client';
 
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap, useMapEvents } from 'react-leaflet';
-import { useMemo, useRef, useState, useEffect } from 'react';
+import React, { useMemo, useRef, useState, useEffect } from 'react';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -14,17 +14,17 @@ L.Icon.Default.mergeOptions({
 });
 
 // Component to handle map clicks
-function ClickHandler({ onMapClick }: { onMapClick?: (lat: number, lng: number) => void }) {
+const ClickHandler = React.memo(function ClickHandler({ onMapClick }: { onMapClick?: (lat: number, lng: number) => void }) {
     useMapEvents({
         click(e) {
             if (onMapClick) onMapClick(e.latlng.lat, e.latlng.lng);
         },
     });
     return null;
-}
+});
 
 // Component to fit map to route bounds
-function MapController({ driverLocation, destination }: { driverLocation: [number, number], destination: [number, number] }) {
+const MapController = React.memo(function MapController({ driverLocation, destination }: { driverLocation: [number, number], destination: [number, number] }) {
     const map = useMap();
     useEffect(() => {
         // Create bounds from driver and destination
@@ -38,7 +38,7 @@ function MapController({ driverLocation, destination }: { driverLocation: [numbe
         });
     }, [driverLocation, destination, map]);
     return null;
-}
+});
 
 interface LiveMapProps {
     driverLocation: [number, number];
@@ -48,6 +48,7 @@ interface LiveMapProps {
     onDragEnd?: (lat: number, lng: number) => void; // New callback
 }
 
+// Main Component
 export default function LiveMap({ driverLocation, destination, onMapClick, draggable, onDragEnd }: LiveMapProps) {
 
     // Draggable Marker Logic
@@ -111,22 +112,18 @@ function RoutePolyline({ driverLocation, destination }: { driverLocation: [numbe
                 const data = await res.json();
 
                 if (data.routes && data.routes.length > 0) {
-                    // OSRM returns [lng, lat], Leaflet needs [lat, lng]
                     const route = data.routes[0].geometry.coordinates.map((coord: number[]) => [coord[1], coord[0]] as [number, number]);
                     setPositions(route);
-                    console.log('[LiveMap] Route Found:', route.length, 'points');
                 } else {
-                    console.warn('[LiveMap] No route found by OSRM');
-                    setPositions([]); // Fallback to straight line
+                    setPositions([]);
                 }
             } catch (error) {
                 console.error("Routing Error:", error);
-                setPositions([]); // Fallback
+                setPositions([]);
             }
         };
 
         if (driverLocation && destination && driverLocation[0] !== 0) {
-            console.log('[LiveMap] Fetching route from', driverLocation, 'to', destination);
             fetchRoute();
         }
     }, [driverLocation, destination]);
@@ -134,14 +131,11 @@ function RoutePolyline({ driverLocation, destination }: { driverLocation: [numbe
     if (positions.length > 0) {
         return (
             <>
-                {/* Main Route Line */}
                 <Polyline positions={positions} color="#C00029" weight={5} opacity={0.8} />
-                {/* Shadow/Stroke for visibility */}
                 <Polyline positions={positions} color="white" weight={8} opacity={0.4} className="blur-sm" />
             </>
         );
     }
 
-    // Fallback Straight Dotted Line
     return <Polyline positions={[driverLocation, destination]} color="#C00029" dashArray="10, 10" opacity={0.5} weight={4} />;
 }

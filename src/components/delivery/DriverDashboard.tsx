@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    Navigation, MapPin, Wallet, Clock,
+    Navigation, MapPin, Wallet, Clock, Loader2,
     ChevronRight, Bell, LayoutGrid, RotateCcw, User, Scan, Package, LogOut, Search, Star, BadgeCheck, X, ArrowLeft, CornerUpLeft
 } from 'lucide-react';
 import OnlineButton from './OnlineButton';
@@ -97,6 +97,7 @@ export default function DriverDashboard() {
     const [activeTab, setActiveTab] = useState('dashboard');
     const [isMinimized, setIsMinimized] = useState(false);
     const [manualLocationMode, setManualLocationMode] = useState(false);
+    const [isToggleLoading, setIsToggleLoading] = useState(false);
 
     const [profile, setProfile] = useState<UserProfile>({
         name: 'Loading...',
@@ -147,12 +148,7 @@ export default function DriverDashboard() {
             const { latitude, longitude } = pos.coords;
 
             // OPTIMIZATION: Only update if moved > 5 meters (approx 0.00005 deg)
-            setCurrentLocation(prev => {
-                if (!prev) return [latitude, longitude];
-                const dist = Math.sqrt(Math.pow(prev[0] - latitude, 2) + Math.pow(prev[1] - longitude, 2));
-                if (dist < 0.00005) return prev; // Skip update if movement is negligible
-                return [latitude, longitude];
-            });
+            setCurrentLocation([latitude, longitude]);
             setManualLocationMode(false);
         };
 
@@ -297,49 +293,54 @@ export default function DriverDashboard() {
         if (loading || isTogglingRef.current) return;
 
         isTogglingRef.current = true;
+        setIsToggleLoading(true); // START LOADER
         const targetStatus = !isOnline;
 
         // 1. Optimistic Update immediately
         setIsOnline(targetStatus);
 
-        try {
-            let location = null;
-            if (targetStatus) {
-                try {
-                    // Short timeout for location to keep UI snappy
-                    location = await new Promise<{ lat: number, lng: number } | null>((resolve) => {
-                        if (!navigator.geolocation) resolve(null);
-                        navigator.geolocation.getCurrentPosition(
-                            (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-                            (err) => resolve(null),
-                            { enableHighAccuracy: false, timeout: 3000 }
-                        );
-                    });
-                } catch (e) { console.warn('Loc failed', e); }
+        // Defer heavy operations to next tick to allow UI to update first
+        setTimeout(async () => {
+            try {
+                let location = null;
+                if (targetStatus) {
+                    try {
+                        // Short timeout for location to keep UI snappy
+                        location = await new Promise<{ lat: number, lng: number } | null>((resolve) => {
+                            if (!navigator.geolocation) resolve(null);
+                            navigator.geolocation.getCurrentPosition(
+                                (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+                                (err) => resolve(null),
+                                { enableHighAccuracy: false, timeout: 3000 }
+                            );
+                        });
+                    } catch (e) { console.warn('Loc failed', e); }
+                }
+
+                const res = await fetch('/api/driver/status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        status: targetStatus ? 'ONLINE' : 'OFFLINE',
+                        location: location || { lat: 28.6139, lng: 77.2090 }
+                    })
+                });
+
+                if (!res.ok) throw new Error('Failed');
+
+                toast.success(targetStatus ? 'You are now ONLINE' : 'You are now OFFLINE');
+            } catch (error) {
+                // Revert on failure
+                setIsOnline(!targetStatus);
+                toast.error('Connection Failed');
+            } finally {
+                // Add a small delay before allowing interactions again
+                setTimeout(() => {
+                    isTogglingRef.current = false;
+                    setIsToggleLoading(false); // STOP LOADER
+                }, 1000);
             }
-
-            const res = await fetch('/api/driver/status', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    status: targetStatus ? 'ONLINE' : 'OFFLINE',
-                    location: location || { lat: 28.6139, lng: 77.2090 }
-                })
-            });
-
-            if (!res.ok) throw new Error('Failed');
-
-            toast.success(targetStatus ? 'You are now ONLINE' : 'You are now OFFLINE');
-        } catch (error) {
-            // Revert on failure
-            setIsOnline(!targetStatus);
-            toast.error('Connection Failed');
-        } finally {
-            // Add a small delay before allowing interactions again
-            setTimeout(() => {
-                isTogglingRef.current = false;
-            }, 1000);
-        }
+        }, 100);
     };
 
     const simulateIncomingRequest = () => {
@@ -1283,6 +1284,30 @@ export default function DriverDashboard() {
                     </motion.div>
                 )
             }
+            {/* --- ONLINE/OFFLINE TOGGLE LOADER --- */}
+            <AnimatePresence>
+                {isToggleLoading && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[200] flex items-center justify-center bg-white/30 backdrop-blur-md"
+                    >
+                        <div className="bg-white p-6 rounded-3xl shadow-2xl flex flex-col items-center gap-4 border border-zinc-100">
+                            <motion.div
+                                animate={{ rotate: 360 }}
+                                transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                            >
+                                <Loader2 className="text-rose-500 w-10 h-10" />
+                            </motion.div>
+                            <p className="text-zinc-600 font-bold uppercase tracking-wider text-sm">
+                                {isOnline ? 'Going Online...' : 'Going Offline...'}
+                            </p>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
         </div >
     );
 }

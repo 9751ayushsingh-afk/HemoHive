@@ -53,7 +53,7 @@ export const SwipeToAccept: React.FC<SwipeToAcceptProps> = ({
 
     return (
         <div
-            className={`relative h-[4.5rem] rounded-[2.25rem] bg-zinc-100 shadow-[inset_0_2px_6px_rgba(0,0,0,0.1)] border border-zinc-200/80 overflow-hidden select-none ${className}`}
+            className={`relative h-[4.5rem] rounded-[2.25rem] bg-zinc-100 shadow-[inset_0_2px_6px_rgba(0,0,0,0.1)] border border-zinc-200/80 overflow-hidden select-none touch-none ${className}`}
             ref={containerRef}
         >
             {/* 1. PROGRESS FILL (Gradient) */}
