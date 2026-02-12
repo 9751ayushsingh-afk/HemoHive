@@ -145,7 +145,14 @@ export default function DriverDashboard() {
 
         const success = (pos: GeolocationPosition) => {
             const { latitude, longitude } = pos.coords;
-            setCurrentLocation([latitude, longitude]);
+
+            // OPTIMIZATION: Only update if moved > 5 meters (approx 0.00005 deg)
+            setCurrentLocation(prev => {
+                if (!prev) return [latitude, longitude];
+                const dist = Math.sqrt(Math.pow(prev[0] - latitude, 2) + Math.pow(prev[1] - longitude, 2));
+                if (dist < 0.00005) return prev; // Skip update if movement is negligible
+                return [latitude, longitude];
+            });
             setManualLocationMode(false);
         };
 
@@ -189,7 +196,15 @@ export default function DriverDashboard() {
             const res = await fetch('/api/driver/current-delivery');
             if (res.ok) {
                 const data = await res.json();
-                if (data.active) setActiveDelivery(data.delivery);
+                if (data.active) {
+                    setActiveDelivery((prev: any) => {
+                        // Prevent re-render if data is identical (Deep equality check not needed, just ID/Status)
+                        if (prev?._id === data.delivery._id && prev?.status === data.delivery.status) return prev;
+                        return data.delivery;
+                    });
+                } else {
+                    setActiveDelivery(null);
+                }
             }
         } catch (e) { console.error(e); }
     };
@@ -944,10 +959,9 @@ export default function DriverDashboard() {
             {/* --- BOTTOM NAV (Wide Dark Premium Island) --- */}
             {/* HIDE NAVBAR when on Active Delivery (Fullscreen) OR Scanner is open */}
             <div
-                className="fixed bottom-4 md:bottom-6 left-4 right-4 md:left-6 md:right-6 top-auto z-40 flex justify-center pointer-events-none"
-                style={{ display: (activeDelivery && !isMinimized) || showScanner ? 'none' : 'flex' }}
+                className={`fixed bottom-4 md:bottom-6 left-4 right-4 md:left-6 md:right-6 top-auto z-40 flex justify-center transition-transform duration-500 ease-in-out ${((activeDelivery && !isMinimized) || showScanner) ? 'translate-y-[200%] pointer-events-none' : 'translate-y-0 pointer-events-auto'}`}
             >
-                <div className="bg-zinc-900/90 backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-2 pl-6 pr-6 md:pl-8 md:pr-8 flex items-center justify-between shadow-2xl ring-1 ring-black/5 pointer-events-auto w-full max-w-2xl relative overflow-visible group">
+                <div className="bg-zinc-900/90 backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-2 pl-6 pr-6 md:pl-8 md:pr-8 flex items-center justify-between shadow-2xl ring-1 ring-black/5 w-full max-w-2xl relative overflow-visible group">
 
                     {/* Ambient Glow behind navbar */}
                     <div className="absolute inset-0 bg-gradient-to-r from-rose-500/20 via-transparent to-blue-500/20 blur-3xl -z-10 rounded-[2.5rem]" />
@@ -1000,7 +1014,7 @@ export default function DriverDashboard() {
             </div>
 
             {/* --- REQUEST OVERLAY (Premium Acceptance Modal - No Tilt) --- */}
-            <AnimatePresence>
+            <AnimatePresence mode="wait">
                 {request && (
                     <motion.div
                         initial={{ y: '100%', opacity: 0 }}

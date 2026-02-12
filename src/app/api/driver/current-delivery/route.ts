@@ -5,6 +5,7 @@ import { authOptions } from '../../../../lib/auth';
 import dbConnect from '../../../../lib/dbConnect';
 import Delivery from '../../../../models/Delivery';
 import Driver from '../../../../models/Driver';
+import BloodRequest from '../../../../models/BloodRequest'; // Fix: Register BloodRequest Schema
 
 export const dynamic = 'force-dynamic';
 
