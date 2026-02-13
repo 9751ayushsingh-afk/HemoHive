@@ -23,20 +23,51 @@ interface ScheduleDonationFormProps {
 
 const donationTypes = ["Whole Blood", "Plasma", "Platelets"];
 const timeSlots = ["9AM–11AM", "11AM–1PM", "2PM–4PM", "4PM–6PM"];
-// Placeholder for centers, in a real app this would be fetched from API
-const donationCenters = [
-  { id: '1', name: 'City Hospital Blood Bank' },
-  { id: '2', name: 'Red Cross Donation Center' },
-  { id: '3', name: 'Community Health Clinic' },
-];
+interface Hospital {
+  _id: string;
+  fullName: string;
+  city?: string;
+}
 
 const ScheduleDonationForm: React.FC<ScheduleDonationFormProps> = ({ isOpen, onClose, onAppointmentConfirm }) => {
   const [donationType, setDonationType] = useState<string>(donationTypes[0]);
   const [preferredDate, setPreferredDate] = useState<string>('');
   const [timeSlot, setTimeSlot] = useState<string>(timeSlots[0]);
-  const [centerId, setCenterId] = useState<string>(donationCenters[0].id);
+
+  // Hospital fetching state
+  const [hospitals, setHospitals] = useState<Hospital[]>([]);
+  const [loadingHospitals, setLoadingHospitals] = useState<boolean>(true);
+  const [centerId, setCenterId] = useState<string>('');
+
   const [pickupRequired, setPickupRequired] = useState<boolean>(false);
   const [aadhaarVerified, setAadhaarVerified] = useState<boolean>(false);
+
+  // Fetch hospitals on mount
+  React.useEffect(() => {
+    if (isOpen) {
+      const fetchHospitals = async () => {
+        try {
+          setLoadingHospitals(true);
+          const res = await fetch('/api/hospitals');
+          if (res.ok) {
+            const data = await res.json();
+            setHospitals(data);
+            if (data.length > 0) {
+              setCenterId(data[0]._id);
+            }
+          } else {
+            console.error("Failed to fetch hospitals");
+          }
+        } catch (error) {
+          console.error("Error fetching hospitals:", error);
+        } finally {
+          setLoadingHospitals(false);
+        }
+      };
+
+      fetchHospitals();
+    }
+  }, [isOpen]);
 
   const handleSubmit = async () => {
     const formData = {
@@ -135,14 +166,20 @@ const ScheduleDonationForm: React.FC<ScheduleDonationFormProps> = ({ isOpen, onC
             <Label htmlFor="center" className="text-right">
               Donation Center
             </Label>
-            <Select onValueChange={setCenterId} value={centerId}>
+            <Select onValueChange={setCenterId} value={centerId} disabled={loadingHospitals}>
               <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Select center" />
+                <SelectValue placeholder={loadingHospitals ? "Loading hospitals..." : "Select center"} />
               </SelectTrigger>
               <SelectContent>
-                {donationCenters.map((center) => (
-                  <SelectItem key={center.id} value={center.id}>{center.name}</SelectItem>
-                ))}
+                {hospitals.length === 0 && !loadingHospitals ? (
+                  <SelectItem value="no-hospitals" disabled>No hospitals available</SelectItem>
+                ) : (
+                  hospitals.map((hospital) => (
+                    <SelectItem key={hospital._id} value={hospital._id}>
+                      {hospital.fullName} {hospital.city ? `(${hospital.city})` : ''}
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
           </div>
