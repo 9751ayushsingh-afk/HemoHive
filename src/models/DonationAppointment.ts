@@ -8,6 +8,7 @@ export interface IDonationAppointment extends Document {
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
   qr_code?: string; // QR code for appointment verification
   pickup_required?: boolean; // Added based on UI field
+  cancellationReason?: string;
 }
 
 const DonationAppointmentSchema: Schema = new Schema({
@@ -41,6 +42,9 @@ const DonationAppointmentSchema: Schema = new Schema({
   pickup_required: {
     type: Boolean,
     default: false,
+  },
+  cancellationReason: {
+    type: String,
   }
 }, {
   timestamps: true,

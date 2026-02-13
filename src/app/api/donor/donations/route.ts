@@ -50,7 +50,7 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const { id } = await req.json();
+    const { id, status, cancellationReason } = await req.json();
 
     const appointment = await DonationAppointment.findOne({ _id: id, user: user_id });
 
@@ -63,6 +63,7 @@ export async function PATCH(req: Request) {
     }
 
     appointment.status = 'cancelled';
+    if (cancellationReason) appointment.cancellationReason = cancellationReason;
     await appointment.save();
 
     return NextResponse.json({ message: 'Appointment cancelled successfully' });

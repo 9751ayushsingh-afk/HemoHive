@@ -104,21 +104,39 @@ const DonateBloodPage = () => {
     setIsCancelDialogOpen(true);
   };
 
-  const handleCancelConfirm = async () => {
+  const handleCancelConfirm = async (reason: string) => {
     if (!appointmentToCancel) return;
 
-    // Call Real API to cancel
     try {
-      // Assuming there is an endpoint, or just log for now if API endpoint is unknown
-      // const res = await fetch(`/api/appointments/${appointmentToCancel.id}/cancel`, { method: 'POST' });
-      console.log("Cancelling appointment:", appointmentToCancel.id);
+      // Call Real API to cancel
+      const res = await fetch('/api/donor/donations', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: appointmentToCancel.id,
+          status: 'cancelled',
+          cancellationReason: reason
+        })
+      });
 
-      // For now, close dialog and maybe refresh list (if we had a real list fetch)
-      setIsCancelDialogOpen(false);
-      setAppointmentToCancel(null);
-      alert("Appointment Cancelled (API Placeholder)");
+      if (res.ok) {
+        // Update local state to show cancelled status immediately
+        setAppointments(prev => prev.map(appt =>
+          appt.id === appointmentToCancel.id ? { ...appt, status: 'cancelled' } : appt
+        ));
+
+        // Show feedback (using alert for now as per existing pattern)
+        alert("Appointment Cancelled Successfully");
+      } else {
+        const data = await res.json();
+        alert(data.message || "Failed to cancel appointment");
+      }
     } catch (error) {
       console.error("Error cancelling:", error);
+      alert("An error occurred while cancelling.");
+    } finally {
+      setIsCancelDialogOpen(false);
+      setAppointmentToCancel(null);
     }
   };
 
@@ -179,22 +197,23 @@ const DonateBloodPage = () => {
           />
         )}
 
-        <CancelDialog
-          isOpen={isCancelDialogOpen}
-          onClose={() => setIsCancelDialogOpen(false)}
-          onConfirm={handleCancelConfirm}
-          userStats={{
-            totalDonations: displayUser.totalDonations,
-            bloodGroup: displayUser.bloodGroup
-          }}
-        />
-
-        {isRescheduleDialogOpen && (
-          <RescheduleDialog
-            onClose={() => setIsRescheduleDialogOpen(false)}
-          />
-        )}
       </div>
+
+      <CancelDialog
+        isOpen={isCancelDialogOpen}
+        onClose={() => setIsCancelDialogOpen(false)}
+        onConfirm={handleCancelConfirm}
+        userStats={{
+          totalDonations: displayUser.totalDonations,
+          bloodGroup: displayUser.bloodGroup
+        }}
+      />
+
+      {isRescheduleDialogOpen && (
+        <RescheduleDialog
+          onClose={() => setIsRescheduleDialogOpen(false)}
+        />
+      )}
     </div>
   );
 };

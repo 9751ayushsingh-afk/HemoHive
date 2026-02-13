@@ -38,16 +38,19 @@ export async function PATCH(req: Request) {
             return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
         }
 
-        const { id, status } = await req.json();
+        const { id, status, cancellationReason } = await req.json();
 
         if (!['confirmed', 'completed', 'cancelled'].includes(status)) {
             return NextResponse.json({ message: 'Invalid status' }, { status: 400 });
         }
 
+        const updateData: any = { status: status };
+        if (cancellationReason) updateData.cancellationReason = cancellationReason;
+
         // Verify the appointment belongs to this center before updating
         const appointment = await DonationAppointment.findOneAndUpdate(
             { _id: id, center: userId },
-            { status: status },
+            updateData,
             { new: true }
         );
 

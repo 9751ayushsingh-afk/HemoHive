@@ -8,6 +8,8 @@ import QrReader from 'react-qr-scanner';
 const DonationRequestsTable = () => {
     const [requests, setRequests] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [rejectId, setRejectId] = useState<string | null>(null);
+    const [rejectionReason, setRejectionReason] = useState('');
     const [verifyId, setVerifyId] = useState<string | null>(null);
     const [dpnInput, setDpnInput] = useState('');
     const [isVerified, setIsVerified] = useState(false);
@@ -31,12 +33,15 @@ const DonationRequestsTable = () => {
         fetchRequests();
     }, []);
 
-    const handleStatusUpdate = async (id: string, newStatus: string) => {
+    const handleStatusUpdate = async (id: string, newStatus: string, reason?: string) => {
         try {
+            const body: any = { id, status: newStatus };
+            if (reason) body.cancellationReason = reason;
+
             const res = await fetch('/api/hospital/appointments', {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id, status: newStatus })
+                body: JSON.stringify(body)
             });
             if (res.ok) {
                 fetchRequests();
@@ -47,6 +52,13 @@ const DonationRequestsTable = () => {
             console.error(err);
             alert('Error updating status');
         }
+    };
+
+    const handleRejectConfirm = async () => {
+        if (!rejectId || !rejectionReason.trim()) return;
+        await handleStatusUpdate(rejectId, 'cancelled', rejectionReason);
+        setRejectId(null);
+        setRejectionReason('');
     };
 
     const handleVerify = () => {
@@ -94,6 +106,40 @@ const DonationRequestsTable = () => {
                 RaktSeva
                 <span className="text-slate-400 text-sm font-normal ml-2">(Donation Requests)</span>
             </h3>
+
+            {/* Rejection/Cancellation Reason Modal */}
+            {rejectId && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm animate-fade-in">
+                    <div className="bg-white p-6 rounded-2xl shadow-xl w-96 animate-scale-in">
+                        <h3 className="text-lg font-bold text-slate-900 mb-2">Reject Request</h3>
+                        <p className="text-sm text-slate-500 mb-4">Please specify a reason for rejecting this donation request. This will be visible to the donor.</p>
+
+                        <textarea
+                            value={rejectionReason}
+                            onChange={(e) => setRejectionReason(e.target.value)}
+                            placeholder="Reason for rejection (e.g., Overbooked, Inventory Full, etc.)"
+                            className="w-full border border-slate-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-red-100 focus:border-red-200 outline-none transition-all mb-4"
+                            rows={3}
+                        />
+
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => { setRejectId(null); setRejectionReason(''); }}
+                                className="flex-1 py-2.5 rounded-lg bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleRejectConfirm}
+                                disabled={!rejectionReason.trim()}
+                                className="flex-1 py-2.5 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-red-100"
+                            >
+                                Confirm Rejection
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Verification Modal */}
             {verifyId && (
@@ -217,6 +263,11 @@ const DonationRequestsTable = () => {
                                         <Clock size={12} />
                                         {new Date(request.scheduled_at).toLocaleDateString()} • {new Date(request.scheduled_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                     </div>
+                                    {request.status === 'cancelled' && request.cancellationReason && (
+                                        <div className="mt-2 text-xs text-red-500 bg-red-50 p-1.5 rounded border border-red-100 italic">
+                                            "{request.cancellationReason}"
+                                        </div>
+                                    )}
                                 </td>
                                 <td className="py-4 px-2 text-slate-600 text-xs">
                                     <p>{request.user?.mobile || 'N/A'}</p>
@@ -243,7 +294,7 @@ const DonationRequestsTable = () => {
                                                     <Check size={16} />
                                                 </button>
                                                 <button
-                                                    onClick={() => handleStatusUpdate(request._id, 'cancelled')}
+                                                    onClick={() => setRejectId(request._id)}
                                                     className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 border border-red-200"
                                                     title="Reject"
                                                 >
