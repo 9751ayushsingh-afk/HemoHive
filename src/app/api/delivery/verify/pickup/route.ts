@@ -18,10 +18,13 @@ export async function POST(request: Request) {
 
         // --- RAKTSINDHU SECURITY: Blood Bag Verification (FIRST) ---
         if (bloodBagId) {
+            const cleanBagId = bloodBagId.trim();
+
             // 1. Verify Bag Exists & Belongs to Hospital
+            // [FIX] Changed 'hospitalId' to 'currentOwnerId' as per BloodBag schema
             const bag = await BloodBag.findOne({
-                bagId: bloodBagId,
-                hospitalId: (delivery.requestId as any).hospitalId
+                bagId: cleanBagId,
+                currentOwnerId: (delivery.requestId as any).hospitalId
             });
 
             if (!bag) {
@@ -29,7 +32,8 @@ export async function POST(request: Request) {
             }
 
             // 2. Verify Bag Status
-            if (bag.status !== 'available') {
+            // [FIX] Changed 'available' to 'AVAILABLE' to match schema Enum
+            if (bag.status !== 'AVAILABLE') {
                 return NextResponse.json({ message: `Bag is currently ${bag.status} (Not Available)` }, { status: 400 });
             }
 
@@ -50,13 +54,16 @@ export async function POST(request: Request) {
         }
 
         // --- Finalize: Mark Bag as Issued & Delivery as Picked Up ---
+        // --- Finalize: Mark Bag as Issued & Delivery as Picked Up ---
         if (bloodBagId) {
-            const bag = await BloodBag.findOne({ bagId: bloodBagId });
+            const cleanBagId = bloodBagId.trim();
+            const bag = await BloodBag.findOne({ bagId: cleanBagId });
             if (bag) {
-                bag.status = 'issued';
+                // [FIX] Changed 'issued' to 'TRANSFERRED' to match schema Enum
+                bag.status = 'TRANSFERRED';
                 await bag.save();
             }
-            delivery.bloodBagId = bloodBagId;
+            delivery.bloodBagId = cleanBagId;
         }
 
         // Update Status
