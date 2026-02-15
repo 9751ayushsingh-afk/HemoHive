@@ -37,6 +37,7 @@ export interface IUser extends Document {
         coordinates: number[];
     };
     fcmToken?: string;
+    currentSessionId?: string | null;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -162,6 +163,10 @@ const UserSchema = new mongoose.Schema({
     },
     fcmToken: {
         type: String,
+    },
+    currentSessionId: {
+        type: String,
+        default: null,
     },
 }, { timestamps: true });
 

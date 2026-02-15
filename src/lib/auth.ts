@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import crypto from 'crypto';
 import { getToken } from 'next-auth/jwt';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
@@ -15,6 +16,7 @@ interface AuthPayload {
   profilePicture?: string;
   bloodGroup?: string;
   createdAt?: string;
+  sessionId?: string;
   [key: string]: any;
 }
 
@@ -103,24 +105,62 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, account }) {
       await dbConnect();
 
-      // If this is a login, user object will be present
+      // If this is a login, user object will be present (initial trigger)
       if (user) {
         const dbUser = await User.findOne({ email: user.email });
         if (dbUser) {
+          // Generate a new unique session ID for this login instance
+          const newSid = crypto.randomBytes(16).toString('hex');
+
+          console.log(`[AUTH-DEBUG] NEW LOGIN: ${dbUser.email} | Generating SID: ${newSid}`);
+
+          // Lock this SID into the database
+          const updateResult = await User.updateOne(
+            { _id: dbUser._id },
+            { $set: { currentSessionId: newSid } }
+          );
+
+          console.log(`[AUTH-DEBUG] DB UPDATE RESULT:`, updateResult);
+
           token.id = dbUser._id.toString();
+          token.email = dbUser.email; // Crucial: preserve email
           token.role = dbUser.role;
           token.fullName = dbUser.fullName;
           token.profilePicture = dbUser.profilePicture;
           token.hospitalId = dbUser.hospitalId?.toString();
           token.bloodGroup = dbUser.bloodGroup;
           token.createdAt = dbUser.createdAt?.toISOString();
+          token.sessionId = newSid;
         }
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
+        await dbConnect();
+
+        // Fetch user document to check its state
+        const dbUser = (await User.findById(token.id).lean()) as any;
+
+        const dbSid = dbUser?.currentSessionId;
+        const browserSid = token.sessionId as string;
+        const userEmail = dbUser?.email || token.email || 'Unknown';
+
+        console.log(`[AUTH-LOCK] SYNC: ${userEmail} | BrowserSID: ${browserSid} | DBSID: ${dbSid}`);
+
+        // SELF-HEALING: If DB SID is missing but Browser has one, sync it!
+        if (dbUser && browserSid && !dbSid) {
+          console.warn(`[AUTH-LOCK] Syncing missing DBSID for ${userEmail}...`);
+          await User.findByIdAndUpdate(token.id, { $set: { currentSessionId: browserSid } });
+        }
+        // REAL OVERRIDE: Both exist but mismatch
+        else if (dbUser && browserSid && dbSid && dbSid !== browserSid) {
+          console.log(`[AUTH-LOCK] !!! OVERRIDE DETECTED !!! for ${userEmail}`);
+          (session as any).error = 'SESSION_OVERRIDDEN';
+        }
+
         session.user.id = token.id as string;
+        session.user.email = token.email as string;
         session.user.role = token.role as string;
         session.user.fullName = token.fullName as string;
         session.user.profilePicture = token.profilePicture as string;

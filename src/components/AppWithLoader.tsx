@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import SplashScreen from './SplashScreen';
 import { Providers } from '../app/providers';
 import CustomNavBar from './CustomNavBar';
+import SessionGuard from './auth/SessionGuard';
 
 const navItems = [
     { href: "/", label: "Home" },
@@ -36,10 +37,10 @@ export default function AppWithLoader({ children }: { children: React.ReactNode 
             {loading ? (
                 <SplashScreen onAnimationComplete={handleAnimationComplete} />
             ) : (
-                <>
+                <SessionGuard>
                     <CustomNavBar items={navItems} />
                     {children}
-                </>
+                </SessionGuard>
             )}
         </>
     );
