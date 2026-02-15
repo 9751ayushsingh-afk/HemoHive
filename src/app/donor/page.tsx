@@ -37,8 +37,14 @@ const DonorDashboardPage = () => {
           <UserProfileCard
             fullName={donorData?.fullName || donorData?.name}
             profilePicture={donorData?.profilePicture || donorData?.image}
-            createdAt={donorData?.createdAt}
+            email={donorData?.email}
+            mobile={donorData?.mobile}
+            address={donorData?.address}
+            joinedAt={donorData?.joinedAt}
             bloodGroup={donorData?.blood_group}
+            totalDonations={donorData?.total_donations}
+            credits={donorData?.credit}
+            status={donorData?.status}
           />
         </div>
 

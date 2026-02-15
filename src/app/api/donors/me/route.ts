@@ -19,8 +19,10 @@ export async function GET(request: Request) {
   try {
     const userId = session.user.id; // Use implicit user ID
 
-    // 1. Fetch User Details for Blood Group
-    const user = await User.findById(userId).select('bloodGroup next_eligible_date');
+    // 1. Fetch User Details
+    const user = await User.findById(userId).select('bloodGroup next_eligible_date mobile email address city state pincode status fullName profilePicture createdAt');
+
+    // ... (rest of logic remains same, just ensuring we return the new fields)
 
     // 2. Fetch Donation Statistics from Appointments
     const completedAppointments = await DonationAppointment.find({
@@ -58,6 +60,12 @@ export async function GET(request: Request) {
 
     // 5. Return formatted response (snake_case keys as expected by page.tsx)
     return NextResponse.json({
+      fullName: user?.fullName || session.user.name,
+      email: user?.email || session.user.email,
+      mobile: user?.mobile || 'Not Provided',
+      address: `${user?.address || ''}, ${user?.city || ''}, ${user?.state || ''} ${user?.pincode || ''}`.trim().replace(/^,|,$/g, '') || 'Address Pending',
+      status: user?.status || 'Active',
+      joinedAt: user?.createdAt?.toISOString(),
       blood_group: user?.bloodGroup || 'Unknown',
       last_donation_date: lastDonationDate ? new Date(lastDonationDate).toISOString().split('T')[0] : 'Never',
       next_eligible_date: nextEligibleDate ? new Date(nextEligibleDate).toISOString().split('T')[0] : 'Available',
