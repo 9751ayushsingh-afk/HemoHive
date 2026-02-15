@@ -54,7 +54,7 @@ const UserSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: [true, 'Password is required'],
+        required: false,
     },
     role: {
         type: String,
@@ -175,7 +175,7 @@ UserSchema.pre('save', async function (next) {
     console.log('this:', this);
 
 
-    if (this.isModified('password')) {
+    if (this.isModified('password') && this.password) {
         const salt = await bcrypt.genSalt(10);
         this.password = await bcrypt.hash(this.password, salt);
     }

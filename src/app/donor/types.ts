@@ -4,6 +4,8 @@ export interface UserProfile {
   lastDonationDate: string;
   nextEligibleDate: string;
   totalDonations: number;
+  amount?: number;
+  credit?: number;
 }
 
 export interface DonationHistoryItem {

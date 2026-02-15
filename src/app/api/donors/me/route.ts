@@ -62,7 +62,9 @@ export async function GET(request: Request) {
       last_donation_date: lastDonationDate ? new Date(lastDonationDate).toISOString().split('T')[0] : 'Never',
       next_eligible_date: nextEligibleDate ? new Date(nextEligibleDate).toISOString().split('T')[0] : 'Available',
       total_donations: totalDonations,
-      eligibility: isEligible ? 'Eligible' : 'Not Eligible'
+      eligibility: isEligible ? 'Eligible' : 'Not Eligible',
+      amount: user?.amount || 0,
+      credit: user?.credit || 0
     });
 
   } catch (error) {

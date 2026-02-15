@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import GoogleProvider from 'next-auth/providers/google';
 import dbConnect from './dbConnect';
 import User from '../models/User';
 import bcrypt from 'bcryptjs';
@@ -8,8 +9,12 @@ import { NextAuthOptions } from 'next-auth';
 
 interface AuthPayload {
   id: string;
-  role: 'hospital' | 'admin' | 'donor';
+  role: 'hospital' | 'admin' | 'donor' | 'driver';
   hospitalId?: string;
+  fullName?: string;
+  profilePicture?: string;
+  bloodGroup?: string;
+  createdAt?: string;
   [key: string]: any;
 }
 
@@ -25,12 +30,15 @@ export async function getAuth(request: NextRequest): Promise<AuthResult> {
     return { user: null, error: 'No token found or token is invalid' };
   }
 
-  // The token payload from next-auth/jwt already has the user data from the jwt callback
-  return { user: token as AuthPayload };
+  return { user: token as unknown as AuthPayload };
 }
 
 export const authOptions: NextAuthOptions = {
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID || '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+    }),
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
@@ -46,16 +54,16 @@ export const authOptions: NextAuthOptions = {
 
         const user = await User.findOne({ email: credentials.email });
 
-        if (user && (await bcrypt.compare(credentials.password, user.password))) {
+        if (user && user.password && (await bcrypt.compare(credentials.password, user.password))) {
           return {
             id: user._id.toString(),
             email: user.email,
             role: user.role,
             fullName: user.fullName,
             profilePicture: user.profilePicture,
-            hospitalId: user.hospitalId?.toString(), // Ensure hospitalId is included
+            hospitalId: user.hospitalId?.toString(),
             bloodGroup: user.bloodGroup,
-            createdAt: user.createdAt,
+            createdAt: user.createdAt?.toISOString(),
           };
         } else {
           return null;
@@ -64,15 +72,49 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async signIn({ user, account, profile }) {
+      if (account?.provider === 'google') {
+        await dbConnect();
+        const existingUser = await User.findOne({ email: user.email });
+
+        if (!existingUser) {
+          // Create a donor profile for new Google users
+          await User.create({
+            fullName: user.name,
+            email: user.email,
+            role: 'donor',
+            profilePicture: user.image,
+            status: 'Approved', // Auto-approve Google users for now or set based on your policy
+            bloodGroup: 'Unknown',
+            gender: 'Other',
+            dob: new Date(0),
+            mobile: '0000000000',
+            aadhaar: '000000000000',
+            address: 'Pending Completion',
+            city: 'Pending',
+            state: 'Pending',
+            pincode: '000000',
+            agreeTerms: true,
+          });
+        }
+      }
+      return true;
+    },
+    async jwt({ token, user, account }) {
+      await dbConnect();
+
+      // If this is a login, user object will be present
       if (user) {
-        token.id = user.id;
-        token.role = user.role;
-        token.fullName = user.fullName;
-        token.profilePicture = user.profilePicture;
-        token.hospitalId = user.hospitalId; // Add hospitalId to the token
-        token.bloodGroup = user.bloodGroup;
-        token.createdAt = user.createdAt;
+        const dbUser = await User.findOne({ email: user.email });
+        if (dbUser) {
+          token.id = dbUser._id.toString();
+          token.role = dbUser.role;
+          token.fullName = dbUser.fullName;
+          token.profilePicture = dbUser.profilePicture;
+          token.hospitalId = dbUser.hospitalId?.toString();
+          token.bloodGroup = dbUser.bloodGroup;
+          token.createdAt = dbUser.createdAt?.toISOString();
+        }
       }
       return token;
     },
@@ -82,7 +124,7 @@ export const authOptions: NextAuthOptions = {
         session.user.role = token.role as string;
         session.user.fullName = token.fullName as string;
         session.user.profilePicture = token.profilePicture as string;
-        session.user.hospitalId = token.hospitalId as string; // Add hospitalId to the session
+        session.user.hospitalId = token.hospitalId as string;
         session.user.bloodGroup = token.bloodGroup as string;
         session.user.createdAt = token.createdAt as string;
       }

@@ -33,8 +33,8 @@ const Dashboard: React.FC<DashboardProps> = ({ user, history, onDonateClick, onV
               onClick={isEligible ? onDonateClick : undefined}
               disabled={!isEligible}
               className={`font-bold py-3 px-8 rounded-full shadow-lg transition-all flex items-center gap-2 ${isEligible
-                  ? "bg-white text-red-600 hover:bg-red-50 hover:scale-105 active:scale-95 cursor-pointer"
-                  : "bg-red-800/50 text-white/50 cursor-not-allowed scale-100 shadow-none border border-red-500/30"
+                ? "bg-white text-red-600 hover:bg-red-50 hover:scale-105 active:scale-95 cursor-pointer"
+                : "bg-red-800/50 text-white/50 cursor-not-allowed scale-100 shadow-none border border-red-500/30"
                 }`}
             >
               <Heart size={20} className={isEligible ? "animate-pulse" : ""} />
@@ -130,7 +130,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, history, onDonateClick, onV
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-medium text-slate-900">{item.date}</p>
+                  <p className="text-sm font-medium text-slate-900">{new Date(item.date).toLocaleDateString()}</p>
                   <p className="text-xs text-slate-500 mb-1">{item.amount}</p>
                   {/* Status Badge */}
                   <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border ${item.status === 'completed' ? 'bg-green-50 text-green-700 border-green-100' :

@@ -8,9 +8,10 @@ import SuccessView from './SuccessView';
 import AppointmentsView from './AppointmentsView';
 import CancelDialog from './CancelDialog'; // Emotional Hindi Messages
 import RescheduleDialog from './RescheduleDialog';
+import CancellationSuccessView from './CancellationSuccessView';
 import { UserProfile, DonationHistoryItem, Appointment } from '../types';
 
-type View = 'dashboard' | 'eligibility' | 'schedule' | 'success' | 'appointments';
+type View = 'dashboard' | 'eligibility' | 'schedule' | 'success' | 'appointments' | 'cancellation-success';
 
 const DonateBloodPage = () => {
   const [view, setView] = useState<View>('dashboard');
@@ -58,7 +59,7 @@ const DonateBloodPage = () => {
               id: a._id,
               status: a.status,
               donationType: a.donation_type,
-              centerName: a.center?.name || 'Unknown Center',
+              centerName: a.center?.fullName || a.center?.name || 'Unknown Center',
               date: a.scheduled_at,
               timeSlot: timeStr, // Using start time as slot
               pickupRequired: a.pickup_required || false,
@@ -125,8 +126,8 @@ const DonateBloodPage = () => {
           appt.id === appointmentToCancel.id ? { ...appt, status: 'cancelled' } : appt
         ));
 
-        // Show feedback (using alert for now as per existing pattern)
-        alert("Appointment Cancelled Successfully");
+        // Switch to the rich cancellation success view
+        setView('cancellation-success');
       } else {
         const data = await res.json();
         alert(data.message || "Failed to cancel appointment");
@@ -159,7 +160,17 @@ const DonateBloodPage = () => {
         {view === 'dashboard' && (
           <Dashboard
             user={displayUser}
-            history={[]} // TODO: Fetch real history if available
+            history={appointments
+              .filter(a => a.status === 'completed')
+              .map(a => ({
+                id: a.id,
+                type: a.donationType,
+                center: a.centerName || 'Unknown Center',
+                date: a.date, // Use raw date for reliable parsing in chart
+                amount: (user?.amount !== undefined && user?.amount > 0) ? `₹${user.amount}` :
+                  (user?.credit !== undefined && user?.credit > 0) ? `${user.credit} Credit` : '—',
+                status: 'completed'
+              }))}
             onDonateClick={handleDonateClick}
             onViewAppointmentsClick={handleViewAppointmentsClick}
           />
@@ -195,6 +206,9 @@ const DonateBloodPage = () => {
             }}
             onCancel={handleCancelClick} // Connect the Cancel Handler
           />
+        )}
+        {view === 'cancellation-success' && (
+          <CancellationSuccessView onBack={handleHome} />
         )}
 
       </div>

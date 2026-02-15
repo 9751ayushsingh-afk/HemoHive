@@ -80,7 +80,7 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({ onBack, onConfirm }) => {
         onConfirm({
           id: result.appointment_id,
           donationType: form.type,
-          centerId: form.center,
+          centerName: centers.find(c => c.id === form.center)?.name || 'Unknown Center',
           date: form.date,
           timeSlot: form.timeSlot,
           status: 'pending',

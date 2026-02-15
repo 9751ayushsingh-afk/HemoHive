@@ -11,7 +11,10 @@ const RedirectPage = async () => {
   if (role === 'hospital') {
     redirect('/hospital/home');
   } else if (role === 'donor') {
-    // Assuming a donor dashboard exists or will exist
+    // If the donor's profile is incomplete (e.g. blood group unknown), redirect to complete it
+    if (session?.user?.bloodGroup === 'Unknown') {
+      redirect('/donor/complete-profile');
+    }
     redirect('/donor');
   } else if (role === 'admin') {
     redirect('/admin'); // Updated to point to main admin page

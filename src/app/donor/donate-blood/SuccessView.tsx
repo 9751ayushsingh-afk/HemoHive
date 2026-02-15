@@ -51,7 +51,7 @@ const SuccessView: React.FC<SuccessViewProps> = ({ onHome, appointment, isViewOn
             <div>
               <p className="text-xs text-slate-400 uppercase font-bold">Location</p>
               <p className="font-semibold text-slate-900">
-                Center: {appointment.centerName || appointment.center || 'Unknown'}
+                Center: {appointment.centerName || appointment.center || 'Unknown Center'}
               </p>
             </div>
           </div>

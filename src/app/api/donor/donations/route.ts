@@ -17,7 +17,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ message: 'Unauthorized. Please log in.' }, { status: 401 });
     }
 
-    const appointments = await DonationAppointment.find({ user: user_id }).populate('center', 'name location').sort({ scheduled_at: -1 });
+    const appointments = await DonationAppointment.find({ user: user_id }).populate('center', 'fullName location').sort({ scheduled_at: -1 });
 
     return NextResponse.json(appointments);
 
