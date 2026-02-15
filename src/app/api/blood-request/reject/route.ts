@@ -18,7 +18,7 @@ export async function PATCH(request: NextRequest) {
 
     if (user.role !== 'hospital') {
         return new NextResponse(
-            JSON.stringify({ message: 'Only hospitals can approve requests.' }),
+            JSON.stringify({ message: 'Only hospitals can reject requests.' }),
             { status: 403 }
         );
     }
@@ -33,24 +33,25 @@ export async function PATCH(request: NextRequest) {
             );
         }
 
-        // Atomic Update: Only strictly finding one that has NO hospitalId assigned yet
-        // AND is not expired.
         const now = new Date();
 
+        // Rejection marks it as 'Rejected' for this specific hospital if it was personal,
+        // or effectively removes it from the broadcast pool if we set hospitalId.
         const updatedRequest = await BloodRequest.findOneAndUpdate(
             {
                 _id: requestId,
                 $or: [
-                    { hospitalId: { $exists: false } }, // Broadcast
-                    { hospitalId: null },               // Broadcast 
-                    { hospitalId: user.id }             // Specifically targeted to ME
+                    { hospitalId: { $exists: false } },
+                    { hospitalId: null },
+                    { hospitalId: user.id }
                 ],
-                expiresAt: { $gt: now }
+                expiresAt: { $gt: now },
+                status: 'Pending'
             },
             {
                 $set: {
                     hospitalId: user.id,
-                    status: 'Approved'
+                    status: 'Rejected'
                 }
             },
             { new: true }
@@ -58,29 +59,18 @@ export async function PATCH(request: NextRequest) {
 
         if (!updatedRequest) {
             return new NextResponse(
-                JSON.stringify({ message: 'Request unavailable or expired.' }),
-                { status: 409 } // Conflict
+                JSON.stringify({ message: 'Request unavailable, already handled, or expired.' }),
+                { status: 409 }
             );
         }
 
-        // Broadcast "Request Taken" to remove it from other dashboards
-        try {
-            await fetch('http://localhost:3000/api/internal/broadcast-taken', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ requestId })
-            }).catch(err => console.log("Broadcast skipped:", err.message));
-        } catch (e) {
-            // Ignore
-        }
-
         return new NextResponse(
-            JSON.stringify({ message: 'Request Approved Successfully', request: updatedRequest }),
+            JSON.stringify({ message: 'Request Rejected', request: updatedRequest }),
             { status: 200 }
         );
 
     } catch (error: any) {
-        console.error('Error approving request:', error);
+        console.error('Error rejecting request:', error);
         return new NextResponse(
             JSON.stringify({ message: 'Internal Server Error' }),
             { status: 500 }

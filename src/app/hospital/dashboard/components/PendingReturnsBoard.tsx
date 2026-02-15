@@ -25,6 +25,72 @@ interface ReturnRequest {
   createdAt: string;
 }
 
+const viewDocument = async (doc: string) => {
+  if (!doc) return;
+
+  console.log('[DocumentView] Initial URL:', doc);
+  const toastId = toast.loading('Preparing document...');
+
+  try {
+    let processedUrl = doc;
+    if (doc.includes('cloudinary.com') && doc.startsWith('http:')) {
+      processedUrl = doc.replace('http:', 'https:');
+      console.log('[DocumentView] Promoted to HTTPS:', processedUrl);
+    } else if (doc.startsWith('//')) {
+      processedUrl = 'https:' + doc;
+      console.log('[DocumentView] Fixed protocol-relative:', processedUrl);
+    }
+
+    if (processedUrl.startsWith('http')) {
+      const response = await fetch(processedUrl);
+      if (!response.ok) throw new Error(`Server returned ${response.status}`);
+
+      let blob = await response.blob();
+
+      // Force PDF type if URL suggests it, to prevent "unreadable text"
+      if (processedUrl.toLowerCase().endsWith('.pdf') || processedUrl.includes('/raw/')) {
+        blob = new Blob([blob], { type: 'application/pdf' });
+      }
+
+      const blobUrl = URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast.success('Document opened', { id: toastId });
+    } else if (processedUrl.startsWith('data:')) {
+      const res = await fetch(processedUrl);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast.success('Document opened', { id: toastId });
+    } else {
+      window.open(processedUrl, '_blank');
+      toast.dismiss(toastId);
+    }
+  } catch (e) {
+    console.error('[DocumentView] High-reliability view failed:', e);
+    toast.error('Direct view failed. Downloading fallback...', { id: toastId });
+
+    const link = document.createElement('a');
+    link.href = doc;
+    link.target = '_blank';
+    link.download = 'medical-report';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+};
+
 const PendingReturnsBoard = ({ hospitalId }: { hospitalId: string }) => {
   const queryClient = useQueryClient();
   const [selectedRequest, setSelectedRequest] = useState<ReturnRequest | null>(null);
@@ -245,6 +311,18 @@ const PendingReturnsBoard = ({ hospitalId }: { hospitalId: string }) => {
                     <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Name</div>
                     <div className="font-bold text-slate-800 text-sm truncate">{selectedRequest.userId.fullName}</div>
                   </div>
+                  {(selectedRequest.creditId as any)?.requestId?.document && (
+                    <button
+                      onClick={() => viewDocument((selectedRequest.creditId as any).requestId.document)}
+                      className="p-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-xl border border-indigo-100 transition-colors flex items-center justify-center gap-2"
+                      title="View Medical Document"
+                    >
+                      <span className="text-xs font-black">VIEW DOC</span>
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </button>
+                  )}
                 </div>
 
                 {/* Inputs */}

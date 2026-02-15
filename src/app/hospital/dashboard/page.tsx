@@ -43,7 +43,7 @@ const HospitalDashboardPage = async () => {
       <div className="col-span-12 lg:col-span-7">
         <OverviewCards />
         <div className="mt-6">
-          <LiveBloodRequests inventory={inventoryData} />
+          <LiveBloodRequests inventory={inventoryData} hospitalId={hospitalId || ''} />
         </div>
         <div className="mt-6">
           <PendingReturnsBoard hospitalId={hospitalId || ''} />

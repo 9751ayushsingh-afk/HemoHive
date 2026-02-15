@@ -11,8 +11,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
   try {
     const userId = params.id;
-    if (!userId) {
-      return new NextResponse(JSON.stringify({ message: 'User ID is required' }), {
+    if (!userId || userId === 'undefined') {
+      return new NextResponse(JSON.stringify({ message: 'Valid User ID is required' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
       });

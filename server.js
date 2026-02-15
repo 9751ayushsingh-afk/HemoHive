@@ -31,9 +31,23 @@ app.prepare().then(() => {
         req.on('end', () => {
           try {
             const requestData = JSON.parse(body);
-            console.log('Broadcasting New Request to Hospitals:', requestData._id);
-            // Broadcast to all hospitals
-            io.to('hospitals').emit('new_blood_request', requestData);
+            const fulfillmentTarget = requestData.hospitalId;
+            const broadcastTargets = requestData.broadcastTo; // Array of hospital IDs
+
+            if (broadcastTargets && Array.isArray(broadcastTargets) && broadcastTargets.length > 0) {
+              console.log(`Targeting Request ${requestData._id} to ${broadcastTargets.length} private hospital rooms.`);
+              broadcastTargets.forEach(targetId => {
+                io.to(`hospital_${targetId}`).emit('new_blood_request', requestData);
+              });
+            } else if (fulfillmentTarget) {
+              console.log(`Targeting Request ${requestData._id} to Single Hospital Room: ${fulfillmentTarget}`);
+              io.to(`hospital_${fulfillmentTarget}`).emit('new_blood_request', requestData);
+            } else {
+              console.log('Broadcasting New Request to GLOBAL Hospital Room:', requestData._id);
+              // Last fallback: global notification
+              io.to('hospitals').emit('new_blood_request', requestData);
+            }
+
             res.statusCode = 200;
             res.end('Broadcasted');
           } catch (e) {
@@ -131,9 +145,12 @@ app.prepare().then(() => {
     });
 
     // Hospital Room Logic
-    socket.on('join_hospital_room', () => {
-      socket.join('hospitals');
-      console.log(`Socket ${socket.id} joined 'hospitals' room`);
+    socket.on('join_hospital_room', (hospitalId) => {
+      socket.join('hospitals'); // Still join global room for broadcasts
+      if (hospitalId) {
+        socket.join(`hospital_${hospitalId}`);
+        console.log(`Socket ${socket.id} joined private hospital_${hospitalId}`);
+      }
     });
 
     // Driver Personal Room

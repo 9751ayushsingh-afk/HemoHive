@@ -21,7 +21,7 @@ const CreditWallet = () => {
     const { data, isLoading, error } = useQuery({
         queryKey: ['userCredits', userId],
         queryFn: () => fetchUserCredits(userId!),
-        enabled: !!userId, // Only run the query if the userId is available
+        enabled: !!userId && userId !== 'undefined', // Only run the query if the userId is available and valid
         refetchInterval: 30000, // Refetch every 30 seconds to keep status up-to-date
     });
 

@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '../../../../../lib/dbConnect';
+import Credit from '../../../../../models/Credit'; // Import Credit Model
 import Delivery from '../../../../../models/Delivery';
-import Driver from '../../../../../models/Driver';
-import BloodBag from '../../../../../models/BloodBag'; // Import BloodBag Model
+import BloodBag from '../../../../../models/BloodBag';
 import Inventory from '../../../../../models/Inventory';
+import Driver from '../../../../../models/Driver';
 
 export async function POST(request: Request) {
     await dbConnect();
@@ -23,18 +24,14 @@ export async function POST(request: Request) {
 
         // --- RAKTSINDHU: Inventory Deduction ---
         if (delivery.bloodBagId) {
-            // 1. Mark Specific Bag as 'issued' (or delete) to remove from available stock
-            // We use 'delete' to simulate physics of 'bag is gone' as per user request
             await BloodBag.findOneAndDelete({ bagId: delivery.bloodBagId });
 
-            // 2. Decrement Aggregated Inventory for Stats
             if (delivery.requestId) {
                 await Inventory.findOneAndUpdate(
                     { hospital: (delivery.requestId as any).hospitalId, bloodGroup: (delivery.requestId as any).bloodGroup },
                     { $inc: { quantity: -1 } }
                 );
             }
-            console.log(`[RaktSindhu] Processed Bag ${delivery.bloodBagId}: Removed from DB & Inventory Decremented.`);
         }
 
         // Update Delivery Status
@@ -42,10 +39,23 @@ export async function POST(request: Request) {
         delivery.endTime = new Date();
         await delivery.save();
 
-        // Update Blood Request Status to 'Fulfilled'
+        // Update Blood Request Status to 'Fulfilled' AND Create Credit
         if (delivery.requestId) {
             const BloodRequest = (await import('../../../../../models/BloodRequest')).default;
-            await BloodRequest.findByIdAndUpdate(delivery.requestId._id || delivery.requestId, { status: 'Fulfilled' });
+            const request = await BloodRequest.findByIdAndUpdate(delivery.requestId._id || delivery.requestId, { status: 'Fulfilled' }, { new: true });
+
+            // Create the credit record now that delivery is confirmed
+            if (request) {
+                const dueDate = new Date();
+                dueDate.setDate(dueDate.getDate() + 30);
+
+                await Credit.create({
+                    userId: request.userId,
+                    requestId: request._id,
+                    dueDate,
+                    status: 'active'
+                });
+            }
         }
 
         // Free the Driver

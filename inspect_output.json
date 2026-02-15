@@ -1,0 +1,18 @@
+{
+  "_id": "6991fa6ad1540cf0dd47231b",
+  "userId": "690995111f8cd77da9a6b496",
+  "patientHospital": "jeevan jyoti",
+  "hospitalId": "698eddd718688df24d07fed1",
+  "recipientHospitalId": "698eddd718688df24d07fed1",
+  "broadcastTo": [],
+  "bloodGroup": "A+",
+  "units": 2,
+  "urgency": "Normal",
+  "reason": "",
+  "document": "",
+  "status": "Pending",
+  "paymentStatus": "Pending",
+  "createdAt": "2026-02-15T16:55:06.052Z",
+  "updatedAt": "2026-02-15T16:55:06.052Z",
+  "__v": 0
+}

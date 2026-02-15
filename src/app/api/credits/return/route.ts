@@ -91,7 +91,7 @@ export async function GET(req: Request) {
         path: 'creditId',
         populate: {
           path: 'requestId', // To get original units/blood group details if needed
-          select: 'bloodGroup units'
+          select: 'bloodGroup units document'
         }
       })
       .sort({ createdAt: -1 });

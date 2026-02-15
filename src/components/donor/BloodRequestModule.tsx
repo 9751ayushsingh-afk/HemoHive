@@ -29,6 +29,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/ca
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
+  DialogDescription,
 } from '../../components/ui/dialog';
 import { Droplets, Activity, Zap, Radio, CheckCircle2, Wifi } from 'lucide-react';
 
@@ -60,18 +62,24 @@ const formSchema = z.object({
   patientHospital: z.string().min(3, 'Please select a hospital'),
   recipientHospitalId: z.string().optional(),
   reason: z.string().optional(),
+  document: z.string().optional(), // Will be validated in onSubmit or via refine
+}).refine((data) => {
+  if (data.units > 2 && !data.document) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Document is required for requests > 2 units",
+  path: ["document"],
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
-const createBloodRequest = async (data: FormValues) => {
-  console.log('Broadcasting blood request:', data);
-  const res = await fetch('/api/donor/blood-requests', {
+const createBloodRequest = async (formData: FormData) => {
+  console.log('Broadcasting blood request with FormData');
+  const res = await fetch('/api/credits/request', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
+    body: formData, // Send FormData directly
   });
 
   if (!res.ok) {
@@ -87,6 +95,7 @@ export default function BloodRequestModule() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [lastRequest, setLastRequest] = useState<FormValues | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema) as any,
@@ -97,6 +106,7 @@ export default function BloodRequestModule() {
       patientHospital: '',
       recipientHospitalId: '',
       reason: '',
+      document: '',
     },
   });
 
@@ -119,9 +129,11 @@ export default function BloodRequestModule() {
     mutationFn: createBloodRequest,
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['inventory'] });
-      setLastRequest(variables);
+      // We need to pass the form values for the success dialog
+      setLastRequest(form.getValues());
       setShowSuccessDialog(true);
       form.reset();
+      setSelectedFile(null);
     },
     onError: (error) => {
       console.error('Submission error:', error);
@@ -130,7 +142,36 @@ export default function BloodRequestModule() {
   });
 
   const onSubmit = (values: FormValues) => {
-    mutation.mutate(values);
+    const formData = new FormData();
+    Object.entries(values).forEach(([key, value]) => {
+      if (key !== 'document' && value !== undefined) {
+        formData.append(key, String(value));
+      }
+    });
+
+    if (selectedFile) {
+      formData.append('document', selectedFile);
+    }
+
+    // Extract all hospital IDs from the availability stock check
+    if (hospitals && hospitals.length > 0) {
+      const targetedIds = hospitals.map(h => h._id);
+      formData.append('targetedHospitalIds', JSON.stringify(targetedIds));
+    }
+
+    mutation.mutate(formData as any); // Cast because mutationFn signature changed
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        showNotification('File size exceeds 5MB limit', 'error');
+        return;
+      }
+      setSelectedFile(file);
+      form.setValue('document', file.name, { shouldValidate: true });
+    }
   };
 
   return (
@@ -154,7 +195,10 @@ export default function BloodRequestModule() {
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <form onSubmit={form.handleSubmit(onSubmit, (errors) => {
+                console.error('❌ Form Validation Errors:', errors);
+                showNotification(`Validation Failed: ${Object.keys(errors).join(', ')}`, 'error');
+              })} className="space-y-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FormField
                     control={form.control}
@@ -189,6 +233,7 @@ export default function BloodRequestModule() {
                         <FormControl>
                           <Input
                             type="number"
+                            min="1"
                             placeholder="e.g. 2"
                             className="bg-white/5 border-white/10 text-white h-12 rounded-xl focus:border-red-500/50 transition-all font-mono"
                             {...field}
@@ -198,6 +243,52 @@ export default function BloodRequestModule() {
                       </FormItem>
                     )}
                   />
+
+                  {/* Document Upload Field - Conditionally Rendered */}
+                  <AnimatePresence>
+                    {units > 2 && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="col-span-full"
+                      >
+                        <FormField
+                          control={form.control}
+                          name="document"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-slate-300 font-medium flex items-center gap-2">
+                                <span className="text-red-500">*</span> Medical Authorization Document
+                                <span className="text-xs text-slate-500 font-normal">(Required for &gt; 2 units)</span>
+                              </FormLabel>
+                              <FormControl>
+                                <div className="border-2 border-dashed border-white/10 rounded-xl p-4 bg-white/5 hover:bg-white/10 transition-colors text-center cursor-pointer relative">
+                                  <input
+                                    type="file"
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    onChange={handleFileChange}
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                  />
+                                  <div className="flex flex-col items-center gap-2 text-slate-400">
+                                    <span className="bg-white/10 p-2 rounded-full">
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" x2="12" y1="3" y2="15" /></svg>
+                                    </span>
+                                    <span className="text-sm font-medium">
+                                      {field.value ? "Document Uploaded (Click to Change)" : "Click to Upload Document"}
+                                    </span>
+                                    <span className="text-xs opacity-60">PDF, JPG, or PNG (Max 5MB)</span>
+                                  </div>
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
                   <FormField
                     control={form.control}
                     name="urgency"
@@ -433,10 +524,10 @@ export default function BloodRequestModule() {
           </div>
 
           <div className="p-8 text-center">
-            <h2 className="text-2xl font-black uppercase tracking-[0.2em] mb-4">Signal Transmitted</h2>
-            <p className="text-slate-400 text-sm leading-relaxed mb-8">
+            <DialogTitle className="text-2xl font-black uppercase tracking-[0.2em] mb-4 text-center">Signal Transmitted</DialogTitle>
+            <DialogDescription className="text-slate-400 text-sm leading-relaxed mb-8">
               Your blood request for <span className="text-white font-bold">{lastRequest?.bloodGroup}</span> has been broadcasted to all synchronized hospitals across the local grid.
-            </p>
+            </DialogDescription>
 
             <div className="grid grid-cols-2 gap-4 mb-8">
               <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5">

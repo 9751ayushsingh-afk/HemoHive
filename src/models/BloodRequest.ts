@@ -10,6 +10,7 @@ export interface IBloodRequest extends Document {
     units: number;
     urgency: 'Normal' | 'Urgent' | 'Emergency';
     reason?: string;
+    document?: string; // [NEW] Path/URL to uploaded document
     status: 'Pending' | 'Approved' | 'Rejected' | 'Fulfilled';
     paymentStatus: 'Pending' | 'Completed' | 'Failed';
 }
@@ -57,6 +58,9 @@ const BloodRequestSchema: Schema = new Schema({
         default: 'Normal',
     },
     reason: {
+        type: String,
+    },
+    document: { // [NEW] Document path
         type: String,
     },
     status: {

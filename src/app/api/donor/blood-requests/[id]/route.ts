@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '../../../../../lib/db';
 import BloodRequest from '../../../../../models/BloodRequest';
+import Credit from '../../../../../models/Credit';
 import { getToken } from 'next-auth/jwt';
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
@@ -62,6 +63,18 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
     bloodRequest.status = 'Fulfilled';
     await bloodRequest.save();
+
+    // --- RAKTSINDHU: Delayed Credit Activation ---
+    // Create the credit record for manual fulfillment
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + 30);
+
+    await Credit.create({
+      userId: bloodRequest.userId,
+      requestId: bloodRequest._id,
+      dueDate,
+      status: 'active'
+    });
 
     return NextResponse.json(bloodRequest, { status: 200 });
   } catch (error) {
