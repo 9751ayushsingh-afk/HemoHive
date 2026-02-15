@@ -9,10 +9,10 @@ import { motion } from 'framer-motion';
 
 const navItems = [
   { name: 'Dashboard', icon: Home, path: '/donor' },
-  { name: 'Credit Wallet', icon: Wallet, path: '/donor/wallet' },
-  { name: 'Request Blood', icon: Droplets, path: '/donor/request' },
-  { name: 'History', icon: History, path: '/donor/history' },
-  { name: 'Profile', icon: User, path: '/donor/profile' },
+  { name: 'Credit Wallet', icon: Wallet, path: '/donor#wallet' },
+  { name: 'Request Blood', icon: Droplets, path: '/donor#request' },
+  { name: 'History', icon: History, path: '/donor#history' },
+  { name: 'Profile', icon: User, path: '/donor#profile' },
 ];
 
 const Sidebar = () => {

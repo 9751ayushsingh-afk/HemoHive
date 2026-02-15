@@ -29,11 +29,11 @@ const DonorDashboardPage = () => {
   const isLocked = !donorData?.total_donations || donorData.total_donations === 0;
 
   return (
-    <div className="p-8">
+    <div className="p-8 scroll-smooth">
       <h1 className="text-4xl font-bold text-white mb-8">Dashboard</h1>
       {/* Dashboard Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-1">
+        <div id="profile" className="lg:col-span-1">
           <UserProfileCard
             fullName={donorData?.fullName || donorData?.name}
             profilePicture={donorData?.profilePicture || donorData?.image}
@@ -53,13 +53,13 @@ const DonorDashboardPage = () => {
         </div>
 
         {/* Locked Features for New Donors */}
-        <div className="lg:col-span-3">
+        <div id="wallet" className="lg:col-span-3">
           {isLocked ? <LockedFeature title="Credit Wallet" /> : <CreditWallet />}
         </div>
-        <div className="lg:col-span-3">
+        <div id="request" className="lg:col-span-3">
           {isLocked ? <LockedFeature title="Blood Requests" /> : <BloodRequestModule />}
         </div>
-        <div className="lg:col-span-3">
+        <div id="history" className="lg:col-span-3">
           {isLocked ? <LockedFeature title="Request History" /> : <BloodRequestHistory />}
         </div>
       </div>
