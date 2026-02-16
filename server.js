@@ -109,6 +109,15 @@ app.prepare().then(() => {
     }
   });
 
+  const io = new Server(server, {
+    path: '/api/socket',
+    addTrailingSlash: false,
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST"]
+    }
+  });
+
   // Tracking for latest driver locations per delivery
   const deliveryLocations = new Map();
 
