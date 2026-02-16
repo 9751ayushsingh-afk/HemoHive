@@ -77,6 +77,7 @@ export default function DeliveryTracking({ deliveryId, initialData }: DeliveryTr
         });
 
         newSocket.on('driver_moved', (location) => {
+            console.log('[Socket] driver_moved:', location);
             // location: { lat, lng }
             setDriverLocation(location);
             if (mapRef.current) {
@@ -85,9 +86,11 @@ export default function DeliveryTracking({ deliveryId, initialData }: DeliveryTr
         });
 
         // [FIX] Request latest location immediately upon joining
+        console.log('[Socket] Requesting driver location for:', deliveryId);
         newSocket.emit('request_driver_location', deliveryId);
 
         newSocket.on('current_driver_location', (location) => {
+            console.log('[Socket] Received current_driver_location:', location);
             if (location) {
                 setDriverLocation(location);
                 if (mapRef.current) {

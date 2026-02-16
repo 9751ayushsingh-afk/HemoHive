@@ -98,6 +98,7 @@ export default function DriverDashboard() {
     const [isMinimized, setIsMinimized] = useState(false);
     const [manualLocationMode, setManualLocationMode] = useState(false);
     const [isToggleLoading, setIsToggleLoading] = useState(false);
+    const lastDbUpdateRef = useRef<number>(0);
 
     const [profile, setProfile] = useState<UserProfile>({
         name: 'Loading...',
@@ -131,12 +132,32 @@ export default function DriverDashboard() {
     useEffect(() => {
         if (currentLocation && activeDelivery && socketRef.current) {
             const deliveryId = activeDelivery._id || activeDelivery.id;
+
+            // 1. Instant Socket Update
             socketRef.current.emit('update_location', {
                 deliveryId,
                 location: { lat: currentLocation[0], lng: currentLocation[1] }
             });
+
+            // 2. Throttled DB Update (every 30 seconds)
+            const now = Date.now();
+            if (now - lastDbUpdateRef.current > 30000) {
+                lastDbUpdateRef.current = now;
+                fetch('/api/delivery/location', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        driverId: (profile as any).id,
+                        deliveryId,
+                        location: {
+                            type: 'Point',
+                            coordinates: [currentLocation[1], currentLocation[0]] // [lng, lat]
+                        }
+                    })
+                }).catch(err => console.error('DB Location Sync Error:', err));
+            }
         }
-    }, [currentLocation, activeDelivery]);
+    }, [currentLocation, activeDelivery, profile]);
 
     const startGPS = () => {
         if (!navigator.geolocation) {

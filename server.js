@@ -109,14 +109,8 @@ app.prepare().then(() => {
     }
   });
 
-  const io = new Server(server, {
-    path: '/api/socket',
-    addTrailingSlash: false,
-    cors: {
-      origin: "*",
-      methods: ["GET", "POST"]
-    }
-  });
+  // Tracking for latest driver locations per delivery
+  const deliveryLocations = new Map();
 
   io.on('connection', (socket) => {
     console.log('Client connected:', socket.id);
@@ -131,9 +125,22 @@ app.prepare().then(() => {
     socket.on('update_location', (data) => {
       const { deliveryId, location } = data;
       console.log(`[Socket] Received update_location for delivery_${deliveryId}:`, location);
+
+      // Store latest location
+      deliveryLocations.set(deliveryId, location);
+
       // Broadcast to everyone in the room (hospital, donor)
       io.to(`delivery_${deliveryId}`).emit('driver_moved', location);
       console.log(`[Socket] Broadcasted driver_moved to delivery_${deliveryId}`);
+    });
+
+    // Request latest location (used by donor on join)
+    socket.on('request_driver_location', (deliveryId) => {
+      const location = deliveryLocations.get(deliveryId);
+      console.log(`[Socket] Received request_driver_location for delivery_${deliveryId}. Found:`, !!location);
+      if (location) {
+        socket.emit('current_driver_location', location);
+      }
     });
 
     // Delivery status change
