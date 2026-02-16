@@ -108,7 +108,8 @@ export async function GET(req: Request) {
 export async function PATCH(req: Request) {
   try {
     await dbConnect();
-    const { requestId, status, adminComments, bagId, expiryDate, hospitalId } = await req.json();
+    const data = await req.json();
+    const { requestId, status, adminComments, hospitalId, expiryDate } = data;
 
     if (!requestId || !status) {
       return NextResponse.json({ error: 'Request ID and Status are required' }, { status: 400 });
@@ -120,19 +121,24 @@ export async function PATCH(req: Request) {
     }
 
     if (status === 'approved') {
-      if (!bagId || !expiryDate) {
-        return NextResponse.json({ error: 'Bag ID and Expiry Date are required for approval' }, { status: 400 });
+      const { bagIds, bagId: singleBagId } = data;
+      const finalBagIds = bagIds || (singleBagId ? [singleBagId] : []);
+
+      if (finalBagIds.length === 0 || !expiryDate) {
+        return NextResponse.json({ error: 'At least one Bag ID and Expiry Date are required for approval' }, { status: 400 });
       }
 
-      // 0. Check for Bag ID uniqueness
-      const existingBag = await BloodBag.findOne({ bagId: bagId });
-      if (existingBag) {
-        return NextResponse.json({ error: 'Bag ID already exists in inventory. Please use a unique ID.' }, { status: 409 });
+      // 0. Check for Bag ID uniqueness for all scanned bags
+      const existingBags = await BloodBag.find({ bagId: { $in: finalBagIds } });
+      if (existingBags.length > 0) {
+        return NextResponse.json({
+          error: `One or more Bag IDs (${existingBags.map(b => b.bagId).join(', ')}) already exist in inventory.`
+        }, { status: 409 });
       }
 
       // 1. Update Return Request
       returnRequest.status = 'approved';
-      returnRequest.bagId = bagId;
+      returnRequest.bagId = finalBagIds.join(', '); // Join IDs for record keeping
       returnRequest.expiryDate = expiryDate;
       returnRequest.adminComments = adminComments;
       await returnRequest.save();
@@ -144,17 +150,23 @@ export async function PATCH(req: Request) {
       // Use the actual returned units (which may include penalty) from the request
       const units = returnRequest.units || 1;
 
-      // 2. Create Blood Bag in Inventory
-      await BloodBag.create({
-        bagId,
-        bloodGroup,
-        hospitalId,
-        units,
-        expiryDate,
-        donorId: returnRequest.userId,
-        status: 'available', // Ready for use
-        metadata: { source: 'return_credit', returnRequestId: returnRequest._id }
-      });
+      // Calculate quantity per bag (approx 450ml per unit)
+      const quantityPerBag = 450;
+
+      // 2. Create Blood Bag records
+      for (const id of finalBagIds) {
+        await BloodBag.create({
+          bagId: id,
+          bloodGroup,
+          quantity: quantityPerBag,
+          expiryDate,
+          collectionDate: new Date(),
+          originHospitalId: hospitalId,
+          currentOwnerId: hospitalId,
+          sourceDonorId: returnRequest.userId,
+          status: 'AVAILABLE'
+        });
+      }
 
       // 3. Clear the Credit
       credit.status = 'cleared';
