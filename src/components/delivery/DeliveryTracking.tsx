@@ -1,9 +1,8 @@
-
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { io, Socket } from 'socket.io-client';
@@ -35,17 +34,59 @@ interface DeliveryTrackingProps {
     initialData?: any;
 }
 
+// Internal component to handle map movement
+function MapController({ driver, pickup, dropoff }: { driver?: { lat: number, lng: number } | null, pickup?: [number, number] | null, dropoff?: [number, number] | null }) {
+    const map = useMap();
+    useEffect(() => {
+        const points: [number, number][] = [];
+        if (driver) points.push([driver.lat, driver.lng]);
+        if (pickup) points.push(pickup);
+        if (dropoff) points.push(dropoff);
+
+        if (points.length > 0) {
+            const bounds = L.latLngBounds(points);
+            map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+        }
+    }, [driver, pickup, dropoff]);
+    return null;
+}
+
 export default function DeliveryTracking({ deliveryId, initialData }: DeliveryTrackingProps) {
     const [socket, setSocket] = useState<Socket | null>(null);
     const [deliveryStatus, setDeliveryStatus] = useState(initialData?.status || 'SEARCHING');
+    const [driverLocation, setDriverLocation] = useState<{ lat: number, lng: number } | null>(
+        initialData?.driverId?.currentLocation?.coordinates && initialData.driverId.currentLocation.coordinates[0] !== 0
+            ? { lat: initialData.driverId.currentLocation.coordinates[1], lng: initialData.driverId.currentLocation.coordinates[0] }
+            : null
+    );
 
-    // [FIX] Update status if initialData changes (e.g. hydration with new status)
+    // [NEW] Map Center & Bounds Logic
+    const pickupCoords: [number, number] | null = initialData?.pickup?.location?.coordinates
+        ? [initialData.pickup.location.coordinates[1], initialData.pickup.location.coordinates[0]]
+        : null;
+    const dropoffCoords: [number, number] | null = initialData?.dropoff?.location?.coordinates
+        ? [initialData.dropoff.location.coordinates[1], initialData.dropoff.location.coordinates[0]]
+        : null;
+
+    const [mapCenter, setMapCenter] = useState<[number, number]>(pickupCoords || [28.6139, 77.2090]);
+
+    const steps = ['SEARCHING', 'ASSIGNED', 'PICKED_UP', 'DELIVERED'];
+    const currentStepIndex = steps.indexOf(deliveryStatus);
+
     useEffect(() => {
+        // [FIX] Update status if initialData changes (e.g. hydration with new status)
         if (initialData?.status) {
             setDeliveryStatus(initialData.status);
         }
+        // Update driver location if initialData updates and we don't have one yet
+        if (!driverLocation && initialData?.driverId?.currentLocation?.coordinates) {
+            const coords = initialData.driverId.currentLocation.coordinates;
+            if (coords[0] !== 0) {
+                setDriverLocation({ lat: coords[1], lng: coords[0] });
+            }
+        }
     }, [initialData]);
-    const [driverLocation, setDriverLocation] = useState<{ lat: number, lng: number } | null>(initialData?.driverId?.currentLocation?.coordinates ? { lat: initialData.driverId.currentLocation.coordinates[1], lng: initialData.driverId.currentLocation.coordinates[0] } : null);
+
     const [eta, setEta] = useState(initialData?.eta || '15 mins');
     const [verificationCode, setVerificationCode] = useState(initialData?.dropoffCode || '****');
     const router = useRouter(); // Use App Router
@@ -62,9 +103,6 @@ export default function DeliveryTracking({ deliveryId, initialData }: DeliveryTr
 
     const mapRef = useRef<any>(null);
 
-    const steps = ['SEARCHING', 'ASSIGNED', 'PICKED_UP', 'DELIVERED'];
-    const currentStepIndex = steps.indexOf(deliveryStatus);
-
     useEffect(() => {
         // Connect to custom server socket
         const newSocket = io({
@@ -78,11 +116,8 @@ export default function DeliveryTracking({ deliveryId, initialData }: DeliveryTr
 
         newSocket.on('driver_moved', (location) => {
             console.log('[Socket] driver_moved:', location);
-            // location: { lat, lng }
             setDriverLocation(location);
-            if (mapRef.current) {
-                mapRef.current.flyTo([location.lat, location.lng], 15);
-            }
+            setMapCenter([location.lat, location.lng]);
         });
 
         // [FIX] Request latest location immediately upon joining
@@ -93,9 +128,7 @@ export default function DeliveryTracking({ deliveryId, initialData }: DeliveryTr
             console.log('[Socket] Received current_driver_location:', location);
             if (location) {
                 setDriverLocation(location);
-                if (mapRef.current) {
-                    mapRef.current.setView([location.lat, location.lng], 15);
-                }
+                setMapCenter([location.lat, location.lng]);
             }
         });
 
@@ -220,7 +253,7 @@ export default function DeliveryTracking({ deliveryId, initialData }: DeliveryTr
                     </h2>
                     <div className="px-4 py-1 bg-red-50 text-red-600 rounded-full text-sm font-semibold border border-red-100 flex items-center gap-2">
                         <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-                        Live
+                        {driverLocation ? 'Live Tracking' : 'Waiting for Signal'}
                     </div>
                 </div>
 
@@ -331,7 +364,7 @@ export default function DeliveryTracking({ deliveryId, initialData }: DeliveryTr
 
                 {typeof window !== 'undefined' && (
                     <MapContainer
-                        center={[28.6139, 77.2090]}
+                        center={mapCenter}
                         zoom={13}
                         style={{ height: '100%', width: '100%' }}
                         ref={mapRef}
@@ -342,16 +375,39 @@ export default function DeliveryTracking({ deliveryId, initialData }: DeliveryTr
                             url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
                         />
 
+                        <MapController driver={driverLocation} pickup={pickupCoords} dropoff={dropoffCoords} />
+
                         {driverLocation && (
                             <Marker position={[driverLocation.lat, driverLocation.lng]} icon={iconDriver}>
-                                <Popup>Driver is here</Popup>
+                                <Popup>Driver {initialData?.driverId?.userId?.fullName ? `- ${initialData.driverId.userId.fullName}` : ''}</Popup>
                             </Marker>
                         )}
 
-                        {/* Mock Hospital & User for Demo */}
-                        <Marker position={[28.6139, 77.2090]} icon={iconHospital}>
-                            <Popup>City Hospital</Popup>
-                        </Marker>
+                        {pickupCoords && (
+                            <Marker position={pickupCoords} icon={iconHospital}>
+                                <Popup>Pickup (Hospital)</Popup>
+                            </Marker>
+                        )}
+
+                        {dropoffCoords && (
+                            <Marker position={dropoffCoords} icon={iconPerson}>
+                                <Popup>Drop-off (Donor Location)</Popup>
+                            </Marker>
+                        )}
+
+                        {/* Route Line if driver and dropoff known */}
+                        {driverLocation && dropoffCoords && (
+                            <Polyline
+                                positions={[
+                                    [driverLocation.lat, driverLocation.lng],
+                                    dropoffCoords
+                                ]}
+                                color="red"
+                                dashArray="10, 10"
+                                weight={3}
+                                opacity={0.5}
+                            />
+                        )}
 
                     </MapContainer>
                 )}

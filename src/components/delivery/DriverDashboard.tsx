@@ -134,6 +134,7 @@ export default function DriverDashboard() {
             const deliveryId = activeDelivery._id || activeDelivery.id;
 
             // 1. Instant Socket Update
+            console.log('[Socket] Emitting location for:', deliveryId, currentLocation);
             socketRef.current.emit('update_location', {
                 deliveryId,
                 location: { lat: currentLocation[0], lng: currentLocation[1] }
@@ -143,6 +144,7 @@ export default function DriverDashboard() {
             const now = Date.now();
             if (now - lastDbUpdateRef.current > 30000) {
                 lastDbUpdateRef.current = now;
+                console.log('[API] Saving location to DB...');
                 fetch('/api/delivery/location', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -158,6 +160,17 @@ export default function DriverDashboard() {
             }
         }
     }, [currentLocation, activeDelivery, profile]);
+
+    // [NEW] Trigger location push as soon as active delivery is detected (for stationary drivers)
+    useEffect(() => {
+        if (activeDelivery && currentLocation && socketRef.current) {
+            const deliveryId = activeDelivery._id || activeDelivery.id;
+            socketRef.current.emit('update_location', {
+                deliveryId,
+                location: { lat: currentLocation[0], lng: currentLocation[1] }
+            });
+        }
+    }, [activeDelivery]);
 
     const startGPS = () => {
         if (!navigator.geolocation) {
