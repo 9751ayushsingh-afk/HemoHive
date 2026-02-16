@@ -35,10 +35,10 @@ export async function POST(request: NextRequest) {
       targetedHospitalIds
     } = data;
 
-    // hospitalId is the TARGET for fulfillment. recipientHospitalId is the PATIENT'S location.
+    // recipientHospitalId is the PATIENT'S location.
     // actualBroadcastTo will store the IDs of all hospitals that have stock (from frontend stock check)
     const actualRecipientHospitalId = (recipientHospitalId as string) || null;
-    const actualHospitalId = (hospitalId as string) || actualRecipientHospitalId;
+    const actualHospitalId = (hospitalId as string) || null; // Fix: Don't default to patient location
 
     let actualBroadcastTo: string[] = [];
     if (targetedHospitalIds) {
@@ -49,9 +49,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    if (!bloodGroup || !units || !actualHospitalId || !urgency) {
+    if (!bloodGroup || !units || !urgency || (!actualHospitalId && actualBroadcastTo.length === 0)) {
       return new NextResponse(
-        JSON.stringify({ message: 'Missing required blood group, units, or urgency' }),
+        JSON.stringify({ message: 'Missing blood group, units, urgency, or target hospitals' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
