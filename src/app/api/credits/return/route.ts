@@ -5,7 +5,7 @@ import ReturnRequest from '../../../../models/ReturnRequest';
 import Credit from '../../../../models/Credit';
 import BloodBag from '../../../../models/BloodBag';
 import Inventory from '../../../../models/Inventory';
-import User from '../../../../models/User';
+import BloodRequest from '../../../../models/BloodRequest';
 
 // POST: Create a new Return Request (Donor Action)
 export async function POST(req: Request) {
@@ -17,8 +17,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Verify Credit exists and belongs to user
-    const credit = await Credit.findOne({ _id: creditId, userId: userId });
+    // [FIX] Populate requestId to get the unit count
+    const credit = await Credit.findOne({ _id: creditId, userId: userId }).populate('requestId');
     if (!credit) {
       return NextResponse.json({ error: 'Credit not found or unauthorized' }, { status: 404 });
     }

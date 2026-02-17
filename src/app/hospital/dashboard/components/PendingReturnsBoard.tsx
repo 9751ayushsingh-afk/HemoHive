@@ -345,7 +345,7 @@ const PendingReturnsBoard = ({ hospitalId }: { hospitalId: string }) => {
                                 setBagIds(newIds);
                               }}
                               placeholder={`SCAN BAG ID #${index + 1}...`}
-                              className="w-full pl-12 pr-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-indigo-500 focus:bg-white outline-none font-mono font-bold text-slate-800 transition-all group-hover/input:border-slate-300"
+                              className="w-full pl-12 pr-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-indigo-500 focus:bg-white outline-none font-mono font-bold text-slate-800 transition-all group-hover/input:border-slate-300 shadow-inner"
                             />
                             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl">🩸</span>
                           </div>
@@ -367,8 +367,11 @@ const PendingReturnsBoard = ({ hospitalId }: { hospitalId: string }) => {
                     ))}
                   </div>
 
-                  <div className="group/input">
-                    <label className="block text-xs font-bold text-slate-500 uppercase mb-2 pl-1">Bag Expiry Date</label>
+                  <div className="group/input pt-2">
+                    <label className="block text-xs font-bold text-slate-500 uppercase mb-2 pl-1 flex justify-between">
+                      <span>Common Expiry Date</span>
+                      <span className="text-[10px] text-amber-500 normal-case">(Applies to all units above)</span>
+                    </label>
                     <div className="relative">
                       <input
                         type="date"

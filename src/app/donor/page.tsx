@@ -8,6 +8,7 @@ import BloodRequestModule from '../../components/donor/BloodRequestModule';
 import CreditWallet from '../../components/donor/CreditWallet';
 import BloodRequestHistory from '../../components/donor/BloodRequestHistory';
 import LockedFeature from '../../components/donor/LockedFeature';
+import PosterKiosk from '../../components/donor/PosterKiosk';
 
 const DonorDashboardPage = () => {
   const { data: session } = useSession();
@@ -48,7 +49,7 @@ const DonorDashboardPage = () => {
           />
         </div>
 
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 flex flex-col gap-8">
           <DonateBloodCard
             bloodGroup={donorData?.blood_group}
             lastDonationDate={donorData?.last_donation_date}
@@ -56,6 +57,8 @@ const DonorDashboardPage = () => {
             nextEligibleDate={donorData?.next_eligible_date}
             totalDonationsDone={donorData?.total_donations}
           />
+
+          <PosterKiosk />
         </div>
 
         {/* Locked Features for New Donors */}
