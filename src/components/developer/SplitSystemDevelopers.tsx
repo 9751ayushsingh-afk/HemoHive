@@ -148,7 +148,7 @@ const SplitSystemDevelopers = () => {
 
 
             {/* =========================================
-                RIGHT PANEL: ANCHAL TIWARI
+                RIGHT PANEL: ANSH SHRIVASTAV
                ========================================= */}
             <div className="relative w-full md:w-1/2 h-full flex flex-col items-center justify-center p-8 md:p-16">
                 {/* Background "Code Rain" Effect (Subtle) */}
@@ -214,8 +214,8 @@ const SplitSystemDevelopers = () => {
                     >
                         <div className="absolute inset-0 bg-neutral-100 z-0" />
                         <img
-                            src="/anchal_dev.jpg"
-                            alt="Anchal Tiwari"
+                            src="/ansh_dev.jpg"
+                            alt="Ansh Shrivastav"
                             className="w-full h-full object-cover relative z-10 transition-all duration-700 grayscale hover:grayscale-0"
                         />
                     </motion.div>
@@ -228,7 +228,7 @@ const SplitSystemDevelopers = () => {
                             transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
                             className="text-3xl md:text-5xl font-bold tracking-tighter mb-2"
                         >
-                            ANCHAL TIWARI
+                            ANSH SHRIVASTAV
                         </motion.h2>
                     </div>
                     <div className="overflow-hidden">
