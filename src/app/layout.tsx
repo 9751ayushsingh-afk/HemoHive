@@ -41,6 +41,11 @@ const dotGothic16 = DotGothic16({
 export const metadata: Metadata = {
   title: "HemoHive",
   description: "Delivering Hope, Saving Lives.",
+  icons: {
+    icon: "/HemoHive_logo.png",
+    shortcut: "/HemoHive_logo.png",
+    apple: "/HemoHive_logo.png",
+  },
 };
 
 export default function RootLayout({
