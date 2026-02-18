@@ -3,28 +3,28 @@ import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
 
 const pages = [
     {
-        src: '/image1.png',
+        src: 'https://res.cloudinary.com/drwfe1mhk/image/upload/f_auto,q_auto/hemohive_assets/image1',
         title: 'The Shortage',
         description: 'Every 2 seconds, someone in India needs blood.',
         color: 'from-red-900/40 to-black',
         accent: 'text-red-500'
     },
     {
-        src: '/image2.png',
+        src: 'https://res.cloudinary.com/drwfe1mhk/image/upload/f_auto,q_auto/hemohive_assets/image2',
         title: 'The Gap',
         description: '12 million units needed. Only 10 million collected.',
         color: 'from-purple-900/40 to-black',
         accent: 'text-purple-500'
     },
     {
-        src: '/image3.png',
+        src: 'https://res.cloudinary.com/drwfe1mhk/image/upload/f_auto,q_auto/hemohive_assets/image3',
         title: 'The Impact',
         description: 'Blood shortage turns treatable emergencies into fatal outcomes.',
         color: 'from-blue-900/40 to-black',
         accent: 'text-blue-500'
     },
     {
-        src: '/image4.png',
+        src: 'https://res.cloudinary.com/drwfe1mhk/image/upload/f_auto,q_auto/hemohive_assets/image4',
         title: 'The Solution',
         description: 'Your one donation can save up to 3 lives.',
         color: 'from-emerald-900/40 to-black',

@@ -15,7 +15,7 @@ const DeveloperSketchReveal = () => {
         {
             name: "AYUSH SINGH",
             role: "Founder & Lead Architect",
-            img: "/ayush_dev.png",
+            img: "https://res.cloudinary.com/drwfe1mhk/image/upload/f_auto,q_auto/hemohive_assets/ayush_dev",
             id: "dev-1"
         },
         {

@@ -42,9 +42,9 @@ export const metadata: Metadata = {
   title: "HemoHive",
   description: "Delivering Hope, Saving Lives.",
   icons: {
-    icon: "/HemoHive_logo.png",
-    shortcut: "/HemoHive_logo.png",
-    apple: "/HemoHive_logo.png",
+    icon: "https://res.cloudinary.com/drwfe1mhk/image/upload/f_auto,q_auto/hemohive_assets/HemoHive_logo",
+    shortcut: "https://res.cloudinary.com/drwfe1mhk/image/upload/f_auto,q_auto/hemohive_assets/HemoHive_logo",
+    apple: "https://res.cloudinary.com/drwfe1mhk/image/upload/f_auto,q_auto/hemohive_assets/HemoHive_logo",
   },
 };
 

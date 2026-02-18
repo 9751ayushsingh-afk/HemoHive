@@ -125,7 +125,7 @@ const MissionPage = () => {
                     className="mb-12 relative w-64 h-64 mx-auto"
                 >
                     <img
-                        src="/mission_first_boy.png"
+                        src="https://res.cloudinary.com/drwfe1mhk/image/upload/f_auto,q_auto/hemohive_assets/mission_first_boy"
                         alt="Mission Doodle"
                         className="w-full h-full object-contain transition-transform duration-500 hover:scale-105"
                         style={{ mixBlendMode: 'multiply' }}
@@ -275,7 +275,7 @@ const MissionPage = () => {
                         className="relative w-full bg-neutral-100 rounded-lg overflow-hidden shadow-2xl border border-neutral-200 order-2 md:order-1"
                     >
                         <img
-                            src="/mission_responsibility.png"
+                            src="https://res.cloudinary.com/drwfe1mhk/image/upload/f_auto,q_auto/hemohive_assets/mission_responsibility"
                             alt="Responsibility Image"
                             className="w-full h-auto block"
                         />

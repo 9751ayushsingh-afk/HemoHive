@@ -132,7 +132,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onAnimationComplete }) => {
         {/* 🐝 Bee logo image */}
         <motion.img
           ref={beeRef}
-          src="/assets/images/Splash_BEE.png"
+          src="https://res.cloudinary.com/drwfe1mhk/image/upload/f_auto,q_auto/hemohive_assets/Splash_BEE"
           alt="bee"
           className="absolute w-28 h-28"
           style={{
@@ -148,7 +148,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onAnimationComplete }) => {
         {/* 🩸 HemoHive text logo */}
         <motion.img
           ref={logoRef}
-          src="/assets/images/HemoHive_Text_Logo.png"
+          src="https://res.cloudinary.com/drwfe1mhk/image/upload/f_auto,q_auto/hemohive_assets/HemoHive_Text_Logo"
           alt="HemoHive Logo"
           className="opacity-0 scale-75 mt-32"
           style={{ width: "500px" }}
