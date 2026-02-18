@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Poppins, Playfair_Display, JetBrains_Mono, Press_Start_2P, DotGothic16 } from "next/font/google";
+import { Inter, Poppins, Playfair_Display, JetBrains_Mono } from "next/font/google";
 import AppWithLoader from "../components/AppWithLoader";
 import { Providers } from "./providers";
 import { NotificationProvider } from "../contexts/NotificationContext";
@@ -26,18 +26,6 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-tech",
 });
 
-const pressStart2P = Press_Start_2P({
-  subsets: ["latin"],
-  weight: ["400"],
-  variable: "--font-arcade",
-});
-
-const dotGothic16 = DotGothic16({
-  subsets: ["latin"],
-  weight: ["400"],
-  variable: "--font-game",
-});
-
 export const metadata: Metadata = {
   title: "HemoHive",
   description: "Delivering Hope, Saving Lives.",
@@ -55,7 +43,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${poppins.variable} ${playfairDisplay.variable} ${jetbrainsMono.variable} ${pressStart2P.variable} ${dotGothic16.variable} font-body antialiased`}>
+      <body
+        className={`${inter.variable} ${poppins.variable} ${playfairDisplay.variable} ${jetbrainsMono.variable} antialiased bg-background text-foreground overflow-x-hidden selection:bg-rose-500/30 selection:text-rose-200`}
+      >
         <Providers>
           <NotificationProvider>
             <AppWithLoader>{children}</AppWithLoader>

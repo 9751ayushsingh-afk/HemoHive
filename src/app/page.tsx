@@ -1,4 +1,5 @@
 "use client";
+
 import React from "react";
 import dynamic from "next/dynamic";
 import AnimatedText from '../components/AnimatedText';
@@ -10,7 +11,7 @@ import { motion } from "framer-motion";
 const StickyScrollReveal = dynamic(() => import("../components/StickyScrollReveal"), { ssr: false });
 const ChaosScroll = dynamic(() => import("../components/organisms/ChaosScroll"), { ssr: false });
 const HowItWorks = dynamic(() => import("../components/organisms/HowItWorks"), { ssr: false });
-const HeatmapPreview = dynamic(() => import("../components/organisms/HeatmapPreview"), { ssr: false });
+const WhatWeAre = dynamic(() => import("../components/organisms/WhatWeAre"), { ssr: false });
 const Footer = dynamic(() => import("../components/organisms/Footer"), { ssr: false });
 import { useMobile } from "../hooks/use-mobile";
 const MobileHero = dynamic(() => import("../components/MobileHero"), { ssr: false });
@@ -42,8 +43,8 @@ const Home = () => {
         <div className="absolute inset-0 flex flex-col justify-center items-center pointer-events-none">
           <div className="text-center">
             <>
-              <AnimatedText text="HemoHive" el="h1" className="text-6xl font-bold font-accent" />
-              <AnimatedText text="When Every Second Matters, We Deliver." el="h2" className="text-2xl mt-4 font-accent" />
+              <AnimatedText text="HemoHive" el="h1" className="text-7xl md:text-9xl font-bold font-accent tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400" />
+              <AnimatedText text="When Every Second Matters, We Deliver." el="h2" className="text-2xl md:text-3xl mt-6 font-accent tracking-tight text-neutral-300" />
               <motion.div
                 className="mt-8 flex justify-center items-center gap-8 pointer-events-auto"
                 initial={{ opacity: 0, y: 10 }}
@@ -60,7 +61,7 @@ const Home = () => {
                   <span className="absolute flex items-center justify-center w-full h-full text-white transition-all duration-300 transform group-hover:translate-x-full ease">Get Started</span>
                   <span className="relative invisible">Get Started</span>
                 </Link>
-                <a href="#" className="text-white font-medium hover:underline">Learn More</a>
+                <a href="#" className="text-white font-bold hover:underline">Learn More</a>
               </motion.div>
             </>
           </div>
@@ -71,7 +72,7 @@ const Home = () => {
 
       <main>
         <HowItWorks />
-        <HeatmapPreview />
+        <WhatWeAre />
         <ChaosScroll />
       </main>
 

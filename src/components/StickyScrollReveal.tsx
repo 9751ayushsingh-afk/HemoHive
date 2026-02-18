@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
 
@@ -127,7 +129,7 @@ const RevealLayer = ({
                     whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
                     transition={{ delay: 0.2, duration: 0.8, ease: "easeOut" }}
                 >
-                    <h2 className="text-7xl md:text-9xl font-black font-accent text-transparent bg-clip-text bg-gradient-to-br from-white via-neutral-200 to-neutral-500 mb-4 uppercase tracking-tighter drop-shadow-2xl">
+                    <h2 className="text-7xl md:text-9xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-white via-neutral-200 to-neutral-500 mb-4 uppercase tracking-tighter">
                         {page.title}
                     </h2>
                 </motion.div>
@@ -141,7 +143,7 @@ const RevealLayer = ({
                     {/* Decorative Line */}
                     <div className={`w-24 h-1 mx-auto mb-8 rounded-full bg-gradient-to-r from-transparent via-${page.accent.split('-')[1]}-500 to-transparent`} />
 
-                    <p className="text-2xl md:text-4xl text-neutral-200 font-body font-light max-w-2xl leading-relaxed drop-shadow-lg">
+                    <p className="text-2xl md:text-4xl text-neutral-200 font-light max-w-2xl leading-relaxed">
                         {page.description}
                     </p>
                 </motion.div>

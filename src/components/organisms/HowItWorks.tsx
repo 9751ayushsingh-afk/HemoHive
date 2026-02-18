@@ -96,8 +96,8 @@ const HowItWorks = () => {
         <Antigravity count={200} />
       </div>
       <div className="text-center pt-20 pb-16 relative z-10">
-        <h1 className={`font-headline font-black text-gray-900 tracking-tighter ${styles.glitch}`} data-text="How It Works">How It Works</h1>
-        <TypingText text="A simple and efficient process" className="font-body text-xl text-gray-600 max-w-3xl mx-auto mb-4 mt-2" />
+        <h1 className={`font-black text-gray-900 tracking-tighter text-6xl md:text-8xl drop-shadow-xl ${styles.glitch}`} data-text="How It Works">How It Works</h1>
+        <TypingText text="A simple and efficient process" className="text-xl text-gray-600 max-w-3xl mx-auto mb-4 mt-4 tracking-widest uppercase" />
       </div>
       <div ref={targetRef} className="relative h-[300vh]">
         <div className="sticky top-0 flex h-screen items-center overflow-hidden">

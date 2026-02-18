@@ -102,7 +102,7 @@ const ChaosCard = ({
                 opacity,
                 scale,
             }}
-            className="group bg-black rounded-xl shadow-2xl overflow-hidden relative z-10 h-80 cursor-pointer"
+            className="group bg-neutral-900/40 backdrop-blur-md border border-neutral-800 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] overflow-hidden relative z-10 h-80 cursor-pointer"
             onClick={onToggle}
             data-state={isActive ? "active" : "inactive"}
         >
@@ -146,21 +146,21 @@ const ChaosScroll = () => {
     };
 
     return (
-        <div ref={containerRef} className="bg-background py-32 min-h-screen relative overflow-hidden">
+        <div ref={containerRef} className="bg-black py-32 min-h-screen relative overflow-hidden">
 
             {/* Title stays static or fades in */}
             <div className="container mx-auto px-4 mb-12 relative z-20 text-center">
                 <motion.h2
                     style={{ opacity: scrollYProgress }}
-                    className="text-4xl font-bold text-text-dark"
+                    className="text-4xl md:text-6xl font-bold text-white mb-2"
                 >
                     Core Features: Order from Chaos
                 </motion.h2>
                 <motion.p
                     style={{ opacity: scrollYProgress }}
-                    className="text-text-muted mt-4"
+                    className="text-text-muted mt-4 text-xl"
                 >
-                    Scroll to Assemble the Solution
+
                 </motion.p>
             </div>
 
