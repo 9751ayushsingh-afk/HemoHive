@@ -19,9 +19,9 @@ const DeveloperSketchReveal = () => {
             id: "dev-1"
         },
         {
-            name: "ANCHAL TIWARI",
+            name: "ANSH SHRIVASTAV",
             role: "Co-Founder & Operator",
-            img: "/anchal_dev_rect.jpg",
+            img: "/ansh_dev_rect.jpg",
             id: "dev-2"
         }
     ];
