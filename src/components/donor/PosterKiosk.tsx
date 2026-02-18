@@ -12,7 +12,7 @@ const POSTERS = [
         title: "Mega Blood Drive",
         subtitle: "Join the movement to save lives!",
         date: "Sun, Oct 13 â€¢ 9:00 AM",
-        location: "City Center Mall, Atrium",
+        location: "78,NEWADA SAMOGAR T.S.L NAINI, Prayagraj",
         icon: Calendar,
         color: "from-blue-600 to-indigo-700",
         image: "https://images.unsplash.com/photo-1615461168078-83e8cbec2044?auto=format&fit=crop&q=80&w=1000",

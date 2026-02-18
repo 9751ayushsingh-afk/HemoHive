@@ -254,7 +254,7 @@ const MissionPage = () => {
                         className="relative w-full bg-neutral-100 rounded-lg overflow-hidden shadow-2xl border border-neutral-200"
                     >
                         <img
-                            src="/mission_first.png"
+                            src="https://res.cloudinary.com/drwfe1mhk/image/upload/f_auto,q_auto/hemohive_assets/mission_first"
                             alt="Manifesto Image"
                             className="w-full h-auto block"
                         />
@@ -462,7 +462,7 @@ const MissionPage = () => {
                         className="relative w-full bg-neutral-100 rounded-lg overflow-hidden shadow-2xl border border-neutral-200"
                     >
                         <img
-                            src="/mission_principles.png"
+                            src="https://res.cloudinary.com/drwfe1mhk/image/upload/f_auto,q_auto/hemohive_assets/mission_principles"
                             alt="Principles Image"
                             className="w-full h-auto block"
                         />

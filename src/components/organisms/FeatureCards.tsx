@@ -8,42 +8,42 @@ const features = [
     {
         title: "Credit-Based Blood Exchange",
         description: "A decentralized credit system ensuring fair and balanced blood exchange between hospitals.",
-        image: "/images/features/credit.jpg",
+        image: "https://res.cloudinary.com/drwfe1mhk/image/upload/f_auto,q_auto/hemohive_assets/credit",
     },
     {
         title: "Guaranteed Logistics",
         description: "Reliable and tracked transportation for time-sensitive blood units.",
-        image: "/images/features/delivery.jpg",
+        image: "https://res.cloudinary.com/drwfe1mhk/image/upload/f_auto,q_auto/hemohive_assets/delivery",
     },
     {
         title: "Aadhaar-Backed Accountability",
         description: "Verified donor and recipient identity tracking to prevent fraud and ensure traceability.",
-        image: "/images/features/aadhar.jpg",
+        image: "https://res.cloudinary.com/drwfe1mhk/image/upload/f_auto,q_auto/hemohive_assets/aadhar",
     },
     {
         title: "AI-Driven Demand Forecasting",
         description: "Predictive analytics to optimize inventory and prevent shortages before they happen.",
-        image: "/images/features/AI_Demand.jpg",
+        image: "https://res.cloudinary.com/drwfe1mhk/image/upload/f_auto,q_auto/hemohive_assets/AI_Demand",
     },
     {
         title: "Penalty & Compliance Engine",
         description: "Automated system to ensure adherence to safety protocols and regulatory standards.",
-        image: "/images/features/Penalty.jpg",
+        image: "https://res.cloudinary.com/drwfe1mhk/image/upload/f_auto,q_auto/hemohive_assets/Penalty",
     },
     {
         title: "Hospital Multi-Order Dashboard",
         description: "Centralized interface for hospitals to manage multiple blood unit orders and exchanges efficiently.",
-        image: "/images/features/muti-hospital.jpg",
+        image: "https://res.cloudinary.com/drwfe1mhk/image/upload/f_auto,q_auto/hemohive_assets/muti-hospital",
     },
     {
         title: "Cold-Chain Monitored Delivery",
         description: "Real-time temperature monitoring during transport to maintain blood quality and safety.",
-        image: "/images/features/cold-chain.jpg",
+        image: "https://res.cloudinary.com/drwfe1mhk/image/upload/f_auto,q_auto/hemohive_assets/cold-chain",
     },
     {
         title: "Tier-2 & Tier-3 City First",
         description: "Focused on bridging the healthcare gap in smaller cities and rural areas.",
-        image: "/images/features/tier_2 and tier_3.jpg",
+        image: "https://res.cloudinary.com/drwfe1mhk/image/upload/f_auto,q_auto/hemohive_assets/tier_2_and_tier_3",
     },
 ];
 

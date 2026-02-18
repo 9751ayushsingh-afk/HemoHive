@@ -11,27 +11,27 @@ const steps = [
   {
     title: "Request Blood",
     description: "Customers request blood via the portal, verified by Aadhaar.",
-    image: "/images/how-it-works/customer_request_blood.jpg"
+    image: "https://res.cloudinary.com/drwfe1mhk/image/upload/f_auto,q_auto/hemohive_assets/customer_request_blood"
   },
   {
     title: "Credit System",
     description: "Blood is issued on credit, creating accountability to return it.",
-    image: "/images/how-it-works/credit_blood.jpg"
+    image: "https://res.cloudinary.com/drwfe1mhk/image/upload/f_auto,q_auto/hemohive_assets/credit_blood"
   },
   {
     title: "AI-Powered Delivery",
     description: "Our AI dispatches the nearest delivery partner for real-time transport.",
-    image: "/images/how-it-works/delievery.jpg"
+    image: "https://res.cloudinary.com/drwfe1mhk/image/upload/f_auto,q_auto/hemohive_assets/delievery"
   },
   {
     title: "Live Tracking",
     description: "Track the delivery in real-time from the blood bank to the hospital.",
-    image: "/images/how-it-works/live_tracking.jpg"
+    image: "https://res.cloudinary.com/drwfe1mhk/image/upload/f_auto,q_auto/hemohive_assets/live_tracking"
   },
   {
     title: "Return & Restore",
     description: "Return the equivalent blood unit later to restore your credit.",
-    image: "/images/how-it-works/return&restore.jpg"
+    image: "https://res.cloudinary.com/drwfe1mhk/image/upload/f_auto,q_auto/hemohive_assets/return_restore"
   },
 ];
 
