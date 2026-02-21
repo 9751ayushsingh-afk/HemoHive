@@ -126,6 +126,16 @@ export const authOptions: NextAuthOptions = {
           token.email = dbUser.email; // Crucial: preserve email
           token.role = dbUser.role;
           token.fullName = dbUser.fullName;
+
+          // Special case: For hospitals, try to get the actual hospital name
+          if (dbUser.role === 'hospital' && dbUser.hospitalId) {
+            const Hospital = (await import('../models/Hospital')).default;
+            const hospitalDoc = await Hospital.findById(dbUser.hospitalId);
+            if (hospitalDoc) {
+              token.fullName = hospitalDoc.name;
+            }
+          }
+
           token.profilePicture = dbUser.profilePicture;
           token.hospitalId = dbUser.hospitalId?.toString();
           token.bloodGroup = dbUser.bloodGroup;
@@ -163,6 +173,7 @@ export const authOptions: NextAuthOptions = {
         session.user.email = token.email as string;
         session.user.role = token.role as string;
         session.user.fullName = token.fullName as string;
+        session.user.name = token.fullName as string;
         session.user.profilePicture = token.profilePicture as string;
         session.user.hospitalId = token.hospitalId as string;
         session.user.bloodGroup = token.bloodGroup as string;

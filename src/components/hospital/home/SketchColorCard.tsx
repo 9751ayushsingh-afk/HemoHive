@@ -10,7 +10,6 @@ interface SketchColorCardProps {
     href: string;
     sketchImage: string;
     colorImage: string;
-    subtitle: string;
     description: string;
 }
 
@@ -21,7 +20,6 @@ const SketchColorCard: React.FC<SketchColorCardProps> = ({
     href,
     sketchImage,
     colorImage,
-    subtitle,
     description
 }) => {
     const [isHovered, setIsHovered] = useState(false);
@@ -158,14 +156,7 @@ const SketchColorCard: React.FC<SketchColorCardProps> = ({
                         animate={{ y: isHovered ? 0 : 5 }}
                         className="space-y-2"
                     >
-                        <div className="flex items-center gap-3">
-                            <div className="h-1 w-8 bg-red-600 rounded-full" />
-                            <h3 className="text-sm font-black text-red-500 uppercase tracking-[0.2em] font-syne">
-                                {subtitle}
-                            </h3>
-                        </div>
-
-                        <h2 className="text-3xl font-extrabold text-white tracking-tighter group-hover:text-red-500 transition-colors duration-300 font-syne">
+                        <h2 className="text-2xl font-bold text-white tracking-tight group-hover:text-red-500 transition-colors duration-300 font-outfit">
                             {title}
                         </h2>
 

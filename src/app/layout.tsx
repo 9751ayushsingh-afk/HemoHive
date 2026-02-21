@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
-import { Syne, Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Outfit, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import AppWithLoader from "../components/AppWithLoader";
 import { Providers } from "./providers";
 import { NotificationProvider } from "../contexts/NotificationContext";
 import "./globals.css";
 
-const syne = Syne({
+const outfit = Outfit({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-syne",
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  variable: "--font-outfit",
 });
 
-const spaceGrotesk = Space_Grotesk({
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-space-grotesk",
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-jakarta",
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -40,7 +40,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${syne.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} antialiased bg-background text-foreground font-sans overflow-x-hidden selection:bg-rose-500/30 selection:text-rose-200`}
+        className={`${outfit.variable} ${plusJakartaSans.variable} ${jetbrainsMono.variable} antialiased bg-background text-foreground font-sans overflow-x-hidden selection:bg-rose-500/30 selection:text-rose-200`}
       >
         <Providers>
           <NotificationProvider>

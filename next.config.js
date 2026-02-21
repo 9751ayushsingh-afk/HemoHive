@@ -52,6 +52,11 @@ const nextConfig = {
         hostname: 'res.cloudinary.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'grainy-gradients.vercel.app',
+        pathname: '/**',
+      },
     ],
   },
 };

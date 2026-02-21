@@ -85,7 +85,7 @@ const Sidebar = () => {
                         transition={{ duration: 0.8, ease: "easeInOut" }}
                         className="relative z-10 bg-gradient-to-br from-red-600 to-red-900 text-white rounded-2xl p-3 shadow-lg shadow-red-900/50 cursor-pointer"
                     >
-                        <span className="text-2xl font-bold font-syne">H</span>
+                        <span className="text-2xl font-bold font-outfit">H</span>
                     </motion.div>
                 </MagneticIcon>
 
@@ -98,7 +98,7 @@ const Sidebar = () => {
                             transition={{ delay: 0.1, duration: 0.4 }}
                             className="ml-4 flex flex-col"
                         >
-                            <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 font-syne tracking-wide">
+                            <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 font-outfit tracking-wide">
                                 HemoHive
                             </span>
                             <span className="text-xs text-red-400/80 font-mono tracking-widest uppercase">
@@ -214,8 +214,8 @@ const Sidebar = () => {
                                 exit={{ opacity: 0, width: 0 }}
                                 className="ml-4 overflow-hidden flex-1"
                             >
-                                <p className="text-sm font-semibold text-white truncate font-syne capitalize">
-                                    {user?.name || "Hospital Admin"}
+                                <p className="text-sm font-semibold text-white truncate font-outfit">
+                                    {(user as any)?.fullName || "Hospital Admin"}
                                 </p>
                                 <p className="text-xs text-gray-400 truncate font-mono">
                                     {user?.email || "admin@hemohive.com"}
