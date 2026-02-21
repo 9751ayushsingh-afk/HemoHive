@@ -11,3 +11,17 @@ export interface CreditObligation {
   deadline?: string;
   refundEligiblePercentage?: number;
 }
+
+export interface ITransaction {
+  _id: string;
+  userId: string;
+  type: 'DEPOSIT' | 'REFUND' | 'FEE' | 'PENALTY' | 'CREDIT_USED';
+  amount: number;
+  currency: string;
+  status: 'PENDING' | 'COMPLETED' | 'FAILED';
+  relatedEntity: 'BloodRequest' | 'Credit' | 'ReturnRequest';
+  entityId: string;
+  description?: string;
+  metadata?: Record<string, any>;
+  createdAt: string;
+}

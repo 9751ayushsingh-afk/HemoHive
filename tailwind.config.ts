@@ -24,10 +24,9 @@ const config: Config = {
         'danger': '#EF4444',
       },
       fontFamily: {
-        body: ['var(--font-body)', 'sans-serif'],
-        headline: ['var(--font-headline)', 'sans-serif'],
-        arcade: ['var(--font-arcade)', 'monospace'],
-        game: ['var(--font-game)', 'monospace'],
+        syne: ['var(--font-syne)', 'sans-serif'],
+        sans: ['var(--font-space-grotesk)', 'sans-serif'],
+        mono: ['var(--font-mono)', 'monospace'],
       },
       transitionDuration: {
         fast: '120ms',

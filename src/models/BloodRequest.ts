@@ -13,6 +13,9 @@ export interface IBloodRequest extends Document {
     document?: string; // [NEW] Path/URL to uploaded document
     status: 'Pending' | 'Approved' | 'Rejected' | 'Fulfilled';
     paymentStatus: 'Pending' | 'Completed' | 'Failed';
+    processingFee?: number;
+    deliveryFee?: number;
+    depositAmount?: number;
 }
 
 const BloodRequestSchema: Schema = new Schema({
@@ -72,6 +75,18 @@ const BloodRequestSchema: Schema = new Schema({
         type: String,
         enum: ['Pending', 'Completed', 'Failed'],
         default: 'Pending',
+    },
+    processingFee: {
+        type: Number,
+        default: 0
+    },
+    deliveryFee: {
+        type: Number,
+        default: 0
+    },
+    depositAmount: {
+        type: Number,
+        default: 0
     }
 }, { timestamps: true });
 

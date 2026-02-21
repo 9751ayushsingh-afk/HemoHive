@@ -1,29 +1,25 @@
 import type { Metadata } from "next";
-import { Inter, Poppins, Playfair_Display, JetBrains_Mono } from "next/font/google";
+import { Syne, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import AppWithLoader from "../components/AppWithLoader";
 import { Providers } from "./providers";
 import { NotificationProvider } from "../contexts/NotificationContext";
 import "./globals.css";
 
-const inter = Inter({
+const syne = Syne({
   subsets: ["latin"],
-  variable: "--font-body",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-syne",
 });
 
-const poppins = Poppins({
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
-  variable: "--font-headline",
-});
-
-const playfairDisplay = Playfair_Display({
-  subsets: ["latin"],
-  variable: "--font-accent",
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-space-grotesk",
 });
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
-  variable: "--font-tech",
+  variable: "--font-mono",
 });
 
 export const metadata: Metadata = {
@@ -44,7 +40,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${poppins.variable} ${playfairDisplay.variable} ${jetbrainsMono.variable} antialiased bg-background text-foreground overflow-x-hidden selection:bg-rose-500/30 selection:text-rose-200`}
+        className={`${syne.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} antialiased bg-background text-foreground font-sans overflow-x-hidden selection:bg-rose-500/30 selection:text-rose-200`}
       >
         <Providers>
           <NotificationProvider>

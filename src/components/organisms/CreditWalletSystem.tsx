@@ -8,10 +8,18 @@ import confettiAnimation from '../../../public/confetti.json';
 import AIAssistant from './AIAssistant';
 import CreditHealthMeter from '../molecules/CreditHealthMeter';
 import CreditStatusCard from '../molecules/CreditStatusCard';
-import { CreditObligation, CreditLifeCycleState } from '../../types/CreditTypes';
+import { useQuery } from '@tanstack/react-query';
+import { CreditObligation, CreditLifeCycleState, ITransaction } from '../../types/CreditTypes';
 import './CreditWalletSystem.css';
 
 gsap.registerPlugin(ScrollTrigger);
+
+const fetchTransactions = async (): Promise<ITransaction[]> => {
+  const res = await fetch('/api/transactions');
+  if (!res.ok) throw new Error('Failed to fetch transactions');
+  const data = await res.json();
+  return data.data;
+};
 
 // Helper to simulate backend logic for the frontend demo
 const calculateObligation = (obligation: Partial<CreditObligation>): CreditObligation => {
@@ -59,6 +67,11 @@ const calculateObligation = (obligation: Partial<CreditObligation>): CreditOblig
 const CreditWalletSystem = () => {
   const [showConfetti, setShowConfetti] = useState(false);
   const [creditHealthScore, setCreditHealthScore] = useState(88);
+
+  const { data: transactions, isLoading: isTransactionsLoading } = useQuery({
+    queryKey: ['user-transactions'],
+    queryFn: fetchTransactions
+  });
 
   // Generate dates relative to today for accurate demo states
   const today = new Date();
@@ -300,26 +313,9 @@ const CreditWalletSystem = () => {
           </div>
         </motion.div>
 
-        {/* Transaction History Section */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.6 }}>
-          <div className="card">
-            <div className="card-header">
-              <h2 className="card-title">Transaction History</h2>
-            </div>
-            <ul className="timeline">
-              {creditWalletData.transactionHistory.map((item, index) => (
-                <li key={index} ref={el => { transactionHistoryRefs.current[index] = el }}>
-                  <div className="timeline-date">{item.date}</div>
-                  <div className="timeline-event">
-                    <p><strong>{item.event}</strong></p>
-                    <p>{item.details}</p>
-                    {item.event.includes('Penalty') && <button className="cta-button" onClick={() => onOverdueAlert(index)}>Shake</button>}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </motion.div>
+
+
+
 
         {/* Gamification Section */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.7 }}>

@@ -17,7 +17,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // [FIX] Populate requestId to get the unit count
+    // Populate requestId to get the unit count
     const credit = await Credit.findOne({ _id: creditId, userId: userId }).populate('requestId');
     if (!credit) {
       return NextResponse.json({ error: 'Credit not found or unauthorized' }, { status: 404 });
@@ -29,40 +29,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'A return request is already pending for this credit' }, { status: 409 });
     }
 
-    const now = new Date();
-    const dueDate = new Date(credit.dueDate);
-
-    // Default units (from original request)
-    let returnUnits = credit.requestId?.units || 1;
-
-    // Penalty Logic
-    if (now > dueDate) {
-      const overdueMillis = now.getTime() - dueDate.getTime();
-      const overdueDays = Math.ceil(overdueMillis / (1000 * 60 * 60 * 24));
-
-      if (overdueDays <= 7) {
-        // Week 1 (Grace): No Penalty
-        // returnUnits remains same
-      } else if (overdueDays <= 14) {
-        // Week 2: +25%
-        returnUnits = returnUnits * 1.25;
-      } else if (overdueDays <= 21) {
-        // Week 3: +50%
-        returnUnits = returnUnits * 1.50;
-      } else {
-        // Week 4+ (Blocked): +75% (or custom max)
-        returnUnits = returnUnits * 1.75;
-      }
-
-      // Round off to nearest integer as strict fractional units (e.g. 1.25) are not possible
-      returnUnits = Math.round(returnUnits);
-    }
+    // [UPDATED] Financial Penalty Logic
+    // We do NOT increase blood units anymore. One unit borrowed = One unit returned.
+    // The penalty is financial (deducted from deposit).
+    const returnUnits = credit.requestId?.units || 1;
 
     const newRequest = await ReturnRequest.create({
       creditId,
       userId,
       hospitalId,
-      units: returnUnits, // Save calculated units
+      units: returnUnits,
       status: 'pending'
     });
 
@@ -91,7 +67,7 @@ export async function GET(req: Request) {
         path: 'creditId',
         populate: {
           path: 'requestId', // To get original units/blood group details if needed
-          select: 'bloodGroup units document'
+          select: 'bloodGroup units document depositAmount'
         }
       })
       .sort({ createdAt: -1 });
@@ -146,11 +122,9 @@ export async function PATCH(req: Request) {
       // Get full credit details to know what is being returned
       const credit = await Credit.findById(returnRequest.creditId).populate('requestId');
       const bloodGroup = credit.requestId.bloodGroup;
+      const originalDeposit = credit.requestId.depositAmount || 3000; // Default if missing
 
-      // Use the actual returned units (which may include penalty) from the request
       const units = returnRequest.units || 1;
-
-      // Calculate quantity per bag (approx 450ml per unit)
       const quantityPerBag = 450;
 
       // 2. Create Blood Bag records
@@ -179,6 +153,49 @@ export async function PATCH(req: Request) {
         { $inc: { quantity: units } },
         { upsert: true }
       );
+
+      // 5. [NEW] Financial Refund Logic (Transaction)
+      const now = new Date();
+      const dueDate = new Date(credit.dueDate);
+      const overdueMillis = now.getTime() - dueDate.getTime();
+      const overdueDays = Math.ceil(overdueMillis / (1000 * 60 * 60 * 24));
+
+      let refundPercentage = 100;
+      let penaltyReason = 'None';
+
+      if (overdueDays > 21) {
+        refundPercentage = 0;
+        penaltyReason = 'Blocked (>21 Days)';
+      } else if (overdueDays > 14) {
+        refundPercentage = 50;
+        penaltyReason = 'Level 2 Penalty (15-21 Days)';
+      } else if (overdueDays > 7) {
+        refundPercentage = 75;
+        penaltyReason = 'Level 1 Penalty (8-14 Days)';
+      }
+
+      const refundAmount = Math.round(originalDeposit * (refundPercentage / 100));
+      const penaltyAmount = originalDeposit - refundAmount;
+
+      // Dynamically import Transaction to avoid circular dependency issues if any
+      const Transaction = (await import('../../../../models/Transaction')).default;
+
+      await Transaction.create({
+        userId: returnRequest.userId,
+        type: 'REFUND',
+        amount: refundAmount,
+        currency: 'INR',
+        status: 'COMPLETED',
+        relatedEntity: 'ReturnRequest',
+        entityId: returnRequest._id,
+        description: `Refund for Blood Return. Penalty: ₹${penaltyAmount} (${penaltyReason})`,
+        metadata: {
+          originalDeposit,
+          refundPercentage,
+          overdueDays,
+          penaltyReason
+        }
+      });
 
     } else if (status === 'rejected') {
       returnRequest.status = 'rejected';

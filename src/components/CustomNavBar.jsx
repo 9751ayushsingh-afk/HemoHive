@@ -120,7 +120,7 @@ const CustomNavBar = ({ items, theme = 'light' }) => {
 
   // Force light theme (dark text) on specific pages like /our-mission and donation pages (and admin/driver)
   const isLightPage = pathname === '/our-mission' || pathname?.startsWith('/donor/donate-blood') || pathname?.includes('/admin') || pathname?.includes('/driver');
-  console.log('CustomNavBar Debug:', { pathname, isLightPage });
+  const isHospitalPage = pathname?.startsWith('/hospital');
   const themeClass = isLightPage ? 'light-theme' : (theme === 'dark' ? 'dark-theme' : '');
 
   useEffect(() => {
@@ -139,7 +139,7 @@ const CustomNavBar = ({ items, theme = 'light' }) => {
 
   return (
     <>
-      <header className={`custom-nav-header ${scrolled ? 'scrolled' : ''} ${themeClass}`}>
+      <header className={`custom-nav-header ${scrolled ? 'scrolled' : ''} ${themeClass} ${isHospitalPage ? 'hospital-mode' : ''}`}>
         <div className="custom-nav-logo">
           <Link href="/">
             <AnimatedLogo className="h-10" />

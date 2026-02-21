@@ -389,7 +389,7 @@ export default function DriverDashboard() {
             dropoff: { address: 'Sector 62, Noida', location: { type: 'Point', coordinates: [77.3639, 28.6208] } },
             distance: '12 km',
             time: '25 min',
-            earnings: '₹ 250',
+            earnings: '₹ 100',
             status: 'PROPOSED', // Changed from ASSIGNED to PROPOSED to match logic
             deadline: new Date(Date.now() + 30000).toISOString()
         });

@@ -13,6 +13,12 @@
   /* Lowered from 1000 to sit behind Scanner (600) and Notifications (200) */
 }
 
+.custom-nav-header.hospital-mode {
+  padding-left: 24rem;
+  /* Provides clearance for the sidebar (max w-72 = 18rem) + extra gap */
+  transition: padding-left 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
 @media (max-width: 768px) {
   .custom-nav-header {
     padding: 1rem 1.5rem;

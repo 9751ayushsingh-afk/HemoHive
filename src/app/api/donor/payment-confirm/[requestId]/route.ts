@@ -34,6 +34,29 @@ export async function POST(request: NextRequest, { params }: { params: { request
       { new: true }
     );
 
+    if (bloodRequest) {
+      // Create Transaction Record for Payment
+      const Transaction = (await import('../../../../../models/Transaction')).default;
+
+      const totalAmount = (bloodRequest.processingFee || 0) + (bloodRequest.deliveryFee || 0) + (bloodRequest.depositAmount || 0);
+
+      await Transaction.create({
+        userId: user.id,
+        type: 'DEPOSIT',
+        amount: totalAmount,
+        currency: 'INR',
+        status: 'COMPLETED',
+        relatedEntity: 'BloodRequest',
+        entityId: bloodRequest._id,
+        description: 'Payment for Blood Request (Includes Deposit)',
+        metadata: {
+          processingFee: bloodRequest.processingFee,
+          deliveryFee: bloodRequest.deliveryFee,
+          depositAmount: bloodRequest.depositAmount
+        }
+      });
+    }
+
     if (!bloodRequest) {
       return new NextResponse(
         JSON.stringify({ message: 'Blood request not found or not authorized.' }),

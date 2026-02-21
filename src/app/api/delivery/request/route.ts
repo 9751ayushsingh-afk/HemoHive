@@ -189,7 +189,7 @@ export async function POST(request: Request) {
                         deliveryId: delivery._id,
                         pickup: finalPickup,
                         dropoff: finalDropoff,
-                        earnings: '₹ 250', // Mock Calculation
+                        earnings: '₹ 100', // Mock Calculation
                         distance: '5 km', // Mock
                         time: '15 min', // Mock,
                         deadline: deadline // Send deadline to client
