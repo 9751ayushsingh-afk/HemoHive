@@ -46,6 +46,7 @@ const nextConfig = {
   },
   transpilePackages: ['three', '@react-three/fiber', '@react-three/drei', '@react-three/rapier'],
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',

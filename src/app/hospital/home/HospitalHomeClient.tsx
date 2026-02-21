@@ -61,8 +61,8 @@ const cardData = [
   {
     title: "Settings & Profile",
     link: "/hospital/settings",
-    sketchImage: "https://res.cloudinary.com/drwfe1mhk/image/upload/hemohive_assets/Setting_Profile_sketch.png",
-    colorImage: "https://res.cloudinary.com/drwfe1mhk/image/upload/hemohive_assets/Setting_Profile_colour.png",
+    sketchImage: "https://res.cloudinary.com/drwfe1mhk/image/upload/hemohive_assets/Setting_Profile_colour.png",
+    colorImage: "https://res.cloudinary.com/drwfe1mhk/image/upload/hemohive_assets/Setting_Profile_sketch.png",
     description: "Configure your hospital's profile, notification preferences, and security settings."
   },
 ];
