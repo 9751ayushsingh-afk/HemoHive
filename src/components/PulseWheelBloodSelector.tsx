@@ -142,10 +142,10 @@ const PulseWheelBloodSelector = ({ onSelect, onNext }: PulseWheelBloodSelectorPr
 
 
     return (
-        <div ref={containerRef} className="flex flex-col items-center justify-center h-full w-full bg-[#0b0b0b] text-white p-8 rounded-lg overflow-hidden" style={{ fontFamily: "'Poppins', sans-serif", background: 'radial-gradient(circle, #160000 0%, #0b0b0b 100%)' }}>
-            <div ref={particleContainerRef} className="absolute top-0 left-0 w-full h-full" />
-            <h2 className="text-3xl font-semibold mb-4 z-10">Select Your Blood Group</h2>
-            <p className="text-red-300 mb-8 z-10">Your blood type is a vital part of your identity.</p>
+        <div ref={containerRef} className="flex flex-col items-center justify-center w-full text-white p-4 rounded-lg overflow-hidden relative" style={{ fontFamily: "'Poppins', sans-serif" }}>
+            <div ref={particleContainerRef} className="absolute top-0 left-0 w-full h-full pointer-events-none" />
+            <h2 className="text-2xl font-semibold mb-2 z-10 text-white">Select Your Blood Group</h2>
+            <p className="text-red-300 mb-6 z-10 text-sm">Your blood type is a vital part of your identity.</p>
 
             <div ref={wheelRef} className="relative w-80 h-80 md:w-96 md:h-96 z-10 overflow-visible">
                 {bloodGroups.map((bg, index) => {

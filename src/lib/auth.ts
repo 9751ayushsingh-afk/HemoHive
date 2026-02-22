@@ -54,7 +54,12 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        const user = await User.findOne({ email: credentials.email });
+        const user = await User.findOne({
+          $or: [
+            { email: credentials.email },
+            { mobile: credentials.email }
+          ]
+        });
 
         if (user && user.password && (await bcrypt.compare(credentials.password, user.password))) {
           return {

@@ -25,7 +25,10 @@ import {
     PhoneArrowDownLeftIcon,
     BuildingLibraryIcon,
     IdentificationIcon,
-    BeakerIcon
+    BeakerIcon,
+    QuestionMarkCircleIcon,
+    EyeIcon,
+    EyeSlashIcon
 } from '@heroicons/react/24/solid';
 import MaleIcon from '../../components/atoms/MaleIcon';
 import FemaleIcon from '../../components/atoms/FemaleIcon';
@@ -59,25 +62,32 @@ const roles: any = {
 
 const validationSchema = yup.lazy(values => {
     const role = values.role;
+    const checkUniqueness = async (field: string, value: string | undefined) => {
+        if (!value) return true;
+        try {
+            const res = await axios.post('/api/register/check', { field, value });
+            return !res.data.exists;
+        } catch (error) {
+            console.error("Uniqueness check error", error);
+            return true;
+        }
+    };
+
     if (role === 'donor') {
         return yup.object().shape({
             fullName: yup.string().required('Full name is required'),
-            email: yup.string().email('Invalid email format').required('Email is required'),
+            email: yup.string().email('Invalid email format').required('Email is required')
+                .test('unique-email', 'Email already registered', value => checkUniqueness('email', value)),
             password: yup.string().min(8, 'Password must be at least 8 characters').required('Password is required'),
             confirmPassword: yup.string().oneOf([yup.ref('password')], 'Passwords must match').required('Please confirm your password'),
             role: yup.string().oneOf(Object.keys(roles)).required('Please select a role'),
             gender: yup.string().required('Gender is required'),
-            dob: yup.date().typeError('Enter a valid date').max(new Date(), 'Date of birth cannot be in the future').required('Date of birth is required'),
-            mobile: yup.string().matches(/^[0-9]{10}$/, 'Must be 10 digits').required('Mobile number is required'),
-            aadhaar: yup.string().matches(/^[0-9]{12}$/, 'Must be 12 digits').required('Aadhaar number is required'),
+            mobile: yup.string().matches(/^[0-9]{10}$/, 'Must be 10 digits').required('Mobile number is required')
+                .test('unique-mobile', 'Mobile number already registered', value => checkUniqueness('mobile', value)),
             address: yup.string().required('Address is required'),
             city: yup.string().required('City is required'),
             state: yup.string().required('State is required'),
             pincode: yup.string().matches(/^[0-9]{6}$/, 'Must be 6 digits').required('Pincode is required'),
-            lastDonationDate: yup.date().max(new Date(), 'Donation date cannot be in the future'),
-            weight: yup.number().typeError('Weight must be a number').positive('Weight must be positive'),
-            medicalConditions: yup.string(),
-            preferredDonationType: yup.string(),
             bloodGroup: yup.string().required('Blood group is required'),
             agreeTerms: yup.boolean().oneOf([true], 'You must agree to the terms and conditions'),
             notificationPreference: yup.string(),
@@ -89,7 +99,8 @@ const validationSchema = yup.lazy(values => {
     } else if (role === 'hospital') {
         return yup.object().shape({
             fullName: yup.string().required('Hospital Name is required'),
-            email: yup.string().email('Invalid email format').required('Email is required'),
+            email: yup.string().email('Invalid email format').required('Email is required')
+                .test('unique-email', 'Email already registered', value => checkUniqueness('email', value)),
             password: yup.string().min(8, 'Password must be at least 8 characters').required('Password is required'),
             confirmPassword: yup.string().oneOf([yup.ref('password')], 'Passwords must match').required('Please confirm your password'),
             role: yup.string().oneOf(Object.keys(roles)).required('Please select a role'),
@@ -105,7 +116,8 @@ const validationSchema = yup.lazy(values => {
     } else {
         return yup.object().shape({
             fullName: yup.string().required('Full name is required'),
-            email: yup.string().email('Invalid email format').required('Email is required'),
+            email: yup.string().email('Invalid email format').required('Email is required')
+                .test('unique-email', 'Email already registered', value => checkUniqueness('email', value)),
             password: yup.string().min(8, 'Password must be at least 8 characters').required('Password is required'),
             confirmPassword: yup.string().oneOf([yup.ref('password')], 'Passwords must match').required('Please confirm your password'),
             role: yup.string().oneOf(Object.keys(roles)).required('Please select a role'),
@@ -113,10 +125,80 @@ const validationSchema = yup.lazy(values => {
     }
 });
 
+const InputField = ({ name, type, placeholder, icon: Icon, errors, register, role, roles, tooltip, onEnter }: { name: string; type: string; placeholder: string; icon?: React.ElementType; errors: any; register: any; role: string; roles: any; tooltip?: string, onEnter?: () => void }) => {
+    const [showPassword, setShowPassword] = useState(false);
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const form = e.currentTarget.form;
+            if (!form) return;
+
+            const allElements = Array.from(form.elements) as HTMLElement[];
+            const focusableElements = allElements.filter(el =>
+                (el.tagName === 'INPUT' || el.tagName === 'SELECT') &&
+                !(el as HTMLInputElement).disabled
+            );
+
+            const currentIndex = focusableElements.indexOf(e.currentTarget);
+            const nextElement = focusableElements[currentIndex + 1];
+
+            if (nextElement) {
+                nextElement.focus();
+            } else if (onEnter) {
+                onEnter();
+            }
+        }
+    };
+
+    const isPasswordField = type === 'password';
+    const inputType = isPasswordField ? (showPassword ? 'text' : 'password') : type;
+
+    return (
+        <div className="relative mb-4 group">
+            <div className="flex items-center justify-between mb-1">
+                {tooltip && (
+                    <div className="relative flex items-center group/tooltip ml-auto">
+                        <QuestionMarkCircleIcon className="h-4 w-4 text-gray-400 cursor-help" />
+                        <div className="absolute bottom-full right-0 mb-2 w-48 p-2 bg-gray-800 text-white text-[10px] rounded shadow-xl opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none z-50 border border-white/10">
+                            {tooltip}
+                        </div>
+                    </div>
+                )}
+            </div>
+            <div className="relative">
+                {Icon && <Icon className={`absolute top-1/2 left-4 -translate-y-1/2 h-5 w-5 text-gray-400 transition-colors duration-300 ${errors[name] ? 'text-red-400' : 'group-focus-within:text-white'}`} />}
+                <input
+                    {...register(name)}
+                    type={inputType}
+                    placeholder={placeholder}
+                    onKeyDown={handleKeyDown}
+                    className={`w-full py-3 pl-12 pr-12 bg-gray-900 bg-opacity-40 rounded-lg border transition-all duration-300 outline-none focus:ring-2 focus:bg-opacity-60 ${errors[name] ? 'border-red-500 ring-red-500' : `border-gray-600 focus:ring-[${roles[role].color}] focus:border-[${roles[role].color}]`}`}
+                />
+                {isPasswordField && (
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute top-1/2 right-4 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                    >
+                        {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
+                    </button>
+                )}
+            </div>
+            <AnimatePresence>
+                {errors[name] && (
+                    <motion.p className="text-xs text-red-400 mt-1 ml-2" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                        {(errors[name] as any)?.message}
+                    </motion.p>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+};
+
 const donorSteps = [
-    { title: 'Personal Info', fields: ['fullName', 'gender', 'dob', 'mobile', 'aadhaar'] },
-    { title: 'Contact', fields: ['email', 'address', 'city', 'state', 'pincode'] },
-    { title: 'Health', fields: ['lastDonationDate', 'weight', 'medicalConditions', 'preferredDonationType'] },
+    { title: 'Personal Info', fields: ['fullName', 'gender', 'mobile', 'email'] },
+    { title: 'Contact', fields: ['address', 'city', 'state', 'pincode'] },
     { title: 'Blood Group', fields: ['bloodGroup'] },
     { title: 'Account', fields: ['password', 'confirmPassword', 'notificationPreference', 'agreeTerms'] },
     { title: 'Optional', fields: ['profilePicture', 'emergencyContactName', 'emergencyContactNumber', 'preferredBloodBank'] }
@@ -135,11 +217,32 @@ const RegistrationForm = () => {
 
     const { register, handleSubmit, watch, formState: { errors }, setValue, trigger } = useForm<any>({
         resolver: yupResolver(validationSchema),
+        mode: 'onChange',
         defaultValues: { role: 'donor', notificationPreference: 'Email' }
     });
 
     const role = watch('role');
     const genderValue = watch('gender');
+    const pincodeValue = watch('pincode');
+
+    // Handle Pincode Auto-fetch
+    useEffect(() => {
+        if (pincodeValue && pincodeValue.length === 6) {
+            const fetchCityState = async () => {
+                try {
+                    const response = await axios.get(`https://api.postalpincode.in/pincode/${pincodeValue}`);
+                    if (response.data[0].Status === "Success") {
+                        const postOffice = response.data[0].PostOffice[0];
+                        setValue('city', postOffice.District, { shouldValidate: true });
+                        setValue('state', postOffice.State, { shouldValidate: true });
+                    }
+                } catch (error) {
+                    console.error("Pincode fetch error:", error);
+                }
+            };
+            fetchCityState();
+        }
+    }, [pincodeValue, setValue]);
 
     useEffect(() => {
         setSelectedRole(role);
@@ -153,12 +256,18 @@ const RegistrationForm = () => {
 
     const openCamera = async () => {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } }
+            });
             if (videoRef.current) {
                 videoRef.current.srcObject = stream;
+                videoRef.current.onloadedmetadata = () => {
+                    videoRef.current?.play().catch(e => console.error("Auto-play failed:", e));
+                };
             }
         } catch (error) {
             console.error("Error accessing camera:", error);
+            alert("Camera Error: Please ensure camera permissions are allowed.");
         }
     };
 
@@ -200,6 +309,12 @@ const RegistrationForm = () => {
         if (showCamera) {
             openCamera();
         }
+        return () => {
+            if (videoRef.current && videoRef.current.srcObject) {
+                const stream = videoRef.current.srcObject as MediaStream;
+                stream.getTracks().forEach(track => track.stop());
+            }
+        };
     }, [showCamera]);
 
     const onSubmit = async (data: any) => {
@@ -207,25 +322,33 @@ const RegistrationForm = () => {
         setSubmissionStatus(null);
         try {
             const formData = new FormData();
+            if (capturedImage) {
+                const capturedFile = dataURLtoFile(capturedImage, 'profile-picture.png');
+                formData.set('profilePicture', capturedFile);
+            }
+
             for (const key in data) {
                 if (key === 'profilePicture' && data[key] && data[key][0]) {
-                    formData.append(key, data[key][0]);
+                    if (!capturedImage) formData.append(key, data[key][0]);
                 } else if (key === 'location' && data[key]) {
-                    // Start of Selection
                     formData.append('location[lat]', data[key].lat.toString());
                     formData.append('location[lng]', data[key].lng.toString());
-                    // End of Selection
                 } else {
                     formData.append(key, data[key] as string);
                 }
             }
-            // Replace with your API endpoint
+
+            // Stop camera before submission finishes
+            if (videoRef.current && videoRef.current.srcObject) {
+                const stream = videoRef.current.srcObject as MediaStream;
+                stream.getTracks().forEach(track => track.stop());
+            }
+            setShowCamera(false);
+
             const response = await axios.post('/api/register', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             setSubmissionStatus({ success: true, message: `Welcome, ${data.fullName}! Registration successful.` });
-
-            // Redirect to login page after successful registration
             router.push('/login');
 
         } catch (error) {
@@ -234,24 +357,7 @@ const RegistrationForm = () => {
         setIsSubmitting(false);
     };
 
-    const InputField = ({ name, type, placeholder, icon: Icon }: { name: string; type: string; placeholder: string; icon?: React.ElementType }) => (
-        <div className="relative mb-4">
-            {Icon && <Icon className={`absolute top-1/2 left-4 -translate-y-1/2 h-5 w-5 text-gray-400 transition-colors duration-300 ${errors[name] ? 'text-red-400' : 'group-focus-within:text-white'}`} />}
-            <input
-                {...register(name)}
-                type={type}
-                placeholder={placeholder}
-                className={`w-full py-3 pl-12 pr-4 bg-gray-900 bg-opacity-40 rounded-lg border transition-all duration-300 outline-none focus:ring-2 focus:bg-opacity-60 ${errors[name] ? 'border-red-500 ring-red-500' : `border-gray-600 focus:ring-[${roles[role].color}] focus:border-[${roles[role].color}]`}`}
-            />
-            <AnimatePresence>
-                {errors[name] && (
-                    <motion.p className="text-xs text-red-400 mt-1 ml-2" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                        {(errors[name] as any)?.message}
-                    </motion.p>
-                )}
-            </AnimatePresence>
-        </div>
-    );
+
 
     const nextStep = async () => {
         const fields = donorSteps[currentStep].fields;
@@ -327,7 +433,7 @@ const RegistrationForm = () => {
                                     <motion.div key={currentStep} initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.3, ease: 'easeInOut' }}>
                                         {currentStep === 0 && (
                                             <>
-                                                <InputField name="fullName" type="text" placeholder="Full Name" icon={UserIcon} />
+                                                <InputField name="fullName" type="text" placeholder="Full Name" icon={UserIcon} errors={errors} register={register} role={role} roles={roles} />
                                                 <div className="mb-4">
                                                     <label className="block text-sm font-medium text-gray-300 mb-2">Gender</label>
                                                     <div className="flex justify-around">
@@ -355,38 +461,29 @@ const RegistrationForm = () => {
                                                     </div>
                                                     {errors.gender && <p className="text-xs text-red-400 mt-1 ml-2">{(errors.gender as any)?.message}</p>}
                                                 </div>
-                                                <InputField name="dob" type="date" placeholder="Date of Birth" icon={CalendarIcon} />
-                                                <InputField name="mobile" type="text" placeholder="Mobile Number" icon={DevicePhoneMobileIcon} />
-                                                <InputField name="aadhaar" type="text" placeholder="Aadhaar Number" icon={ShieldCheckIcon} />
+                                                <InputField name="mobile" type="text" placeholder="Mobile Number" icon={DevicePhoneMobileIcon} errors={errors} register={register} role={role} roles={roles} tooltip="Your 10-digit mobile number will be used for critical blood requests and emergency alerts." />
+                                                <InputField name="email" type="email" placeholder="Email Address" icon={EnvelopeIcon} errors={errors} register={register} role={role} roles={roles} onEnter={nextStep} tooltip="We will send your digital donor card and donation history details to this email." />
                                             </>
                                         )}
                                         {currentStep === 1 && (
                                             <>
-                                                <InputField name="email" type="email" placeholder="Email Address" icon={EnvelopeIcon} />
-                                                <InputField name="address" type="text" placeholder="Full Address" icon={HomeIcon} />
-                                                <InputField name="city" type="text" placeholder="City" icon={MapPinIcon} />
-                                                <InputField name="state" type="text" placeholder="State" icon={MapPinIcon} />
-                                                <InputField name="pincode" type="text" placeholder="Pincode" icon={MapPinIcon} />
+                                                <InputField name="pincode" type="text" placeholder="Pincode" icon={MapPinIcon} errors={errors} register={register} role={role} roles={roles} />
+                                                <InputField name="address" type="text" placeholder="Full Address" icon={HomeIcon} errors={errors} register={register} role={role} roles={roles} />
+                                                <InputField name="city" type="text" placeholder="City" icon={MapPinIcon} errors={errors} register={register} role={role} roles={roles} />
+                                                <InputField name="state" type="text" placeholder="State" icon={MapPinIcon} errors={errors} register={register} role={role} roles={roles} onEnter={nextStep} />
                                             </>
                                         )}
                                         {currentStep === 2 && (
-                                            <>
-                                                <InputField name="lastDonationDate" type="date" placeholder="Last Donation Date (Optional)" icon={CalendarIcon} />
-                                                <InputField name="weight" type="number" placeholder="Weight in kg (Optional)" icon={ScaleIcon} />
-                                                <InputField name="medicalConditions" type="text" placeholder="Medical Conditions (Optional)" icon={ClipboardDocumentCheckIcon} />
-                                                <InputField name="preferredDonationType" type="text" placeholder="Preferred Donation (Optional)" icon={BeakerIcon} />
-                                            </>
-                                        )}
-                                        {currentStep === 3 && (
                                             <PulseWheelBloodSelector
                                                 onSelect={(bloodGroup: string) => setValue('bloodGroup', bloodGroup, { shouldValidate: true })}
                                                 onNext={nextStep}
                                             />
                                         )}
-                                        {currentStep === 4 && (
+
+                                        {currentStep === 3 && (
                                             <>
-                                                <InputField name="password" type="password" placeholder="Password" icon={LockClosedIcon} />
-                                                <InputField name="confirmPassword" type="password" placeholder="Confirm Password" icon={LockClosedIcon} />
+                                                <InputField name="password" type="password" placeholder="Password" icon={LockClosedIcon} errors={errors} register={register} role={role} roles={roles} />
+                                                <InputField name="confirmPassword" type="password" placeholder="Confirm Password" icon={LockClosedIcon} errors={errors} register={register} role={role} roles={roles} onEnter={nextStep} />
                                                 <div className="relative mb-4">
                                                     <BellIcon className="absolute top-1/2 left-4 -translate-y-1/2 h-5 w-5 text-gray-400" />
                                                     <select {...register("notificationPreference")} className="w-full py-3 pl-12 pr-4 bg-gray-900 bg-opacity-40 rounded-lg border border-gray-600 focus:ring-2 focus:ring-[#EC4899] focus:border-[#EC4899] outline-none">
@@ -404,56 +501,86 @@ const RegistrationForm = () => {
                                                 {errors.agreeTerms && <p className="text-xs text-red-400 mt-1">{(errors.agreeTerms as any)?.message}</p>}
                                             </>
                                         )}
-                                        {currentStep === 5 && (
+                                        {currentStep === 4 && (
                                             <>
-                                                <div className="relative mb-4">
-                                                    <div className="flex items-center">
-                                                        <CameraIcon className="absolute top-1/2 left-4 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                                                        <input {...register("profilePicture")} type="file" className="w-full py-3 pl-12 pr-4 bg-gray-900 bg-opacity-40 rounded-lg border border-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#EC4899] file:text-white hover:file:bg-pink-600" />
-                                                        <button type="button" onClick={() => setShowCamera(prev => !prev)} className="ml-4 py-3 px-4 bg-gray-700 rounded-lg text-white">
-                                                            <CameraIcon className="h-5 w-5" />
+                                                <div className="mb-6 text-center">
+                                                    <p className="text-pink-400 font-bold mb-1">Final Step: Optional</p>
+                                                    <p className="text-xs text-gray-400 italic mb-4">Feel free to skip this section and click "Finish" to submit directly.</p>
+                                                </div>
+                                                <div className="relative mb-6 p-4 bg-gray-900 bg-opacity-30 rounded-xl border border-dashed border-gray-600">
+                                                    <div className="flex items-center justify-between mb-4">
+                                                        <label className="text-sm font-medium text-gray-300">Profile Picture</label>
+                                                        <button type="button" onClick={() => setShowCamera(prev => !prev)} className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 ${showCamera ? 'bg-red-500 hover:bg-red-600' : 'bg-[#EC4899] hover:bg-pink-600'} text-white text-xs font-bold`}>
+                                                            <CameraIcon className="h-4 w-4" />
+                                                            {showCamera ? 'Close Camera' : 'Take Photo'}
                                                         </button>
                                                     </div>
-                                                    {showCamera && (
-                                                        <div className="mt-4">
-                                                            <video ref={videoRef} autoPlay className="w-full rounded-lg"></video>
-                                                            <button type="button" onClick={captureImage} className="mt-2 py-2 px-4 bg-pink-500 rounded-lg text-white">
-                                                                Capture
-                                                            </button>
-                                                        </div>
-                                                    )}
+
+                                                    <div className="flex flex-col gap-4">
+                                                        <input {...register("profilePicture")} type="file" className="text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-semibold file:bg-gray-800 file:text-pink-400 hover:file:bg-gray-700" />
+
+                                                        <AnimatePresence>
+                                                            {showCamera && (
+                                                                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
+                                                                    <div className="relative aspect-video bg-black rounded-lg border border-gray-700 overflow-hidden shadow-2xl">
+                                                                        <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover"></video>
+                                                                        <button type="button" onClick={captureImage} className="absolute bottom-4 left-1/2 -translate-x-1/2 p-4 bg-[#EC4899] hover:bg-pink-600 text-white rounded-full shadow-lg transition-transform active:scale-90">
+                                                                            <CameraIcon className="h-6 w-6" />
+                                                                        </button>
+                                                                    </div>
+                                                                </motion.div>
+                                                            )}
+                                                        </AnimatePresence>
+
+                                                        {capturedImage && (
+                                                            <div className="flex items-center gap-4 p-2 bg-green-500/10 rounded-lg border border-green-500/30">
+                                                                <img src={capturedImage} alt="Captured" className="w-16 h-16 rounded object-cover shadow-md" />
+                                                                <div>
+                                                                    <p className="text-green-400 text-xs font-bold">Photo Captured! ✅</p>
+                                                                    <p className="text-[10px] text-gray-400">This photo will be used for your ID card.</p>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                     <canvas ref={canvasRef} className="hidden"></canvas>
-                                                    {capturedImage && (
-                                                        <div className="mt-4">
-                                                            <p className="text-white">Captured Image:</p>
-                                                            <img src={capturedImage} alt="Captured" className="w-32 h-32 rounded-lg mt-2" />
-                                                        </div>
-                                                    )}
                                                 </div>
-                                                <InputField name="emergencyContactName" type="text" placeholder="Emergency Contact Name" icon={UserIcon} />
-                                                <InputField name="emergencyContactNumber" type="text" placeholder="Emergency Contact Number" icon={PhoneArrowDownLeftIcon} />
-                                                <InputField name="preferredBloodBank" type="text" placeholder="Preferred Blood Bank" icon={BuildingLibraryIcon} />
+                                                <InputField name="emergencyContactName" type="text" placeholder="Emergency Contact Name" icon={UserIcon} errors={errors} register={register} role={role} roles={roles} />
+                                                <InputField name="emergencyContactNumber" type="text" placeholder="Emergency Contact Number" icon={PhoneArrowDownLeftIcon} errors={errors} register={register} role={role} roles={roles} />
+                                                <InputField name="preferredBloodBank" type="text" placeholder="Preferred Blood Bank" icon={BuildingLibraryIcon} errors={errors} register={register} role={role} roles={roles} />
                                             </>
                                         )}
                                     </motion.div>
                                 </AnimatePresence>
 
-                                <div className="flex justify-between mt-8">
-                                    <div>
+                                <div className="flex justify-between mt-8 relative z-50">
+                                    <div className="flex gap-4">
                                         {currentStep > 0 && (
                                             <motion.button type="button" onClick={prevStep} className="py-2 px-6 font-bold text-white rounded-lg bg-gray-600 hover:bg-gray-500 transition-colors" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
                                                 Back
                                             </motion.button>
                                         )}
                                     </div>
-                                    <div>
-                                        {currentStep < donorSteps.length - 1 && currentStep !== 3 && (
-                                            <motion.button type="button" onClick={nextStep} className={`py-2 px-8 font-bold text-white rounded-lg bg-gradient-to-r ${roles[selectedRole].gradient}`} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
+                                    <div className="flex gap-4">
+                                        {currentStep < donorSteps.length - 1 && currentStep !== 2 && (
+                                            <motion.button
+                                                type="button"
+                                                onClick={nextStep}
+                                                disabled={donorSteps[currentStep].fields.some(f => !!errors[f])}
+                                                className={`py-2 px-8 font-bold text-white rounded-lg transition-all duration-300 ${donorSteps[currentStep].fields.some(f => !!errors[f]) ? 'bg-gray-600 opacity-50 cursor-not-allowed' : `bg-gradient-to-r ${roles[selectedRole].gradient}`}`}
+                                                whileHover={donorSteps[currentStep].fields.some(f => !!errors[f]) ? {} : { scale: 1.05 }}
+                                                whileTap={donorSteps[currentStep].fields.some(f => !!errors[f]) ? {} : { scale: 0.98 }}
+                                            >
                                                 Next
                                             </motion.button>
                                         )}
                                         {currentStep === donorSteps.length - 1 && (
-                                            <motion.button type="submit" disabled={isSubmitting} className={`py-2 px-8 font-bold text-white rounded-lg shadow-lg transition-all duration-300 ${isSubmitting ? 'bg-gray-600' : `bg-gradient-to-r ${roles[selectedRole].gradient}`}`} whileHover={{ scale: 1.05, y: -2, boxShadow: `0 10px 20px ${roles[selectedRole].color}40` }} whileTap={{ scale: 0.98 }}>
+                                            <motion.button
+                                                type="submit"
+                                                disabled={isSubmitting || donorSteps[currentStep].fields.some(f => !!errors[f]) || (showCamera && !capturedImage)}
+                                                className={`py-2 px-8 font-bold text-white rounded-lg shadow-lg transition-all duration-300 ${isSubmitting || donorSteps[currentStep].fields.some(f => !!errors[f]) || (showCamera && !capturedImage) ? 'bg-gray-600 opacity-50 cursor-not-allowed' : `bg-gradient-to-r ${roles[selectedRole].gradient}`}`}
+                                                whileHover={isSubmitting || donorSteps[currentStep].fields.some(f => !!errors[f]) || (showCamera && !capturedImage) ? {} : { scale: 1.05, y: -2, boxShadow: `0 10px 20px ${roles[selectedRole].color}40` }}
+                                                whileTap={isSubmitting || donorSteps[currentStep].fields.some(f => !!errors[f]) || (showCamera && !capturedImage) ? {} : { scale: 0.98 }}
+                                            >
                                                 {isSubmitting ? 'Creating Account...' : 'Finish'}
                                             </motion.button>
                                         )}
@@ -462,19 +589,18 @@ const RegistrationForm = () => {
                             </>
                         ) : role === 'hospital' ? (
                             <>
-                                <InputField name="fullName" type="text" placeholder="Hospital Name" icon={UserIcon} />
-                                <InputField name="email" type="email" placeholder="Email Address" icon={EnvelopeIcon} />
+                                <InputField name="fullName" type="text" placeholder="Hospital Name" icon={UserIcon} errors={errors} register={register} role={role} roles={roles} />
+                                <InputField name="email" type="email" placeholder="Email Address" icon={EnvelopeIcon} errors={errors} register={register} role={role} roles={roles} />
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <InputField name="address" type="text" placeholder="Hospital Address" icon={BuildingOfficeIcon} />
-                                    <InputField name="pincode" type="text" placeholder="Pincode" icon={MapPinIcon} />
+                                    <InputField name="address" type="text" placeholder="Hospital Address" icon={BuildingOfficeIcon} errors={errors} register={register} role={role} roles={roles} />
+                                    <InputField name="pincode" type="text" placeholder="Pincode" icon={MapPinIcon} errors={errors} register={register} role={role} roles={roles} />
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <InputField name="city" type="text" placeholder="City" icon={MapPinIcon} />
-                                    <InputField name="state" type="text" placeholder="State" icon={MapPinIcon} />
+                                    <InputField name="city" type="text" placeholder="City" icon={MapPinIcon} errors={errors} register={register} role={role} roles={roles} />
+                                    <InputField name="state" type="text" placeholder="State" icon={MapPinIcon} errors={errors} register={register} role={role} roles={roles} />
                                 </div>
-
-                                {/* GPS Location Capture */}
+                                {/* ... Hospital location button ... */}
                                 <div className="mb-4">
                                     <button
                                         type="button"
@@ -487,8 +613,6 @@ const RegistrationForm = () => {
                                                 (pos) => {
                                                     const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
                                                     setValue('location', loc, { shouldValidate: true });
-                                                    // Auto-fill address if empty using reverse geocoding could go here, 
-                                                    // but for now we just capture accurate GPS.
                                                     alert("GPS Location Captured! ✅");
                                                 },
                                                 (err) => alert("GPS Error: " + err.message),
@@ -503,20 +627,32 @@ const RegistrationForm = () => {
                                     {errors.location && <p className="text-xs text-red-400 mt-1 ml-2">{(errors.location as any)?.message}</p>}
                                 </div>
 
-                                <InputField name="password" type="password" placeholder="Password" icon={LockClosedIcon} />
-                                <InputField name="confirmPassword" type="password" placeholder="Confirm Password" icon={LockClosedIcon} />
+                                <InputField name="password" type="password" placeholder="Password" icon={LockClosedIcon} errors={errors} register={register} role={role} roles={roles} />
+                                <InputField name="confirmPassword" type="password" placeholder="Confirm Password" icon={LockClosedIcon} errors={errors} register={register} role={role} roles={roles} />
 
-                                <motion.button type="submit" disabled={isSubmitting} className={`w-full py-3 mt-4 font-bold text-white rounded-lg shadow-lg transition-all duration-300 ${isSubmitting ? 'bg-gray-600' : `bg-gradient-to-r ${roles[selectedRole].gradient}`}`} whileHover={{ scale: 1.05, y: -2, boxShadow: `0 10px 20px ${roles[selectedRole].color}40` }} whileTap={{ scale: 0.98 }}>
+                                <motion.button
+                                    type="submit"
+                                    disabled={isSubmitting || Object.keys(errors).length > 0}
+                                    className={`w-full py-3 mt-4 font-bold text-white rounded-lg shadow-lg transition-all duration-300 ${isSubmitting || Object.keys(errors).length > 0 ? 'bg-gray-600 opacity-50 cursor-not-allowed' : `bg-gradient-to-r ${roles[selectedRole].gradient}`}`}
+                                    whileHover={isSubmitting || Object.keys(errors).length > 0 ? {} : { scale: 1.05, y: -2, boxShadow: `0 10px 20px ${roles[selectedRole].color}40` }}
+                                    whileTap={isSubmitting || Object.keys(errors).length > 0 ? {} : { scale: 0.98 }}
+                                >
                                     {isSubmitting ? 'Registering...' : 'Register Hospital'}
                                 </motion.button>
                             </>
                         ) : (
                             <>
-                                <InputField name="fullName" type="text" placeholder="Full Name" icon={UserIcon} />
-                                <InputField name="email" type="email" placeholder="Email Address" icon={EnvelopeIcon} />
-                                <InputField name="password" type="password" placeholder="Password" icon={LockClosedIcon} />
-                                <InputField name="confirmPassword" type="password" placeholder="Confirm Password" icon={LockClosedIcon} />
-                                <motion.button type="submit" disabled={isSubmitting} className={`w-full py-3 mt-4 font-bold text-white rounded-lg shadow-lg transition-all duration-300 ${isSubmitting ? 'bg-gray-600' : `bg-gradient-to-r ${roles[selectedRole].gradient}`}`} whileHover={{ scale: 1.05, y: -2, boxShadow: `0 10px 20px ${roles[selectedRole].color}40` }} whileTap={{ scale: 0.98 }}>
+                                <InputField name="fullName" type="text" placeholder="Full Name" icon={UserIcon} errors={errors} register={register} role={role} roles={roles} />
+                                <InputField name="email" type="email" placeholder="Email Address" icon={EnvelopeIcon} errors={errors} register={register} role={role} roles={roles} />
+                                <InputField name="password" type="password" placeholder="Password" icon={LockClosedIcon} errors={errors} register={register} role={role} roles={roles} />
+                                <InputField name="confirmPassword" type="password" placeholder="Confirm Password" icon={LockClosedIcon} errors={errors} register={register} role={role} roles={roles} />
+                                <motion.button
+                                    type="submit"
+                                    disabled={isSubmitting || Object.keys(errors).length > 0}
+                                    className={`w-full py-3 mt-4 font-bold text-white rounded-lg shadow-lg transition-all duration-300 ${isSubmitting || Object.keys(errors).length > 0 ? 'bg-gray-600 opacity-50 cursor-not-allowed' : `bg-gradient-to-r ${roles[selectedRole].gradient}`}`}
+                                    whileHover={isSubmitting || Object.keys(errors).length > 0 ? {} : { scale: 1.05, y: -2, boxShadow: `0 10px 20px ${roles[selectedRole].color}40` }}
+                                    whileTap={isSubmitting || Object.keys(errors).length > 0 ? {} : { scale: 0.98 }}
+                                >
                                     {isSubmitting ? 'Registering...' : 'Create Account'}
                                 </motion.button>
                             </>

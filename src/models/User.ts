@@ -8,7 +8,6 @@ export interface IUser extends Document {
     role: 'donor' | 'hospital' | 'admin' | 'driver';
     hospitalId?: mongoose.Types.ObjectId;
     gender?: string;
-    dob?: Date;
     mobile?: string;
     aadhaar?: string;
     address?: string;
@@ -71,17 +70,16 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: function () { return this.role === 'donor'; },
     },
-    dob: {
-        type: Date,
-        required: function () { return this.role === 'donor'; },
-    },
     mobile: {
         type: String,
         required: function () { return this.role === 'donor'; },
+        unique: true,
+        sparse: true
     },
     aadhaar: {
         type: String,
-        required: function () { return this.role === 'donor'; },
+        unique: true,
+        sparse: true
     },
     address: {
         type: String,
@@ -186,5 +184,9 @@ UserSchema.pre('save', async function (next) {
     }
     next();
 });
+
+if (mongoose.models.User) {
+    delete mongoose.models.User;
+}
 
 export default mongoose.models.User || mongoose.model('User', UserSchema);
