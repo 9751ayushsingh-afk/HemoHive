@@ -65,7 +65,11 @@ export async function PATCH(request: NextRequest) {
 
         // Broadcast "Request Taken" to remove it from other dashboards
         try {
-            await fetch('http://localhost:3000/api/internal/broadcast-taken', {
+            const protocol = request.headers.get('x-forwarded-proto') || 'http';
+            const host = request.headers.get('host');
+            const baseUrl = `${protocol}://${host}`;
+
+            await fetch(`${baseUrl}/api/internal/broadcast-taken`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ requestId })

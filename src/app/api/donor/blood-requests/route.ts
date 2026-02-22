@@ -95,7 +95,11 @@ export async function POST(request: NextRequest) {
 
     // Attempt to broadcast via internal fetch to custom server (if listening)
     try {
-      await fetch('http://localhost:3000/api/internal/broadcast-request', {
+      const protocol = request.headers.get('x-forwarded-proto') || 'http';
+      const host = request.headers.get('host');
+      const baseUrl = `${protocol}://${host}`;
+
+      await fetch(`${baseUrl}/api/internal/broadcast-request`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newBloodRequest)

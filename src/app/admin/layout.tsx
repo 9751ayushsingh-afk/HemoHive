@@ -4,6 +4,7 @@
 import React from 'react';
 import { LayoutDashboard, Users, UserPlus, Settings, LogOut } from 'lucide-react';
 import Link from 'next/link';
+import { signOut } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -42,7 +43,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </nav>
 
                 <div className="p-4 border-t border-slate-800">
-                    <button className="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg w-full transition-colors">
+                    <button
+                        onClick={() => signOut({ callbackUrl: `${window.location.origin}/login` })}
+                        className="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg w-full transition-colors"
+                    >
                         <LogOut size={20} />
                         <span>Logout</span>
                     </button>

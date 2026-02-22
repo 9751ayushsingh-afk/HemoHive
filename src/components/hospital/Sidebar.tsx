@@ -232,7 +232,7 @@ const Sidebar = () => {
                         >
                             <MagneticIcon>
                                 <button
-                                    onClick={() => signOut({ callbackUrl: '/login' })}
+                                    onClick={() => signOut({ callbackUrl: `${window.location.origin}/login` })}
                                     className="p-2 hover:bg-red-500/20 rounded-full transition-colors group/logout border-none bg-transparent cursor-pointer"
                                     title="Sign Out"
                                 >

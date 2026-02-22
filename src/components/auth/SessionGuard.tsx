@@ -23,12 +23,12 @@ export default function SessionGuard({ children }: { children: React.ReactNode }
     }, [session, status]);
 
     const handleLogout = () => {
-        signOut({ callbackUrl: '/login' });
+        signOut({ callbackUrl: `${window.location.origin}/login` });
     };
 
     const handleRelogin = () => {
         // Clear session and direct to login for fresh 'Winner' status
-        signOut({ callbackUrl: '/login' });
+        signOut({ callbackUrl: `${window.location.origin}/login` });
     };
 
     return (

@@ -112,7 +112,11 @@ export async function POST(request: NextRequest) {
 
     // Real-time Socket Emission via Internal Broadcast Route
     try {
-      await fetch('http://localhost:3000/api/internal/broadcast-request', {
+      const protocol = request.headers.get('x-forwarded-proto') || 'http';
+      const host = request.headers.get('host');
+      const baseUrl = `${protocol}://${host}`;
+
+      await fetch(`${baseUrl}/api/internal/broadcast-request`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newBloodRequest)
