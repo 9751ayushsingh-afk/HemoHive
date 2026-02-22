@@ -5,7 +5,7 @@ import { Download, Truck, AlertCircle, CheckCircle, Receipt, Calendar, User, Pho
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
+import html2canvas from 'html2canvas-pro';
 import { toast } from 'react-hot-toast';
 
 interface InvoiceData {
@@ -49,14 +49,14 @@ const HemoHiveInvoice = () => {
   const { data: invoiceData, isLoading, isError } = useQuery<InvoiceData, Error>({
     queryKey: ['invoice', requestId],
     queryFn: () => fetchInvoiceData(requestId as string),
-    enabled: !!requestId, // Only run query if requestId is available
+    enabled: !!requestId,
   });
 
   const [isVisible, setIsVisible] = useState(false);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const qrRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
-  const invoiceContentRef = useRef<HTMLDivElement>(null); // Add this line
+  const invoiceContentRef = useRef<HTMLDivElement>(null);
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
 
   // Entrance animation
@@ -135,43 +135,104 @@ const HemoHiveInvoice = () => {
 
   const downloadPDF = async (event: React.MouseEvent<HTMLButtonElement>) => {
     const button = event.currentTarget;
-    button.style.transform = 'scale(0.95)';
-    setTimeout(() => {
-      button.style.transform = 'scale(1)';
-    }, 150);
+    button.disabled = true;
+    const originalText = button.innerHTML;
+    button.innerHTML = '<span class="animate-spin mr-2">⏳</span> Generating...';
 
     if (!invoiceContentRef.current) {
-      alert('Error: Invoice content not found for PDF generation.');
+      toast.error('Error: Invoice content not found.');
+      button.disabled = false;
+      button.innerHTML = originalText;
       return;
     }
 
-    alert('📄 Generating PDF...\nThis may take a moment.');
-
     try {
-      const canvas = await html2canvas(invoiceContentRef.current, { scale: 2 } as any);
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgWidth = 210; // A4 width in mm
-      const pageHeight = 297; // A4 height in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-      let position = 0;
+      const element = invoiceContentRef.current;
 
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+      const style = document.createElement('style');
+      style.innerHTML = `
+        [data-pdf-hide] { display: none !important; }
+        .pdf-only { display: block !important; visibility: visible !important; opacity: 1 !important; }
+        .pdf-header { margin-bottom: 40px !important; }
+        .pdf-container { background: #0B0B0B !important; color: white !important; }
+      `;
+      document.head.appendChild(style);
 
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#0B0B0B',
+        logging: false,
+        onclone: (clonedDoc) => {
+          const hideElements = clonedDoc.querySelectorAll('[data-pdf-hide]');
+          hideElements.forEach(el => (el as HTMLElement).style.display = 'none');
 
-      pdf.save(`HemoHive_Invoice_${invoiceData?.invoiceId}.pdf`);
-      alert('✓ PDF generated successfully!');
+          // Fix branding text (gradient clipping)
+          const brandingText = clonedDoc.querySelectorAll('[data-pdf-fix="branding"]');
+          brandingText.forEach(el => {
+            const htmlEl = el as HTMLElement;
+            htmlEl.style.background = 'none';
+            htmlEl.style.color = '#C00029';
+            htmlEl.style.webkitTextFillColor = '#C00029';
+            htmlEl.classList.remove('text-transparent', 'bg-clip-text');
+          });
+
+          // Fix badges that use opacity/gradients
+          const badges = clonedDoc.querySelectorAll('[data-pdf-fix="badge"]');
+          badges.forEach(el => {
+            const htmlEl = el as HTMLElement;
+            htmlEl.style.backgroundColor = '#1a0a0a';
+            htmlEl.style.borderColor = '#C00029';
+            htmlEl.style.color = '#C00029';
+          });
+
+          // Ensure the top-right logo is visible in PDF
+          const pdfOnlyElements = clonedDoc.querySelectorAll('.pdf-only');
+          pdfOnlyElements.forEach(el => {
+            (el as HTMLElement).style.display = 'block';
+            (el as HTMLElement).style.visibility = 'visible';
+            (el as HTMLElement).style.opacity = '1';
+          });
+
+          // Simplify gradients for icon backgrounds
+          const iconBackgrounds = clonedDoc.querySelectorAll('.bg-gradient-to-br');
+          iconBackgrounds.forEach(el => {
+            (el as HTMLElement).style.background = '#C00029';
+          });
+        }
+      });
+
+      document.head.removeChild(style);
+
+      const imgData = canvas.toDataURL('image/png', 1.0);
+      const pdf = new jsPDF({
+        orientation: 'p',
+        unit: 'mm',
+        format: 'a4',
+        compress: true
+      });
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+
+      const width = imgWidth * ratio;
+      const height = imgHeight * ratio;
+      const x = (pdfWidth - width) / 2;
+      const y = 0;
+
+      pdf.addImage(imgData, 'PNG', x, y, width, height, undefined, 'FAST');
+
+      pdf.save(`HemoHive_Invoice_${invoiceData?.invoiceId || 'Download'}.pdf`);
+      toast.success('Invoice downloaded successfully!');
     } catch (error: any) {
       console.error('Error generating PDF:', error);
-      alert(`❌ Failed to generate PDF. Please try again. Error: ${error.message}`);
+      toast.error(`Failed to generate PDF: ${error.message}`);
+    } finally {
+      button.disabled = false;
+      button.innerHTML = originalText;
     }
   };
 
@@ -470,7 +531,7 @@ const HemoHiveInvoice = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0B0B0B] via-[#0F0F0F] to-[#1A0A0A] text-white">
+    <div className="min-h-screen bg-gradient-to-br from-[#0B0B0B] via-[#0F0F0F] to-[#1A0A1A] text-white">
       {/* Animated background elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#C00029] rounded-full opacity-[0.03] blur-[120px] animate-pulse"></div>
@@ -478,6 +539,14 @@ const HemoHiveInvoice = () => {
       </div>
 
       <div ref={invoiceContentRef} className="relative z-10 max-w-5xl mx-auto px-4 md:px-8 py-8 md:py-12">
+        {/* Top Right Logo for PDF Export Only */}
+        <div className="pdf-only hidden absolute top-4 right-8 z-50">
+          <img
+            src="https://res.cloudinary.com/drwfe1mhk/image/upload/f_auto,q_auto/hemohive_assets/HemoHive_logo"
+            alt="HemoHive Official Logo"
+            className="h-16 w-auto object-contain"
+          />
+        </div>
 
         {/* Floating Header with glassmorphism */}
         <div
@@ -490,7 +559,7 @@ const HemoHiveInvoice = () => {
                 <Receipt className="text-white" size={28} />
               </div>
               <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-[#C00029] to-[#FF4458] bg-clip-text text-transparent mb-1">
+                <h1 data-pdf-fix="branding" className="text-4xl font-bold bg-gradient-to-r from-[#C00029] to-[#FF4458] bg-clip-text text-transparent mb-1">
                   HemoHive
                 </h1>
                 <p className="text-sm text-gray-400 italic">Affordable, accountable & always life-saving.</p>
@@ -703,7 +772,7 @@ const HemoHiveInvoice = () => {
               <div className="flex justify-center mb-4" ref={qrRef}></div>
               <div className="text-center space-y-3">
                 <div className="text-xs text-gray-400">Scan for instant access</div>
-                <div className="flex flex-col gap-2 text-xs">
+                <div data-pdf-hide className="flex flex-col gap-2 text-xs">
                   {['Track Delivery', 'Blood Traceability', 'Return Status', 'Receipt History'].map((item, idx) => (
                     <div
                       key={idx}
@@ -720,6 +789,7 @@ const HemoHiveInvoice = () => {
             {/* Action Buttons */}
             <div className="space-y-3">
               <button
+                data-pdf-hide
                 onClick={downloadPDF}
                 className="w-full bg-gradient-to-r from-[#C00029] to-[#8B0020] hover:from-[#D00030] hover:to-[#9B0025] text-white font-bold py-4 px-6 rounded-xl flex items-center justify-center gap-3 transition-all duration-300 shadow-lg hover:shadow-2xl hover:shadow-[#C00029]/30 hover:scale-[1.02] active:scale-95"
               >
@@ -730,6 +800,7 @@ const HemoHiveInvoice = () => {
               {/* AUTOMATED DELIVERY STATUS BUTTON */}
               {isSearchingDriver ? (
                 <button
+                  data-pdf-hide
                   disabled
                   className="w-full bg-slate-800/80 backdrop-blur-lg text-white font-semibold py-4 px-6 rounded-xl flex items-center justify-center gap-3 border border-slate-700 cursor-wait animate-pulse"
                 >
@@ -738,6 +809,7 @@ const HemoHiveInvoice = () => {
                 </button>
               ) : (invoiceData as any).activeDelivery?.status === 'DELIVERED' ? (
                 <button
+                  data-pdf-hide
                   disabled
                   className="w-full bg-slate-800/80 backdrop-blur-lg text-green-400 font-bold py-4 px-6 rounded-xl flex items-center justify-center gap-3 border border-green-500/30"
                 >
@@ -746,6 +818,7 @@ const HemoHiveInvoice = () => {
                 </button>
               ) : deliveryAssigned ? (
                 <button
+                  data-pdf-hide
                   onClick={() => router.push(`/delivery/track/${deliveryId}`)}
                   className="w-full bg-[#C00029] text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-red-900/20 hover:bg-[#a00023] hover:scale-[1.02] transition-all flex items-center justify-center gap-3 animate-pulse"
                 >
@@ -754,6 +827,7 @@ const HemoHiveInvoice = () => {
                 </button>
               ) : (
                 <button
+                  data-pdf-hide
                   disabled
                   className="w-full bg-gray-800/50 text-gray-400 font-semibold py-4 px-6 rounded-xl flex items-center justify-center gap-3 border border-gray-700"
                 >
@@ -819,16 +893,42 @@ const HemoHiveInvoice = () => {
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="text-center text-gray-500 text-xs py-8 space-y-2">
-          <p className="text-sm">
-            <span className="bg-gradient-to-r from-[#C00029] to-[#FF4458] bg-clip-text text-transparent font-semibold">
-              Powered by HemoHive
-            </span>
-            <span className="mx-2">—</span>
-            Delivering Hope, Saving Lives.
-          </p>
-          <p>For support: <a href="mailto:support@hemohive.in" className="text-[#C00029] hover:underline">9751ayushsingh@gmail.com</a> | +91 9026804355</p>
+        {/* Footer & Professional Branding */}
+        <div className="relative mt-12 pb-8 border-t border-gray-800/50 pt-8">
+          <div className="flex flex-col md:flex-row justify-between items-end gap-8">
+            <div className="space-y-4 text-left">
+              <div className="space-y-1">
+                <p className="text-gray-400 text-xs uppercase tracking-widest font-bold">Authorized Signature</p>
+                <div className="h-px w-48 bg-gray-800 mb-2"></div>
+                <p className="text-sm font-mono text-gray-500 italic">Digital Invoice Verified • HemoHive India</p>
+              </div>
+              <div className="text-gray-500 text-xs space-y-1">
+                <p>Support: 9751ayushsingh@gmail.com</p>
+                <p>Helpline: +91 9026804355</p>
+                <p>© {new Date().getFullYear()} HemoHive. All Rights Reserved.</p>
+              </div>
+            </div>
+
+            {/* Bottom Right Professional Logo for PDF */}
+            <div className="text-right">
+              <div className="inline-flex flex-col items-end">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-12 h-12 bg-gradient-to-br from-[#C00029] to-[#8B0020] rounded-xl flex items-center justify-center shadow-lg border border-white/10">
+                    <Receipt className="text-white" size={24} />
+                  </div>
+                  <div className="text-right">
+                    <h2 data-pdf-fix="branding" className="text-2xl font-black bg-gradient-to-r from-[#C00029] to-[#FF4458] bg-clip-text text-transparent leading-none">
+                      HemoHive
+                    </h2>
+                    <p className="text-[10px] text-gray-400 font-medium tracking-tighter uppercase">Life-Saving Infrastructure</p>
+                  </div>
+                </div>
+                <div data-pdf-fix="badge" className="bg-[#C00029]/10 border border-[#C00029]/20 px-3 py-1 rounded-full">
+                  <p className="text-[10px] text-[#C00029] font-bold">OFFICIAL DIGITAL RECEIPT</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div >
