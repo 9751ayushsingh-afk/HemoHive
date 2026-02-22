@@ -80,16 +80,25 @@ export const sendWelcomeEmail = async (userData: UserData) => {
         const subject = `Welcome to HemoHive, ${userData.userName} — Every Drop Counts`;
 
         // Strategy: Try SMTP first if available, then fallback to Resend
+        let sentWithSmtp = false;
+
         if (transporter) {
-            console.log("Using SMTP to send email...");
-            await transporter.sendMail({
-                from: fromEmail,
-                to: userData.email,
-                subject,
-                html: htmlToSend,
-            });
-            console.log('Welcome email sent via SMTP successfully to:', userData.email);
-        } else if (resend) {
+            try {
+                console.log("Using SMTP to send email...");
+                await transporter.sendMail({
+                    from: fromEmail,
+                    to: userData.email,
+                    subject,
+                    html: htmlToSend,
+                });
+                console.log('Welcome email sent via SMTP successfully to:', userData.email);
+                sentWithSmtp = true;
+            } catch (smtpError) {
+                console.error("SMTP delivery failed, attempting fallback to Resend:", smtpError);
+            }
+        }
+
+        if (!sentWithSmtp && resend) {
             console.log("Using Resend to send email...");
             const resendFrom = fromEmail.includes('gmail.com') ? 'onboarding@resend.dev' : fromEmail;
 
@@ -100,10 +109,10 @@ export const sendWelcomeEmail = async (userData: UserData) => {
                 html: htmlToSend,
             });
             console.log('Welcome email sent via Resend successfully to:', userData.email);
-        } else {
+        } else if (!sentWithSmtp && !transporter && !resend) {
             console.warn("No valid email configuration found (SMTP or Resend). Mock Email Logged:", userData.email);
         }
     } catch (error) {
-        console.error('CRITICAL: Error sending welcome email:', error);
+        console.error('CRITICAL: All email delivery methods failed:', error);
     }
 };
