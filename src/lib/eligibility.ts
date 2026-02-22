@@ -5,19 +5,9 @@ export function checkEligibility(user: IUser): { eligible: boolean; reasons: str
   const reasons: string[] = [];
   const today = new Date();
 
-  // 1. Age check
-  if (!user.dob) return { eligible: false, reasons: ['Date of birth not provided'] };
-  const dob = new Date(user.dob);
-  let age = today.getFullYear() - dob.getFullYear();
-  const m = today.getMonth() - dob.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
-    age--;
-  }
-  if (age < 18 || age > 65) {
-    reasons.push('Age must be between 18 and 65.');
-  }
+  // Age and weight checks removed/updated based on schema changes
 
-  // 2. Weight check
+  // 1. Weight check
   if (user.weight && user.weight <= 50) {
     reasons.push('Weight must be above 50 kg.');
   } else if (!user.weight) {

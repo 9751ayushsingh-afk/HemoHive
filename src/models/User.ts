@@ -64,15 +64,15 @@ const UserSchema = new mongoose.Schema({
     hospitalId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Hospital',
-        required: function () { return this.role === 'hospital'; },
+        required: function (this: any): boolean { return this.role === 'hospital'; },
     },
     gender: {
         type: String,
-        required: function () { return this.role === 'donor'; },
+        required: function (this: any): boolean { return this.role === 'donor'; },
     },
     mobile: {
         type: String,
-        required: function () { return this.role === 'donor'; },
+        required: function (this: any): boolean { return this.role === 'donor'; },
         unique: true,
         sparse: true
     },
@@ -83,19 +83,19 @@ const UserSchema = new mongoose.Schema({
     },
     address: {
         type: String,
-        required: function () { return this.role === 'donor'; },
+        required: function (this: any): boolean { return this.role === 'donor'; },
     },
     city: {
         type: String,
-        required: function () { return this.role === 'donor'; },
+        required: function (this: any): boolean { return this.role === 'donor'; },
     },
     state: {
         type: String,
-        required: function () { return this.role === 'donor'; },
+        required: function (this: any): boolean { return this.role === 'donor'; },
     },
     pincode: {
         type: String,
-        required: function () { return this.role === 'donor'; },
+        required: function (this: any): boolean { return this.role === 'donor'; },
     },
     lastDonationDate: {
         type: Date,
@@ -117,11 +117,11 @@ const UserSchema = new mongoose.Schema({
     },
     bloodGroup: {
         type: String,
-        required: function () { return this.role === 'donor'; },
+        required: function (this: any): boolean { return this.role === 'donor'; },
     },
     agreeTerms: {
         type: Boolean,
-        required: function () { return this.role === 'donor'; },
+        required: function (this: any): boolean { return this.role === 'donor'; },
     },
     notificationPreference: {
         type: String,

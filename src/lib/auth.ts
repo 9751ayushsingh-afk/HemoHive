@@ -94,7 +94,6 @@ export const authOptions: NextAuthOptions = {
             status: 'Approved', // Auto-approve Google users for now or set based on your policy
             bloodGroup: 'Unknown',
             gender: 'Other',
-            dob: new Date(0),
             mobile: '0000000000',
             aadhaar: '000000000000',
             address: 'Pending Completion',

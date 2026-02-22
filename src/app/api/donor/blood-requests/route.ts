@@ -1,4 +1,5 @@
 import { NextResponse, NextRequest } from 'next/server';
+export const dynamic = 'force-dynamic';
 import dbConnect from '../../../../lib/dbConnect';
 import BloodRequest from '../../../../models/BloodRequest';
 import Inventory from '../../../../models/Inventory';

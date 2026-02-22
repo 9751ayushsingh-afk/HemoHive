@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+export const dynamic = 'force-dynamic';
 import dbConnect from '../../../lib/dbConnect';
 import Transaction from '../../../models/Transaction';
 import { getServerSession } from 'next-auth';

@@ -1,5 +1,6 @@
 
 import { NextResponse } from 'next/server';
+export const dynamic = 'force-dynamic';
 import dbConnect from '../../../../lib/dbConnect';
 import BloodBag from '../../../../models/BloodBag';
 import { getServerSession } from 'next-auth/next';
