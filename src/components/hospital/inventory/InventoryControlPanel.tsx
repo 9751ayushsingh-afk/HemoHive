@@ -2,6 +2,7 @@
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Droplets } from 'lucide-react';
 import QrScannerModal from './QrScannerModal';
 
 const addBloodBag = async (newItem: any) => {
@@ -92,56 +93,135 @@ const InventoryControlPanel = ({ onFilterChange }: { onFilterChange: (filter: st
   return (
     <>
       <motion.div
-        className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-lg p-6"
+        className="bg-gray-900/40 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-8 shadow-2xl sticky top-8"
         initial={{ opacity: 0, x: 50 }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
       >
-        <h2 className="text-2xl font-bold mb-4">Control Panel</h2>
+        <div className="flex items-center gap-3 mb-8">
+          <div className="h-10 w-1 pt-1 rounded-full bg-red-600" />
+          <h2 className="text-3xl font-black text-white font-outfit uppercase tracking-tighter">Command Centre</h2>
+        </div>
 
         {/* Add Bag Form */}
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-2">Add New Bag</h3>
-          <form className="space-y-3" onSubmit={handleSubmit}>
-            <button type="button" onClick={() => setScannerOpen(true)} className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+        <div className="mb-10 p-6 bg-white/5 rounded-3xl border border-white/10">
+          <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Add Units</h3>
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <button
+              type="button"
+              onClick={() => setScannerOpen(true)}
+              className="group relative w-full overflow-hidden bg-gradient-to-r from-red-600 to-red-800 text-white font-black py-4 px-4 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-red-900/20 active:scale-95 text-xs uppercase tracking-widest"
+            >
+              <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <Droplets size={18} className="group-hover:animate-bounce" />
               Scan QR Code
             </button>
-            <div className="text-center text-gray-400 text-sm">OR</div>
-            <input type="text" placeholder="Enter Bag ID" value={bagId} onChange={e => setBagId(e.target.value)} className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500" />
-            <select value={bloodGroup} onChange={e => setBloodGroup(e.target.value)} className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500">
-              <option value="">Select Blood Group</option>
-              {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(bg => <option key={bg} value={bg}>{bg}</option>)}
-            </select>
-            <select value={quantity} onChange={e => setQuantity(e.target.value)} className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500">
-              <option value="450">450 ml (Standard)</option>
-              <option value="350">350 ml (Low Weight)</option>
-              <option value="250">250 ml (Pediatric)</option>
-            </select>
-            <input type="date" placeholder="Expiry Date" value={expiryDate} onChange={e => setExpiryDate(e.target.value)} className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500" />
-            <button type="submit" className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" disabled={mutation.isPending}>
-              {mutation.isPending ? 'Adding...' : 'Add Bag'}
-            </button>
-            {validationError && <p className="text-red-500 text-sm">{validationError}</p>}
-            {mutation.isError && <p className="text-red-500 text-sm">Error: {mutation.error.message}</p>}
+            <div className="relative flex items-center">
+              <div className="flex-grow border-t border-white/5"></div>
+              <span className="flex-shrink mx-4 text-gray-600 text-[10px] font-black uppercase tracking-tighter">manual entry console</span>
+              <div className="flex-grow border-t border-white/5"></div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="group relative">
+                <input
+                  type="text"
+                  placeholder="Bag Identifier"
+                  value={bagId}
+                  onChange={e => setBagId(e.target.value)}
+                  className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 transition-all placeholder:text-gray-600 font-medium"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <select
+                  value={bloodGroup}
+                  onChange={e => setBloodGroup(e.target.value)}
+                  className="bg-black/40 border border-white/10 rounded-2xl px-4 py-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-all appearance-none cursor-pointer"
+                >
+                  <option value="">Group</option>
+                  {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(bg => <option key={bg} value={bg}>{bg}</option>)}
+                </select>
+
+                <select
+                  value={quantity}
+                  onChange={e => setQuantity(e.target.value)}
+                  className="bg-black/40 border border-white/10 rounded-2xl px-4 py-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-all appearance-none cursor-pointer"
+                >
+                  <option value="450">450ml</option>
+                  <option value="350">350ml</option>
+                  <option value="250">250ml</option>
+                </select>
+              </div>
+
+              <div className="relative group">
+                <div className="absolute top-0 left-5 -translate-y-1/2 bg-gray-900 px-2 text-[10px] font-black text-red-500 uppercase tracking-widest z-10">Expiry Date</div>
+                <input
+                  type="date"
+                  min={new Date().toISOString().split('T')[0]}
+                  value={expiryDate}
+                  onChange={e => setExpiryDate(e.target.value)}
+                  className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-all [color-scheme:dark] cursor-pointer hover:border-red-500/30 font-medium"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className={`w-full font-black py-4 px-4 rounded-2xl shadow-xl transition-all duration-500 active:scale-95 text-xs uppercase tracking-widest ${!bagId || !bloodGroup || !quantity || !expiryDate || mutation.isPending
+                    ? 'bg-white/5 text-gray-600 cursor-not-allowed border border-white/5'
+                    : 'bg-white text-black hover:bg-red-500 hover:text-white shadow-red-500/20'
+                  }`}
+                disabled={!bagId || !bloodGroup || !quantity || !expiryDate || mutation.isPending}
+              >
+                {mutation.isPending ? 'Logging Unit...' : 'Confirm Record'}
+              </button>
+            </div>
+
+            <AnimatePresence>
+              {validationError && (
+                <motion.p
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="text-red-500 text-[10px] font-bold uppercase text-center"
+                >
+                  {validationError}
+                </motion.p>
+              )}
+            </AnimatePresence>
           </form>
         </div>
 
-        {/* Bulk Actions */}
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-2">Bulk Actions</h3>
-          <div className="space-y-2">
-            <button className="w-full text-sm bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Bulk Import (CSV)</button>
-            <button className="w-full text-sm bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">Delete Expired</button>
+        {/* Bulk & Filters */}
+        <div className="space-y-8">
+          <div>
+            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4 opacity-50">Master Controls</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <button className="text-[10px] bg-white/5 hover:bg-white/10 text-white font-black py-4 rounded-2xl border border-white/5 transition-all uppercase tracking-tight">Import Ledger</button>
+              <button className="text-[10px] bg-red-950/20 hover:bg-red-950/40 text-red-500 font-black py-4 rounded-2xl border border-red-500/20 transition-all uppercase tracking-tight">Flush Expired</button>
+            </div>
           </div>
-        </div>
 
-        {/* Quick Filters */}
-        <div>
-          <h3 className="text-lg font-semibold mb-2">Quick Filters</h3>
-          <div className="flex flex-wrap gap-2">
-            <button onClick={() => handleFilterClick('expiring_7d')} className={`text-xs ${activeFilter === 'expiring_7d' ? 'bg-red-600' : 'bg-gray-700'} hover:bg-gray-600 text-white font-bold py-1 px-3 rounded-full`}>Expiring in 7d</button>
-            <button onClick={() => handleFilterClick('low_stock_5')} className={`text-xs ${activeFilter === 'low_stock_5' ? 'bg-red-600' : 'bg-gray-700'} hover:bg-gray-600 text-white font-bold py-1 px-3 rounded-full`}>Low Stock &lt; 5</button>
-            <button onClick={() => handleFilterClick('all')} className={`text-xs ${activeFilter === 'all' ? 'bg-red-600' : 'bg-gray-700'} hover:bg-gray-600 text-white font-bold py-1 px-3 rounded-full`}>All Available</button>
+          <div>
+            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4 opacity-50">Instant Filters</h3>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { label: 'Expiry (7d)', value: 'expiring_7d' },
+                { label: 'Low Stock', value: 'low_stock_5' },
+                { label: 'Active Pool', value: 'all' },
+              ].map((f) => (
+                <button
+                  key={f.value}
+                  onClick={() => handleFilterClick(f.value)}
+                  className={`text-[10px] py-2.5 px-5 rounded-full font-black uppercase transition-all tracking-widest ${activeFilter === f.value
+                    ? 'bg-red-600 text-white shadow-lg shadow-red-500/20 scale-105'
+                    : 'bg-white/5 text-gray-500 hover:text-white border border-white/5'
+                    }`}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </motion.div>

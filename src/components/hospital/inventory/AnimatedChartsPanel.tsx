@@ -1,59 +1,87 @@
 'use client';
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import { Pie } from 'react-chartjs-2';
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+import React from 'react';
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Cell,
+  PieChart,
+  Pie,
+} from 'recharts';
 
 interface AnimatedChartsPanelProps {
-    summary: any;
+  summary: any;
 }
 
+const COLORS = ['#ef4444', '#f87171', '#dc2626', '#b91c1c', '#991b1b', '#7f1d1d', '#450a0a', '#000000'];
+
 const AnimatedChartsPanel: React.FC<AnimatedChartsPanelProps> = ({ summary }) => {
-    const chartData = {
-        labels: summary ? Object.keys(summary).filter(key => key !== 'lowStockGroups') : [],
-        datasets: [
-            {
-                label: '# of Units',
-                data: summary ? Object.keys(summary).filter(key => key !== 'lowStockGroups').map(key => summary[key]) : [],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.7)',
-                    'rgba(54, 162, 235, 0.7)',
-                    'rgba(255, 206, 86, 0.7)',
-                    'rgba(75, 192, 192, 0.7)',
-                    'rgba(153, 102, 255, 0.7)',
-                    'rgba(255, 159, 64, 0.7)',
-                    'rgba(255, 99, 132, 0.7)',
-                    'rgba(54, 162, 235, 0.7)',
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)',
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                ],
-                borderWidth: 1,
-            },
-        ],
-    };
+  const chartData = summary ? Object.keys(summary)
+    .filter(key => key !== 'lowStockGroups')
+    .map((key, index) => ({
+      name: key,
+      value: summary[key],
+    })) : [];
 
   return (
-    <motion.div
-      className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-lg p-6"
-      initial={{ opacity: 0, x: 50 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.5, delay: 0.4 }}
-    >
-      <h2 className="text-2xl font-bold mb-4">Analytics</h2>
-      <div className="h-64 flex items-center justify-center">
-        {summary ? <Pie data={chartData} /> : <p className="text-gray-500">No data for chart</p>}
+    <div className="space-y-6">
+      <div className="h-[250px] w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={chartData}
+              cx="50%"
+              cy="50%"
+              innerRadius={60}
+              outerRadius={90}
+              paddingAngle={8}
+              dataKey="value"
+              animationBegin={0}
+              animationDuration={1500}
+            >
+              {chartData.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                  stroke="rgba(255,255,255,0.1)"
+                  strokeWidth={2}
+                />
+              ))}
+            </Pie>
+            <Tooltip
+              contentStyle={{
+                backgroundColor: 'rgba(0,0,0,0.8)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: '16px',
+                color: '#fff',
+                fontSize: '12px',
+                fontWeight: 'bold'
+              }}
+              cursor={{ fill: 'transparent' }}
+            />
+          </PieChart>
+        </ResponsiveContainer>
       </div>
-    </motion.div>
+
+      <div className="grid grid-cols-4 gap-2">
+        {chartData.map((item, i) => (
+          <div key={item.name} className="flex flex-col items-center">
+            <div
+              className="w-2 h-2 rounded-full mb-1 shadow-[0_0_8px_rgba(239,68,68,0.5)]"
+              style={{ backgroundColor: COLORS[i % COLORS.length] }}
+            />
+            <span className="text-[10px] font-black text-gray-500 uppercase">{item.name}</span>
+            <span className="text-[12px] font-bold text-white">{item.value}u</span>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 };
 
