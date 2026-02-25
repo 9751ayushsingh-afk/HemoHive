@@ -1,0 +1,12 @@
+﻿{
+  "_id": "6935a894029dba0e62e68d51",
+  "name": "City Central Blood Bank",
+  "location": "123 Medical Drive, Downtown",
+  "gps": {
+    "lat": 34.0522,
+    "lng": -118.2437
+  },
+  "contact": "555-0101",
+  "email": "citycentral@hemohive.demo",
+  "__v": 0
+}

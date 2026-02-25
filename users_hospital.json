@@ -1,0 +1,22 @@
+[
+  {
+    "_id": "6909952c1f8cd77da9a6b499",
+    "fullName": "HOSPITAL B",
+    "email": "hospitalb@gmail.com",
+    "password": "$2b$10$wbu9mZaev5JRKWsnHt/LquyGCv4j69IrDDspJN5A14GbxBNo4hkU2",
+    "role": "hospital",
+    "dob": null,
+    "mobile": "",
+    "aadhaar": "",
+    "notificationPreference": "Email",
+    "status": "Pending",
+    "qty": 1,
+    "credit": 1,
+    "amount": 500,
+    "hospitalId": "6909952c1f8cd77da9a6b499",
+    "createdAt": "2025-11-04T05:54:52.643Z",
+    "updatedAt": "2026-02-19T07:30:11.808Z",
+    "__v": 0,
+    "currentSessionId": "c564276475baeb0a042c0fbf314d2c90"
+  }
+]

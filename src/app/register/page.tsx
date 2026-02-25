@@ -101,6 +101,8 @@ const validationSchema = yup.lazy(values => {
             fullName: yup.string().required('Hospital Name is required'),
             email: yup.string().email('Invalid email format').required('Email is required')
                 .test('unique-email', 'Email already registered', value => checkUniqueness('email', value)),
+            mobile: yup.string().matches(/^[0-9]{10}$/, 'Must be 10 digits').required('Contact number is required')
+                .test('unique-mobile', 'Contact number already registered', value => checkUniqueness('mobile', value)),
             password: yup.string().min(8, 'Password must be at least 8 characters').required('Password is required'),
             confirmPassword: yup.string().oneOf([yup.ref('password')], 'Passwords must match').required('Please confirm your password'),
             role: yup.string().oneOf(Object.keys(roles)).required('Please select a role'),
@@ -215,7 +217,7 @@ const RegistrationForm = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    const { register, handleSubmit, watch, formState: { errors }, setValue, trigger } = useForm<any>({
+    const { register, handleSubmit, watch, formState: { errors, isValid }, setValue, trigger } = useForm<any>({
         resolver: yupResolver(validationSchema),
         mode: 'onChange',
         defaultValues: { role: 'donor', notificationPreference: 'Email' }
@@ -590,6 +592,7 @@ const RegistrationForm = () => {
                         ) : role === 'hospital' ? (
                             <>
                                 <InputField name="fullName" type="text" placeholder="Hospital Name" icon={UserIcon} errors={errors} register={register} role={role} roles={roles} />
+                                <InputField name="mobile" type="text" placeholder="Contact Number (10 digits)" icon={DevicePhoneMobileIcon} errors={errors} register={register} role={role} roles={roles} />
                                 <InputField name="email" type="email" placeholder="Email Address" icon={EnvelopeIcon} errors={errors} register={register} role={role} roles={roles} />
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -632,10 +635,10 @@ const RegistrationForm = () => {
 
                                 <motion.button
                                     type="submit"
-                                    disabled={isSubmitting || Object.keys(errors).length > 0}
-                                    className={`w-full py-3 mt-4 font-bold text-white rounded-lg shadow-lg transition-all duration-300 ${isSubmitting || Object.keys(errors).length > 0 ? 'bg-gray-600 opacity-50 cursor-not-allowed' : `bg-gradient-to-r ${roles[selectedRole].gradient}`}`}
-                                    whileHover={isSubmitting || Object.keys(errors).length > 0 ? {} : { scale: 1.05, y: -2, boxShadow: `0 10px 20px ${roles[selectedRole].color}40` }}
-                                    whileTap={isSubmitting || Object.keys(errors).length > 0 ? {} : { scale: 0.98 }}
+                                    disabled={isSubmitting || !isValid}
+                                    className={`w-full py-3 mt-4 font-bold text-white rounded-lg shadow-lg transition-all duration-300 ${isSubmitting || !isValid ? 'bg-gray-600 opacity-50 cursor-not-allowed' : `bg-gradient-to-r ${roles[selectedRole].gradient}`}`}
+                                    whileHover={isSubmitting || !isValid ? {} : { scale: 1.05, y: -2, boxShadow: `0 10px 20px ${roles[selectedRole].color}40` }}
+                                    whileTap={isSubmitting || !isValid ? {} : { scale: 0.98 }}
                                 >
                                     {isSubmitting ? 'Registering...' : 'Register Hospital'}
                                 </motion.button>

@@ -1,0 +1,4 @@
+﻿src/app/hospital/settings/page.tsx(316,29): error TS2322: Type '(e: React.ChangeEvent<HTMLInputElement>) => void' is not assignable to type 'ChangeEventHandler<HTMLTextAreaElement, HTMLTextAreaElement>'.
+  Types of parameters 'e' and 'event' are incompatible.
+    Type 'ChangeEvent<HTMLTextAreaElement, HTMLTextAreaElement>' is not assignable to type 'ChangeEvent<HTMLInputElement, Element>'.
+      Type 'HTMLTextAreaElement' is missing the following properties from type 'HTMLInputElement': accept, align, alt, capture, and 29 more.

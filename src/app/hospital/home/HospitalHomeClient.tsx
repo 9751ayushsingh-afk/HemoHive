@@ -67,6 +67,8 @@ const cardData = [
   },
 ];
 
+import DemandForecastChart from '@/components/hospital/DemandForecastChart';
+
 const HospitalHomeClient = ({ user, inventory }: { user: any, inventory: any[] }) => {
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -94,14 +96,7 @@ const HospitalHomeClient = ({ user, inventory }: { user: any, inventory: any[] }
           <div className="space-y-6">
             <PendingReturnsBoard hospitalId={user?.id || user?._id} />
             {/* Dynamic Import or component for Wastage Meter. Assuming direct import for now */}
-            <div className="bg-gray-800/40 backdrop-blur-md rounded-2xl p-6 border border-gray-700/50">
-              <h3 className="text-white font-bold mb-4 font-outfit tracking-tight">Wastage Efficiency</h3>
-              {/* Visual placeholder since WastageMeter is a client component we can just use here */}
-              {/* Note: We need to import WastageMeter at the top */}
-              <div className="text-center text-gray-400 text-sm">
-                View detailed metrics in Exchange Tab
-              </div>
-            </div>
+            <DemandForecastChart />
           </div>
         </div>
       </div>
