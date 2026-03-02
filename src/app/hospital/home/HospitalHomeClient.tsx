@@ -66,10 +66,9 @@ const cardData = [
     description: "Configure your hospital's profile, notification preferences, and security settings."
   },
 ];
+import WastageMeter from '@/components/hospital/WastageMeter';
 
-import DemandForecastChart from '@/components/hospital/DemandForecastChart';
-
-const HospitalHomeClient = ({ user, inventory }: { user: any, inventory: any[] }) => {
+const HospitalHomeClient = ({ user, inventory, metrics }: { user: any, inventory: any[], metrics?: any }) => {
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -95,8 +94,8 @@ const HospitalHomeClient = ({ user, inventory }: { user: any, inventory: any[] }
           <LiveBloodRequests inventory={inventory} />
           <div className="space-y-6">
             <PendingReturnsBoard hospitalId={user?.id || user?._id} />
-            {/* Dynamic Import or component for Wastage Meter. Assuming direct import for now */}
-            <DemandForecastChart />
+            {/* Live Animated Wastage Meter replaces the AI Demand chart */}
+            <WastageMeter metrics={metrics} />
           </div>
         </div>
       </div>

@@ -84,7 +84,12 @@ const InventoryPage = () => {
     const expiringInGroup = bagsForModal.filter((bag: IBloodBag) => {
       if (bag.bloodGroup !== group.bloodGroup || !bag.expiryDate) return false;
       const expiry = new Date(bag.expiryDate);
-      return expiry <= sevenDaysFromNow && expiry > new Date();
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const limit = new Date(today);
+      limit.setDate(limit.getDate() + 7);
+      limit.setHours(23, 59, 59, 999);
+      return expiry <= limit && expiry >= today;
     }).length;
     return { ...group, expiringSoon: expiringInGroup };
   });
@@ -101,7 +106,13 @@ const InventoryPage = () => {
   const lowStockCount = bloodGroups.filter(g => g.units < 5).length;
   const expiringCount = data?.bags?.filter((bag: IBloodBag) => {
     if (!bag.expiryDate) return false;
-    return new Date(bag.expiryDate) <= sevenDaysFromNow && new Date(bag.expiryDate) > new Date();
+    const expiry = new Date(bag.expiryDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const limit = new Date(today);
+    limit.setDate(limit.getDate() + 7);
+    limit.setHours(23, 59, 59, 999);
+    return expiry <= limit && expiry >= today;
   }).length || 0;
 
   return (

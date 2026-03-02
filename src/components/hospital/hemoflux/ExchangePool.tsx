@@ -26,6 +26,15 @@ const ExchangePool = () => {
     const [loading, setLoading] = useState(true);
     const [claiming, setClaiming] = useState<string | null>(null);
     const [requestingUserId, setRequestingUserId] = useState<string | null>(null);
+    const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' | 'info' } | null>(null);
+
+    // Auto-dismiss messages
+    useEffect(() => {
+        if (message) {
+            const timer = setTimeout(() => setMessage(null), 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [message]);
 
     useEffect(() => {
         fetchPool();
@@ -50,8 +59,9 @@ const ExchangePool = () => {
     };
 
     const handleClaim = async (bagId: string) => {
-        if (!confirm('Confirm One-Time Transfer? This unit will be locked after this transaction.')) return;
-
+        // Replaced native confirm with a smoother flow or implicit acknowledgement.
+        // For God-Level UI, we'll proceed directly as the button already implies action.
+        setMessage({ text: 'Processing transfer...', type: 'info' });
         setClaiming(bagId);
         try {
             const res = await fetch('/api/hemoflux/exchange', {
@@ -63,35 +73,71 @@ const ExchangePool = () => {
             const data = await res.json();
 
             if (res.ok) {
-                alert('Transfer Successful!');
+                setMessage({ text: 'Transfer Successful! Unit is now in transit.', type: 'success' });
                 fetchPool(); // Refresh list
             } else {
-                alert('Error: ' + data.message);
+                setMessage({ text: `Error: ${data.message || 'Transfer failed'}`, type: 'error' });
             }
         } catch (err) {
-            alert('Network Error');
+            setMessage({ text: 'Network Error! Please try again.', type: 'error' });
         } finally {
             setClaiming(null);
         }
     };
 
-    if (loading) return <div className="p-10 text-center text-neutral-500">Loading Exchange Pool...</div>;
+    if (loading) return (
+        <div className="flex justify-center items-center h-64 bg-black/40 backdrop-blur-md rounded-2xl border border-white/10">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
+        </div>
+    );
 
     return (
         <div className="w-full">
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-neutral-900">HemoFlux Exchange Pool</h2>
-                <div className="text-right">
-                    <span className="text-sm text-neutral-500 block">Live • {units.length} Units Avbl</span>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 relative z-20">
+                <div>
+                    <h2 className="text-2xl font-black text-white px-2 font-headline">
+                        <span className="text-red-500">🛒</span> Market Pool
+                    </h2>
+                    <p className="text-sm text-white/50 px-2 mt-1">Available units from the network.</p>
+                </div>
+                <div className="bg-red-500/10 border border-red-500/20 px-4 py-2 rounded-xl backdrop-blur-md">
+                    <span className="text-red-400 font-bold font-mono">Live Database </span>
+                    <span className="text-white/80 pl-2 border-l border-red-500/30 ml-2">{units.length} Units Avbl</span>
                 </div>
             </div>
 
+            {/* Premium Message Toast Layer */}
+            <AnimatePresence>
+                {message && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                        className="fixed top-24 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4 pointer-events-none"
+                    >
+                        <div className={`p-4 rounded-2xl backdrop-blur-xl border flex items-start gap-4 shadow-2xl ${message.type === 'success' ? 'bg-green-950/80 border-green-500/50 text-green-200' : message.type === 'error' ? 'bg-red-950/80 border-red-500/50 text-red-200' : 'bg-black/80 border-white/20 text-white'}`}>
+                            <div className={`mt-1 flex-shrink-0 ${message.type === 'success' ? 'text-green-400' : message.type === 'error' ? 'text-red-400' : 'text-blue-400'}`}>
+                                {message.type === 'success' ? '✅' : message.type === 'error' ? '⚠️' : 'ℹ️'}
+                            </div>
+                            <div className="flex-1">
+                                <h4 className={`font-black uppercase tracking-wider text-xs mb-1 ${message.type === 'success' ? 'text-green-400' : message.type === 'error' ? 'text-red-400' : 'text-blue-400'}`}>
+                                    {message.type === 'success' ? 'Transfer Complete' : message.type === 'error' ? 'Action Failed' : 'Processing'}
+                                </h4>
+                                <p className="text-sm font-medium">{message.text}</p>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             {units.length === 0 ? (
-                <div className="p-10 text-center bg-neutral-50 rounded-xl border border-dashed border-neutral-300">
-                    <p className="text-neutral-500">No units currently listed for exchange.</p>
+                <div className="p-16 text-center bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-b from-red-500/5 to-transparent pointer-events-none" />
+                    <h3 className="text-xl font-bold text-white mb-2 font-headline">No Units Available</h3>
+                    <p className="text-white/50">There are currently no units listed for exchange.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <AnimatePresence>
                         {units.map((unit) => {
                             const daysLeft = calculateExpiryDays(unit.expiryDate);
@@ -101,46 +147,79 @@ const ExchangePool = () => {
                                 <motion.div
                                     key={unit._id}
                                     layout
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.9 }}
-                                    className="bg-white rounded-xl border border-neutral-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                                    className="bg-black/60 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden relative group hover:bg-black/80 transition-all duration-500"
                                 >
-                                    <div className="p-4">
-                                        <div className="flex justify-between items-start mb-3">
-                                            <span className="text-2xl font-black text-red-600 bg-red-50 px-2 py-1 rounded">
-                                                {unit.bloodGroup}
-                                            </span>
-                                            <span className={`text-xs font-bold px-2 py-1 rounded-full ${isUrgent ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                                    {/* Animated Background Glow indicating urgency */}
+                                    <div className={`absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-20 blur-xl transition duration-1000 group-hover:duration-200 pointer-events-none ${isUrgent ? 'bg-gradient-to-r from-red-600 to-red-900' : 'bg-gradient-to-r from-green-600 to-emerald-900'}`} />
+
+                                    <div className="p-6 relative z-10 font-sans">
+                                        <div className="flex justify-between items-start mb-5">
+                                            <div className="relative">
+                                                <div className="absolute inset-0 bg-red-500 blur-lg flex opacity-30 group-hover:opacity-50 transition-opacity" />
+                                                <span className="relative text-2xl font-black text-white bg-gradient-to-br from-red-500 to-red-800 px-3 py-1.5 rounded-xl shadow-lg border border-red-500/30">
+                                                    {unit.bloodGroup}
+                                                </span>
+                                            </div>
+                                            <span className={`text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-inner ${isUrgent ? 'bg-red-500/20 text-red-400 border border-red-500/30 animate-pulse' : 'bg-green-500/20 text-green-400 border border-green-500/30'}`}>
                                                 {daysLeft} Days Left
                                             </span>
                                         </div>
 
-                                        <div className="space-y-1 text-sm text-neutral-600 mb-4">
-                                            <p><strong>Vol:</strong> {unit.quantity}ml</p>
-                                            <p><strong>From:</strong> {(unit.currentOwnerId?.hospitalId?.name || unit.currentOwnerId?.fullName || 'Unknown').substring(0, 25)}...</p>
-                                            <p className="text-xs text-neutral-400 truncate">{unit.currentOwnerId?.address}</p>
+                                        <div className="space-y-2 text-sm text-white/70 mb-6">
+                                            <div className="flex items-center justify-between border-b border-white/5 pb-2">
+                                                <span className="text-white/40 font-bold uppercase tracking-wider text-[10px]">Volume</span>
+                                                <span className="font-mono text-white font-bold">{unit.quantity}ml</span>
+                                            </div>
+                                            <div className="flex flex-col pt-2">
+                                                <span className="text-white/40 font-bold uppercase tracking-wider text-[10px] mb-1">Origin Facility</span>
+                                                <span className="font-headline text-white truncate text-base">{(unit.currentOwnerId?.hospitalId?.name || unit.currentOwnerId?.fullName || 'Unknown')}</span>
+                                                <span className="text-xs text-white/40 truncate mt-0.5">{unit.currentOwnerId?.address}</span>
+                                            </div>
                                         </div>
 
                                         {(unit.currentOwnerId?._id === requestingUserId) ? (
-                                            <div className="w-full py-2 rounded-lg font-bold text-sm bg-gray-100 text-gray-500 text-center border border-gray-200">
+                                            <div className="w-full py-3 rounded-xl font-bold tracking-widest text-[10px] uppercase bg-white/5 text-white/40 text-center border border-white/10">
                                                 Listed by You
                                             </div>
                                         ) : (
                                             <button
                                                 onClick={() => handleClaim(unit.bagId)}
                                                 disabled={claiming === unit.bagId}
-                                                className="w-full py-2 rounded-lg font-semibold text-sm transition-colors text-white bg-black hover:bg-neutral-800 disabled:bg-neutral-300"
+                                                className="relative w-full overflow-hidden rounded-xl py-3 font-black text-sm uppercase tracking-widest transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_0_25px_rgba(239,68,68,0.5)] border border-white/20 hover:border-red-500 disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none group/btn bg-white text-black"
                                             >
-                                                {claiming === unit.bagId ? 'Processing...' : 'Claim Unit (One-Hop)'}
+                                                {/* Invisible placeholder to firmly establish button height */}
+                                                <span className="invisible block">Claim Unit (One-Hop)</span>
+
+                                                {/* Default Text Container (Slides UP and fades out on hover) */}
+                                                <span className="absolute inset-0 flex items-center justify-center gap-2 transform transition-all duration-500 ease-in-out group-hover/btn:-translate-y-[150%] group-hover/btn:opacity-0 group-hover/btn:scale-95 text-black">
+                                                    {claiming === unit.bagId ? (
+                                                        <span className="w-4 h-4 border-2 border-black border-t-transparent animate-spin rounded-full" />
+                                                    ) : (
+                                                        <>Claim Unit (One-Hop)</>
+                                                    )}
+                                                </span>
+
+                                                {/* Premium Animated Fill Background (Slides UP from bottom) */}
+                                                <div className="absolute inset-0 bg-gradient-to-tr from-red-600 via-red-500 to-red-900 translate-y-[101%] group-hover/btn:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] z-0 rounded-xl" />
+
+                                                {/* Diagonal light sweep transition (Runs once across the button on hover) */}
+                                                <div className="absolute top-0 -left-[100%] w-[60%] h-[200%] bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-[-30deg] group-hover/btn:left-[200%] transition-all duration-[1.2s] ease-in-out z-0 delay-100" />
+
+                                                {/* Hover Text Container (Slides UP from bottom into center) */}
+                                                <span className="absolute inset-0 flex items-center justify-center text-white font-black tracking-widest opacity-0 transform translate-y-[150%] scale-95 group-hover/btn:translate-y-0 group-hover/btn:scale-100 group-hover/btn:opacity-100 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] z-10 pointer-events-none drop-shadow-md">
+                                                    <span className="mr-2 text-white/50 group-hover/btn:animate-pulse">⚡</span> INITIATE TRANSFER
+                                                </span>
                                             </button>
                                         )}
                                     </div>
 
                                     {/* Footer Stats */}
-                                    <div className="bg-neutral-50 px-4 py-2 border-t border-neutral-100 flex justify-between text-[10px] text-neutral-500 uppercase tracking-wider font-medium">
-                                        <span>ID: {unit.bagId.slice(-6)}</span>
-                                        <span>Fee: ₹450(abhi aise hi hai )</span>
+                                    <div className="bg-black/50 px-5 py-3 border-t border-white/5 flex justify-between items-center text-[10px] text-white/30 uppercase tracking-widest font-black relative z-10">
+                                        <span className="font-mono bg-white/5 px-2 py-1 rounded">ID: {unit.bagId.slice(-6)}</span>
+                                        <span className="flex items-center gap-1">Fee: <span className="text-white/70">₹450</span></span>
                                     </div>
                                 </motion.div>
                             );
@@ -149,13 +228,6 @@ const ExchangePool = () => {
                 </div>
             )}
 
-            {/* DEBUGGING: REMOVE BEFORE PRODUCTION */}
-            <div className="mt-8 p-4 bg-gray-900 text-green-400 font-mono text-xs overflow-auto h-48 rounded-xl border border-gray-700">
-                <p className="font-bold text-white mb-2">DEBUG DATA DUMP ({units.length} items):</p>
-                <pre>{JSON.stringify(units, null, 2)}</pre>
-                <p className="mt-4 font-bold text-white">MY USER ID:</p>
-                <pre>{JSON.stringify(requestingUserId, null, 2)}</pre>
-            </div>
         </div>
     );
 };

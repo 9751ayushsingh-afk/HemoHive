@@ -59,20 +59,48 @@ export async function PUT(request: NextRequest, { params }: { params: { requestI
         hospital: bloodRequest.hospitalId
       });
 
-      if (!inventoryItem) {
+      if (!inventoryItem || inventoryItem.quantity < bloodRequest.units) {
         return new NextResponse(
-          JSON.stringify({ message: 'Inventory item not found for this blood group and hospital.' }),
-          { status: 404, headers: { 'Content-Type': 'application/json' } }
-        );
-      }
-
-      if (inventoryItem.quantity < bloodRequest.units) {
-        return new NextResponse(
-          JSON.stringify({ message: 'Insufficient blood units in inventory.' }),
+          JSON.stringify({ message: 'Insufficient aggregate blood units in inventory.' }),
           { status: 400, headers: { 'Content-Type': 'application/json' } }
         );
       }
 
+      // IMPORT THE BLOOD BAG MODEL DYNAMICALLY IF NOT AT TOP OF FILE
+      const BloodBag = (await import('../../../../../models/BloodBag')).default;
+
+      // FIFO (First-In, First-Out): Find the oldest available physical bags
+      const availableBags = await BloodBag.find({
+        currentOwnerId: bloodRequest.hospitalId,
+        bloodGroup: bloodRequest.bloodGroup,
+        status: 'AVAILABLE'
+      })
+        .sort({ expiryDate: 1 }) // Get closest to expiry first
+        .limit(bloodRequest.units);
+
+      // Strict Validation: Physical bags must match the requested unit count
+      if (availableBags.length < bloodRequest.units) {
+        return new NextResponse(
+          JSON.stringify({
+            message: 'CRITICAL INVENTORY MISMATCH: Not enough physical, available blood bags (Status: AVAILABLE) were found to fulfill this order, despite aggregate counts. Please check for reserved or expired ghost-inventory.'
+          }),
+          { status: 400, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // MARK EACH BAG AS DISPENSED AND DELIST FROM HEMOFLUX
+      const bagIds = availableBags.map((b: any) => b._id);
+      await BloodBag.updateMany(
+        { _id: { $in: bagIds } },
+        {
+          $set: {
+            status: 'DISPENSED',
+            exchangeStatus: 'NONE' // Crucial: Pulls it off the HemoFlux Market if it was LISTED
+          }
+        }
+      );
+
+      // Decrement the aggregate inventory count
       inventoryItem.quantity -= bloodRequest.units;
       await inventoryItem.save();
     }

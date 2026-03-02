@@ -1,4 +1,5 @@
 import BloodBag, { IBloodBag } from '../models/BloodBag';
+import Inventory from '../models/Inventory';
 import User from '../models/User';
 import mongoose from 'mongoose';
 import dbConnect from './dbConnect';
@@ -77,51 +78,88 @@ const HemoFlux = {
      * This logic MUST be atomic.
      */
     executeTransfer: async (bagId: string, requestingHospitalId: string) => {
-        // Note: Transaction support requires MongoDB Replica Set. 
-        // If running standalone, transactions might fail. We use a session pattern here.
+        // Removed transaction logic to support standalone MongoDB instances (local dev).
         await dbConnect();
-        const session = await mongoose.startSession();
-        session.startTransaction();
 
         try {
-            const bag = await BloodBag.findOne({ bagId }).session(session);
+            const bag = await BloodBag.findOne({ bagId });
 
             if (!bag) throw new HemoFluxError('Bag not found');
 
-            // Re-Check Eligibility inside transaction (Race condition protection)
+            // Re-Check Eligibility (Race condition protection is weaker without a session, but needed for standalone instances)
             if (bag.exchangeStatus !== 'LISTED') throw new HemoFluxError('Bag is not listed for exchange');
             if (bag.transferCount >= 1) throw new HemoFluxError('Security Lock: Transfer limit exceeded');
-            if (new Date(bag.expiryDate) < new Date()) throw new HemoFluxError('Security Lock: Unit expired during transaction');
+            if (new Date(bag.expiryDate) < new Date()) throw new HemoFluxError('Security Lock: Unit expired');
 
             // Update Ownership logic
             const previousOwner = bag.currentOwnerId;
 
             bag.currentOwnerId = requestingHospitalId;
-            bag.status = 'TRANSFERRED'; // It is now in 'Transferred' state until received/verified? Or effectively transferred.
-            // Let's assume 'TRANSFERRED' implies it's leaving origin. 
-            // Ideally, we'd have a 'IN_TRANSIT' state, but for this simplified engine, we move ownership immediately.
+            // The bag is physically moving, so it is IN_TRANSIT
+            bag.status = 'IN_TRANSIT';
 
-            bag.exchangeStatus = 'TRANSFERRED';
-            bag.transferCount += 1; // INCREMENT LOCK
+            bag.exchangeStatus = 'IN_TRANSIT';
+            // Increment Lock
+            bag.transferCount += 1;
 
-            // Save
-            await bag.save({ session });
+            // Save the bag
+            await bag.save();
 
-            // Note: We are NOT modifying the 'Inventory' aggregate collection here.
-            // The frontend should derive 'Available Stock' from counting BloodBag documents, 
-            // OR we need to sync the aggregates. 
-            // For HemoFlux to verify granular precision, we stick to BloodBag as source of truth.
-
-            await session.commitTransaction();
-            session.endSession();
+            // DECREMENT Previous Owner's Inventory Summary
+            await Inventory.findOneAndUpdate(
+                { hospital: previousOwner, bloodGroup: bag.bloodGroup },
+                { $inc: { quantity: -1 }, $set: { lastUpdated: new Date() } }
+            );
 
             return { success: true, bagId: bag.bagId, newOwner: requestingHospitalId };
 
         } catch (error) {
-            await session.abortTransaction();
-            session.endSession();
             throw error;
         }
+    },
+
+    /**
+     * Finalize the transfer when the receiving hospital physically gets the bag.
+     * Checks cold chain integrity.
+     */
+    confirmReceipt: async (bagId: string, receivingHospitalId: string, coldChainIntact: boolean) => {
+        await dbConnect();
+        const bag = await BloodBag.findOne({ bagId });
+
+        if (!bag) throw new HemoFluxError('Bag not found');
+
+        // Ensure the person confirming is the person who claimed it
+        if (bag.currentOwnerId.toString() !== receivingHospitalId) {
+            throw new HemoFluxError('Unauthorized: You are not the claimer of this unit');
+        }
+
+        if (bag.exchangeStatus !== 'IN_TRANSIT') {
+            throw new HemoFluxError('Bag is not currently in transit');
+        }
+
+        bag.exchangeStatus = 'TRANSFERRED';
+        bag.coldChainIntegrity = coldChainIntact;
+
+        if (coldChainIntact) {
+            bag.status = 'AVAILABLE';
+
+            // INCREMENT Receiver's Inventory Summary
+            await Inventory.findOneAndUpdate(
+                { hospital: receivingHospitalId, bloodGroup: bag.bloodGroup },
+                { $inc: { quantity: 1 }, $set: { lastUpdated: new Date() } },
+                { upsert: true }
+            );
+        } else {
+            // UNIT IS MEDICALLY UNFIT - Return liability to Origin Hospital
+            bag.status = 'DISCARDED';
+            bag.currentOwnerId = bag.originHospitalId; // Sender takes the hit
+            bag.notes = (bag.notes ? bag.notes + ' | ' : '') + 'CRITICAL: Cold chain integrity breach during transit. Unit rejected and returned to sender liability as DISCARDED.';
+
+            // Note: We do NOT increment the receiver's Inventory because it should never be used.
+        }
+
+        await bag.save();
+        return bag;
     },
 
     /**
@@ -134,19 +172,37 @@ const HemoFlux = {
             $or: [{ currentOwnerId: hospitalId }, { originHospitalId: hospitalId }]
         });
 
-        if (totalUnits === 0) return { score: 100, wastageRate: 0, savedCount: 0 };
+        if (totalUnits === 0) return { score: 100, wastagePercentage: '0.0', savedviaExchange: 0, grade: 'Green' };
 
         const expiredUnits = await BloodBag.countDocuments({
             currentOwnerId: hospitalId,
-            status: 'EXPIRED'
+            status: { $in: ['EXPIRED', 'DISCARDED'] }
         });
 
         const exchangedUnits = await BloodBag.countDocuments({
             originHospitalId: hospitalId,
-            status: 'TRANSFERRED', // Successfully moved to someone else
+            status: 'AVAILABLE', // Only count units that are still active/available at the destination
+            currentOwnerId: { $ne: hospitalId }
+        }) + await BloodBag.countDocuments({
+            originHospitalId: hospitalId,
+            status: 'TRANSFERRED', // Successfully used/transferred units
+            currentOwnerId: { $ne: hospitalId }
         });
 
-        const wastageRate = (expiredUnits / totalUnits) * 100;
+        const rejectionUnits = await BloodBag.countDocuments({
+            originHospitalId: hospitalId,
+            status: 'DISCARDED',
+            coldChainIntegrity: false
+        });
+
+        // Standard Wastage (Expired / Discarded without transit failure)
+        let wastageRate = (expiredUnits / totalUnits) * 100;
+
+        // Strict Medical Penalty: 
+        // We add a flat +2.5% penalty to the wastage rate for every unit rejected due to cold chain failure, 
+        // to ensure the impact is immediately visible even for hospitals with thousands of units in inventory.
+        wastageRate += (rejectionUnits * 2.5);
+
         const score = Math.max(0, 100 - wastageRate);
 
         // Grade
@@ -158,6 +214,7 @@ const HemoFlux = {
             score: Math.round(score),
             wastagePercentage: wastageRate.toFixed(1),
             savedviaExchange: exchangedUnits,
+            rejections: rejectionUnits,
             grade
         };
     }

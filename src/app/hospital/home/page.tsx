@@ -5,6 +5,7 @@ import { authOptions } from '../../../lib/auth';
 import dbConnect from '../../../lib/dbConnect';
 import Inventory from '../../../models/Inventory';
 import HospitalHomeClient from './HospitalHomeClient';
+import HemoFlux from '../../../lib/hemofluxEngine';
 
 const HospitalHomePage = async () => {
   const session = await getServerSession(authOptions);
@@ -35,7 +36,16 @@ const HospitalHomePage = async () => {
     }
   }
 
-  return <HospitalHomeClient user={user as any} inventory={inventoryData} />;
+  let metrics = null;
+  if (hospitalId) {
+    try {
+      metrics = await HemoFlux.calculateMetrics(hospitalId);
+    } catch (e) {
+      console.error("Failed to fetch metrics", e);
+    }
+  }
+
+  return <HospitalHomeClient user={user as any} inventory={inventoryData} metrics={metrics} />;
 };
 
 export default HospitalHomePage;

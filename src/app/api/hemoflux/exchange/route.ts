@@ -27,31 +27,24 @@ export async function GET(request: Request) {
         let query: any = {};
 
         if (type === 'mine') {
-            // Fetch *MY* listings (Active or Sold)
-            query = {
-                currentOwnerId: requestingHospitalId,
-                exchangeStatus: { $ne: 'NONE' } // Must have been listed at some point. 
-                // Issue: If sold, currentOwnerId might change? 
-                // HemoFlux Engine: bag.currentOwnerId = requestingHospitalId (New Owner).
-                // So if I sold it, I am NO LONGER the owner.
-                // WE NEED TO CHECK originHospitalId OR key off 'exchangeStatus' history?
-                // For simplicity in this V1: 
-                // - Active Listings: owner = ME, status = LISTED
-                // - Sold Listings: origin = ME, status = TRANSFERRED
-            };
-
-            // Actually, robust way:
+            // Fetch *MY* listings (Active or Sold/In-Transit)
             query = {
                 $or: [
                     { currentOwnerId: requestingHospitalId, exchangeStatus: 'LISTED' }, // My Active Listings
-                    { originHospitalId: requestingHospitalId, exchangeStatus: 'TRANSFERRED' } // Things I sold
+                    { originHospitalId: requestingHospitalId, exchangeStatus: { $in: ['TRANSFERRED', 'IN_TRANSIT'] } } // Things I sold
                 ]
+            };
+        } else if (type === 'inbound') {
+            // Fetch units currently physically in transit TO ME
+            query = {
+                currentOwnerId: requestingHospitalId,
+                exchangeStatus: 'IN_TRANSIT'
             };
         } else {
             // Market Pool (Buy View)
             query = {
                 exchangeStatus: 'LISTED',
-                // currentOwnerId: { $ne: requestingHospitalId }, // REMOVED: Allow seeing own listings
+                currentOwnerId: { $ne: requestingHospitalId }, // Exclude own listings
                 expiryDate: { $gt: new Date() },
                 transferCount: 0
             };
@@ -62,6 +55,15 @@ export async function GET(request: Request) {
         const pool = await BloodBag.find(query)
             .populate({
                 path: 'currentOwnerId',
+                select: 'fullName address location hospitalId',
+                populate: {
+                    path: 'hospitalId',
+                    model: Hospital,
+                    select: 'name location gps'
+                }
+            })
+            .populate({
+                path: 'originHospitalId',
                 select: 'fullName address location hospitalId',
                 populate: {
                     path: 'hospitalId',
@@ -110,13 +112,22 @@ export async function POST(request: Request) {
             // Claim/Transfer a unit
             const result = await HemoFlux.executeTransfer(bagId, hospitalId);
             return NextResponse.json({
-                message: 'Transfer executed successfully. One-Hop Lock engaged.',
+                message: 'Unit claimed and is now IN TRANSIT. One-Hop Lock engaged.',
                 details: result
             });
         }
 
+        else if (action === 'CONFIRM_RECEIPT') {
+            const { coldChainIntact } = body;
+            const updatedBag = await HemoFlux.confirmReceipt(bagId, hospitalId, coldChainIntact);
+            return NextResponse.json({
+                message: 'Receipt confirmed successfully. Unit added to inventory.',
+                bag: updatedBag
+            });
+        }
+
         else {
-            return NextResponse.json({ message: 'Invalid action. Use LIST or CLAIM' }, { status: 400 });
+            return NextResponse.json({ message: 'Invalid action.' }, { status: 400 });
         }
 
     } catch (error: any) {

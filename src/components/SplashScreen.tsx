@@ -21,8 +21,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onAnimationComplete }) => {
     // Safety check
     if (!beeRef.current || !logoRef.current || !taglineRef.current || !gradientRef.current) return;
 
-    const flySound = new Audio("/assets/sounds/bee_fly.mp3");
-    const landSound = new Audio("/assets/sounds/bee_land.mp3");
+
 
     // 🐝 Set initial bee position at center
     gsap.set(beeRef.current, {
@@ -45,16 +44,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onAnimationComplete }) => {
 
     // ✨ Timeline
     const tl = gsap.timeline({
-      onStart: () => {
-        flySound.volume = 0.3;
-        flySound.play().catch(() => { }); // catch play error if user hasn't interacted
-      },
       onComplete: () => {
-        // Stop flying sound, play landing sound
-        gsap.to(flySound, { volume: 0, duration: 0.6 });
-        landSound.volume = 0.4;
-        landSound.play().catch(() => { });
-
         // Reveal logo
         if (logoRef.current) {
           gsap.to(logoRef.current, {
@@ -111,11 +101,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onAnimationComplete }) => {
         ease: "power1.inOut",
       });
 
-    // Cleanup sounds on unmount
-    return () => {
-      flySound.pause();
-      landSound.pause();
-    };
+
   }, [onAnimationComplete]);
 
   return (

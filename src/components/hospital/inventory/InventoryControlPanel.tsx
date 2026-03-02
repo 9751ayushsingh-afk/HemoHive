@@ -1,5 +1,6 @@
 'use client';
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Droplets } from 'lucide-react';
@@ -32,6 +33,11 @@ const InventoryControlPanel = ({ onFilterChange }: { onFilterChange: (filter: st
   const [expiryDate, setExpiryDate] = useState('');
   const [isScannerOpen, setScannerOpen] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
 
   const mutation = useMutation({
@@ -43,7 +49,11 @@ const InventoryControlPanel = ({ onFilterChange }: { onFilterChange: (filter: st
       setBloodGroup('');
       setQuantity('450');
       setExpiryDate('');
+      setValidationError(null);
     },
+    onError: (error: any) => {
+      setValidationError(error.message || 'Failed to validate blood unit.');
+    }
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -168,8 +178,8 @@ const InventoryControlPanel = ({ onFilterChange }: { onFilterChange: (filter: st
               <button
                 type="submit"
                 className={`w-full font-black py-4 px-4 rounded-2xl shadow-xl transition-all duration-500 active:scale-95 text-xs uppercase tracking-widest ${!bagId || !bloodGroup || !quantity || !expiryDate || mutation.isPending
-                    ? 'bg-white/5 text-gray-600 cursor-not-allowed border border-white/5'
-                    : 'bg-white text-black hover:bg-red-500 hover:text-white shadow-red-500/20'
+                  ? 'bg-white/5 text-gray-600 cursor-not-allowed border border-white/5'
+                  : 'bg-white text-black hover:bg-red-500 hover:text-white shadow-red-500/20'
                   }`}
                 disabled={!bagId || !bloodGroup || !quantity || !expiryDate || mutation.isPending}
               >
@@ -177,18 +187,6 @@ const InventoryControlPanel = ({ onFilterChange }: { onFilterChange: (filter: st
               </button>
             </div>
 
-            <AnimatePresence>
-              {validationError && (
-                <motion.p
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="text-red-500 text-[10px] font-bold uppercase text-center"
-                >
-                  {validationError}
-                </motion.p>
-              )}
-            </AnimatePresence>
           </form>
         </div>
 
@@ -233,6 +231,72 @@ const InventoryControlPanel = ({ onFilterChange }: { onFilterChange: (filter: st
           />
         )}
       </AnimatePresence>
+
+      {mounted && createPortal(
+        <AnimatePresence>
+          {validationError && (
+            <div className="fixed inset-0 z-[99999] flex items-center justify-center px-4">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-black/80 backdrop-blur-md"
+                onClick={() => setValidationError(null)}
+              />
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8, rotateX: 20 }}
+                animate={{ opacity: 1, scale: 1, rotateX: 0 }}
+                exit={{ opacity: 0, scale: 0.8, rotateX: -20 }}
+                transition={{ type: "spring", damping: 20, stiffness: 200 }}
+                className="relative w-full max-w-lg bg-red-950/80 border border-red-500/40 rounded-[2.5rem] p-10 overflow-hidden shadow-[0_0_100px_rgba(239,68,68,0.3)] perspective-1000"
+              >
+                {/* Background Glows */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/30 blur-[80px] -mt-20 -mr-20 pointer-events-none" />
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-orange-600/20 blur-[80px] -mb-20 -ml-20 pointer-events-none" />
+
+                {/* Scanline overlay */}
+                <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.2)_50%)] bg-[length:100%_4px] pointer-events-none opacity-20" />
+
+                <div className="relative z-10 flex flex-col items-center text-center">
+                  {/* Hazard Icon */}
+                  <div className="relative mb-6">
+                    <div className="absolute inset-0 bg-red-500 animate-ping rounded-full opacity-20" />
+                    <div className="relative w-20 h-20 bg-red-500/10 border-2 border-red-500 rounded-full flex items-center justify-center backdrop-blur-md">
+                      <span className="text-red-500 text-4xl font-black font-outfit drop-shadow-[0_0_15px_rgba(239,68,68,0.8)]">!</span>
+                    </div>
+                  </div>
+
+                  {/* Headers */}
+                  <div className="inline-block px-4 py-1.5 bg-red-500/10 border border-red-500/30 rounded-full mb-4">
+                    <span className="text-red-400 font-mono text-[10px] uppercase tracking-[0.3em] font-black">Command Rejected</span>
+                  </div>
+                  <h2 className="text-3xl font-black text-white font-outfit tracking-tighter mb-4 shadow-black drop-shadow-lg">
+                    Validation Error
+                  </h2>
+
+                  {/* The actual error */}
+                  <div className="bg-black/40 border border-white/5 p-4 rounded-2xl mb-8 w-full">
+                    <p className="text-white/90 text-sm font-medium leading-relaxed font-mono">
+                      <span className="text-red-500 mr-2">{'>'}</span> {validationError}
+                    </p>
+                  </div>
+
+                  {/* Action Button */}
+                  <button
+                    onClick={() => setValidationError(null)}
+                    className="group relative w-full overflow-hidden bg-gradient-to-r from-red-600 to-red-800 text-white font-black py-4 px-8 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-red-900/30 hover:scale-[1.02] active:scale-95 text-xs uppercase tracking-[0.2em]"
+                  >
+                    <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <span className="relative z-10">I will keep it in mind</span>
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </>
   );
 };

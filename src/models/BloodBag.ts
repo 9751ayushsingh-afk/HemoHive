@@ -13,9 +13,9 @@ export interface IBloodBag extends Document {
   sourceDonorId?: mongoose.Schema.Types.ObjectId;
 
   // Status and Flow
-  status: 'AVAILABLE' | 'RESERVED' | 'TRANSFERRED' | 'EXPIRED' | 'USED' | 'DISCARDED';
+  status: 'AVAILABLE' | 'RESERVED' | 'TRANSFERRED' | 'IN_TRANSIT' | 'EXPIRED' | 'USED' | 'DISCARDED';
   transferCount: number; // For HemoFlux One-Hop Rule
-  exchangeStatus: 'NONE' | 'LISTED' | 'TRANSFERRED';
+  exchangeStatus: 'NONE' | 'LISTED' | 'IN_TRANSIT' | 'TRANSFERRED';
 
   // Quality
   coldChainIntegrity: boolean;
@@ -73,7 +73,7 @@ const BloodBagSchema: Schema = new Schema({
   // Status and Flow
   status: {
     type: String,
-    enum: ['AVAILABLE', 'RESERVED', 'TRANSFERRED', 'EXPIRED', 'USED', 'DISCARDED'],
+    enum: ['AVAILABLE', 'RESERVED', 'TRANSFERRED', 'IN_TRANSIT', 'EXPIRED', 'USED', 'DISCARDED'],
     default: 'AVAILABLE',
     index: true,
   },
@@ -84,7 +84,7 @@ const BloodBagSchema: Schema = new Schema({
   },
   exchangeStatus: {
     type: String,
-    enum: ['NONE', 'LISTED', 'TRANSFERRED'],
+    enum: ['NONE', 'LISTED', 'IN_TRANSIT', 'TRANSFERRED'],
     default: 'NONE',
   },
 
