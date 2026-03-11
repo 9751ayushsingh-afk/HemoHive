@@ -198,25 +198,71 @@ const InputField = ({ name, type, placeholder, icon: Icon, errors, register, rol
     );
 };
 
-const SubmitLoader = ({ name }: { name?: string }) => {
+const FullScreenLoader = ({ name, role }: { name?: string, role: string }) => {
     // Extract first name for a friendlier greeting
     const firstName = name ? name.split(' ')[0] : '';
     const greeting = firstName ? `${firstName}, आपका हेमोहाइव में स्वागत है` : 'आपका हेमोहाइव में स्वागत है';
+    
+    const descriptions = [
+        "Securing your connection...",
+        "Encrypting credentials...",
+        role === 'donor' ? "Setting up Digital Donor Card..." : "Configuring Hospital Dashboard...",
+        "Finalizing registration..."
+    ];
 
     return (
-        <div className="flex items-center justify-center gap-3">
-            {/* Circular HemoHive Spinner */}
-            <div className="relative w-6 h-6 flex items-center justify-center">
-                <svg className="animate-spin w-full h-full text-white/20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="text-white" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                {/* Inner dot representing the hive center */}
-                <div className="absolute w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
-            </div>
-            
-            <span className="font-bold tracking-wide">{greeting}</span>
-        </div>
+        <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md"
+        >
+            <motion.div 
+                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                className="relative max-w-sm w-full bg-[#111] border border-white/10 rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.8)] p-8 overflow-hidden flex flex-col items-center text-center"
+            >
+                {/* Background glow */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-pink-500/20 rounded-full blur-[40px] pointer-events-none" />
+                
+                {/* Circular HemoHive Spinner */}
+                <div className="relative w-20 h-20 flex items-center justify-center mb-6">
+                    <svg className="animate-spin w-full h-full text-white/10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeDasharray="16 16"></circle>
+                        <path className="text-pink-500" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    {/* Inner dot representing the hive center */}
+                    <motion.div 
+                        animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                        className="absolute w-3 h-3 bg-pink-500 rounded-full shadow-[0_0_15px_rgba(236,72,153,0.8)]" 
+                    />
+                </div>
+                
+                {/* Text Context */}
+                <h3 className="text-xl md:text-2xl font-bold font-['Outfit'] text-white mb-2 tracking-wide">
+                    {greeting}
+                </h3>
+                
+                <div className="h-[1px] w-12 bg-gray-700 my-4" />
+                
+                <div className="space-y-3 mt-2 w-full text-left ml-4">
+                    {descriptions.map((desc, i) => (
+                        <motion.div 
+                            key={i}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: i * 0.4 + 0.5 }}
+                            className="flex items-center gap-3 text-xs md:text-sm text-gray-400"
+                        >
+                            <ShieldCheckIcon className="w-4 h-4 text-green-400/70" />
+                            <span>{desc}</span>
+                        </motion.div>
+                    ))}
+                </div>
+            </motion.div>
+        </motion.div>
     );
 };
 
@@ -396,7 +442,10 @@ const RegistrationForm = () => {
     };
 
     return (
-        <div className="bg-container min-h-screen font-sans">
+        <div className="bg-container min-h-screen font-sans relative">
+            <AnimatePresence>
+                {isSubmitting && <FullScreenLoader name={watch('fullName')} role={selectedRole} />}
+            </AnimatePresence>
             <div className="h-20" />
             <div className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 p-8">
                 <motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, ease: 'easeOut' }} className="flex flex-col justify-start pt-16">
@@ -605,7 +654,7 @@ const RegistrationForm = () => {
                                                 whileHover={isSubmitting || donorSteps[currentStep].fields.some(f => !!errors[f]) || (showCamera && !capturedImage) ? {} : { scale: 1.05, y: -2, boxShadow: `0 10px 20px ${roles[selectedRole].color}40` }}
                                                 whileTap={isSubmitting || donorSteps[currentStep].fields.some(f => !!errors[f]) || (showCamera && !capturedImage) ? {} : { scale: 0.98 }}
                                             >
-                                                {isSubmitting ? <SubmitLoader name={watch('fullName')} /> : 'Finish'}
+                                                {isSubmitting ? 'Processing...' : 'Finish'}
                                             </motion.button>
                                         )}
                                     </div>
@@ -662,7 +711,7 @@ const RegistrationForm = () => {
                                     whileHover={isSubmitting || !isValid ? {} : { scale: 1.05, y: -2, boxShadow: `0 10px 20px ${roles[selectedRole].color}40` }}
                                     whileTap={isSubmitting || !isValid ? {} : { scale: 0.98 }}
                                 >
-                                    {isSubmitting ? <SubmitLoader name={watch('fullName')} /> : 'Register Hospital'}
+                                    {isSubmitting ? 'Processing...' : 'Register Hospital'}
                                 </motion.button>
                             </>
                         ) : (
@@ -678,7 +727,7 @@ const RegistrationForm = () => {
                                     whileHover={isSubmitting || Object.keys(errors).length > 0 ? {} : { scale: 1.05, y: -2, boxShadow: `0 10px 20px ${roles[selectedRole].color}40` }}
                                     whileTap={isSubmitting || Object.keys(errors).length > 0 ? {} : { scale: 0.98 }}
                                 >
-                                    {isSubmitting ? <SubmitLoader name={watch('fullName')} /> : 'Create Account'}
+                                    {isSubmitting ? 'Processing...' : 'Create Account'}
                                 </motion.button>
                             </>
                         )}
