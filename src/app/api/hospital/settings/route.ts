@@ -6,6 +6,8 @@ import User from '@/models/User';
 import SettingsChangeLog from '@/models/SettingsChangeLog';
 import mongoose from 'mongoose';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
     await dbConnect();
     try {

@@ -3,6 +3,8 @@ import dbConnect from '../../../../lib/dbConnect';
 import BloodRequest from '../../../../models/BloodRequest';
 import { getAuth } from '../../../../lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 export async function PATCH(request: NextRequest) {
     await dbConnect();
 

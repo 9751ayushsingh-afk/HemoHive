@@ -1,0 +1,44 @@
+﻿commit 4f6dfcc20e19ff2f59576ce724eb1d21da02f8a2
+Author: Ayush Singh <9751ayushsingh@gmail.com>
+Date:   Mon Feb 9 22:51:57 2026 +0530
+
+    Fix Render build error: move tailwindcss to dependencies and fix import path
+
+diff --git a/src/app/blood-literacy/page.tsx b/src/app/blood-literacy/page.tsx
+index 57a81e1..398a904 100644
+--- a/src/app/blood-literacy/page.tsx
++++ b/src/app/blood-literacy/page.tsx
+@@ -1,6 +1,6 @@
+ 'use client';
+ import React from 'react';
+-import BloodFlowNetwork from '@/components/blood-literacy/BloodFlowNetwork';
++import BloodFlowNetwork from '../../components/blood-literacy/BloodFlowNetwork';
+ 
+ const BloodLiteracyPage = () => {
+   return (
+
+commit 77444f726548eff3a0674816de5766f11883bb1c
+Author: Ayush Singh <9751ayushsingh@gmail.com>
+Date:   Mon Feb 9 14:37:41 2026 +0530
+
+    Initial commit for HemoHive
+
+diff --git a/src/app/blood-literacy/page.tsx b/src/app/blood-literacy/page.tsx
+new file mode 100644
+index 0000000..57a81e1
+--- /dev/null
++++ b/src/app/blood-literacy/page.tsx
+@@ -0,0 +1,13 @@
++'use client';
++import React from 'react';
++import BloodFlowNetwork from '@/components/blood-literacy/BloodFlowNetwork';
++
++const BloodLiteracyPage = () => {
++  return (
++    <div className="min-h-screen bg-black text-white pt-20">
++      <BloodFlowNetwork />
++    </div>
++  );
++};
++
++export default BloodLiteracyPage;

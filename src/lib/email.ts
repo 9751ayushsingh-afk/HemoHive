@@ -53,66 +53,10 @@ const readEmailTemplate = (): string => {
     }
 };
 
-// 3. Send the welcome email
+// 3. Send the welcome email (Bypassed for faster registration)
 export const sendWelcomeEmail = async (userData: UserData) => {
-    console.log(`Attempting to send welcome email to: ${userData.email}`);
-
-    try {
-        const { transporter, resend } = getEmailClient();
-        const htmlTemplate = readEmailTemplate();
-
-        if (!htmlTemplate) {
-            console.error("Email template not found. Aborting welcome email.");
-            return;
-        }
-
-        // Replace placeholders with actual data
-        const registrationDate = new Date().toLocaleDateString();
-        const dashboardLink = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/login`;
-
-        const htmlToSend = htmlTemplate
-            .replace(/{{userName}}/g, userData.userName)
-            .replace(/{{bloodGroup}}/g, userData.bloodGroup || 'Not Specified')
-            .replace(/{{date}}/g, registrationDate)
-            .replace(/{{dashboardLink}}/g, dashboardLink);
-
-        const fromEmail = process.env.EMAIL_FROM || 'onboarding@resend.dev';
-        const subject = `Welcome to HemoHive, ${userData.userName} — Every Drop Counts`;
-
-        // Strategy: Try SMTP first if available, then fallback to Resend
-        let sentWithSmtp = false;
-
-        if (transporter) {
-            try {
-                console.log("Using SMTP to send email...");
-                await transporter.sendMail({
-                    from: fromEmail,
-                    to: userData.email,
-                    subject,
-                    html: htmlToSend,
-                });
-                console.log('Welcome email sent via SMTP successfully to:', userData.email);
-                sentWithSmtp = true;
-            } catch (smtpError) {
-                console.error("SMTP delivery failed, attempting fallback to Resend:", smtpError);
-            }
-        }
-
-        if (!sentWithSmtp && resend) {
-            console.log("Using Resend to send email...");
-            const resendFrom = fromEmail.includes('gmail.com') ? 'onboarding@resend.dev' : fromEmail;
-
-            await resend.emails.send({
-                from: resendFrom,
-                to: userData.email,
-                subject,
-                html: htmlToSend,
-            });
-            console.log('Welcome email sent via Resend successfully to:', userData.email);
-        } else if (!sentWithSmtp && !transporter && !resend) {
-            console.warn("No valid email configuration found (SMTP or Resend). Mock Email Logged:", userData.email);
-        }
-    } catch (error) {
-        console.error('CRITICAL: All email delivery methods failed:', error);
-    }
+    console.log(`[Bypassed] Would have sent welcome email to: ${userData.email}`);
+    // Email sending is currently delinked to speed up the registration process
+    // as per user request to avoid Resend/SMTP related timeouts.
+    return Promise.resolve();
 };

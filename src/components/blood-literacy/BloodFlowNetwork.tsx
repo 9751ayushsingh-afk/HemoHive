@@ -1,6 +1,6 @@
-
 import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
+import { motion } from "framer-motion";
 
 /*
 BloodFlowNetwork.jsx
@@ -268,39 +268,59 @@ export default function BloodFlowNetwork({ size = 720 }: { size?: number }) {
   };
 
   return (
-    <div className="w-full flex flex-col items-center justify-center p-6">
-      <div className="w-full max-w-4xl">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-red-400 text-3xl font-accent font-semibold">Blood Compatibility Visualizer</h3>
-            <p className="text-gray-200 text-sm">Hover a group to see who it can donate to and receive from. Toggle modes for focused views.</p>
-          </div>
-          <div className="flex gap-2 items-center">
-            <div className="text-xs text-gray-300 mr-2">Mode</div>
-            <div className="bg-zinc-900 rounded-full p-1 flex items-center gap-1">
-              <button
-                className={`px-3 py-1 rounded-full text-sm ${mode === "both" ? "bg-red-600 text-white" : "text-gray-300"}`}
-                onClick={() => setMode("both")}
-              >
-                Both
-              </button>
-              <button
-                className={`px-3 py-1 rounded-full text-sm ${mode === "donate" ? "bg-red-600 text-white" : "text-gray-300"}`}
-                onClick={() => setMode("donate")}
-              >
-                Donate
-              </button>
-              <button
-                className={`px-3 py-1 rounded-full text-sm ${mode === "receive" ? "bg-red-600 text-white" : "text-gray-300"}`}
-                onClick={() => setMode("receive")}
-              >
-                Receive
-              </button>
-            </div>
-          </div>
+    <div className="w-full flex flex-col items-center p-6 md:p-12 relative min-h-[85vh]">
+      {/* Header Section */}
+      <div className="w-full max-w-6xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 z-20">
+        <div className="max-w-xl">
+          <motion.h1
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-4xl md:text-5xl font-bold font-['Outfit'] bg-clip-text text-transparent bg-gradient-to-r from-[#FF1E1E] via-[#FF4D4D] to-[#FF8C00] tracking-tight mb-2 shadow-sm drop-shadow-[0_0_15px_rgba(255,30,30,0.5)]"
+          >
+            Blood Compatibility Visualizer
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-gray-400 text-sm md:text-base font-medium"
+          >
+            Hover a group to see who it can donate to and receive from. Toggle modes for focused views.
+          </motion.p>
         </div>
 
-        <div className="relative bg-black rounded-2xl shadow-xl p-4">
+        {/* Enhanced Toggle Buttons */}
+        <div className="pointer-events-auto bg-[#0a0a0a]/80 backdrop-blur-2xl border border-white/10 rounded-full p-1.5 flex items-center gap-1 shadow-[0_0_40px_rgba(255,0,0,0.15)] relative">
+          {(["both", "donate", "receive"] as const).map((m) => (
+            <button
+              key={m}
+              onClick={() => setMode(m)}
+              className={`relative px-6 py-2.5 rounded-full text-sm font-semibold tracking-wide transition-colors duration-300 z-10 ${mode === m ? "text-white" : "text-gray-400 hover:text-white"
+                }`}
+            >
+              {mode === m && (
+                <motion.div
+                  layoutId="activeModeBubble"
+                  className="absolute inset-0 bg-gradient-to-r from-red-600 to-red-900 rounded-full -z-10"
+                  style={{
+                    boxShadow: "0 0 20px rgba(220, 38, 38, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.2)"
+                  }}
+                  transition={{ 
+                    type: "spring", 
+                    stiffness: 500, 
+                    damping: 30,
+                    mass: 0.8
+                  }}
+                />
+              )}
+              {m.charAt(0).toUpperCase() + m.slice(1)}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="w-full max-w-4xl relative">
+        <div className="relative bg-transparent rounded-2xl w-full flex justify-center items-center">
           <svg
             ref={svgRef}
             viewBox={`0 0 ${size} ${size}`}
@@ -369,39 +389,74 @@ export default function BloodFlowNetwork({ size = 720 }: { size?: number }) {
               ))}
             </g>
 
-            {/* center decorative pulse / logo placeholder */}
+            {/* Center animated HemoHive text */}
             <g transform={`translate(${cx}, ${cy})`}>
-              <circle r={60} fill="rgba(255,10,10,0.04)" />
-              <circle r={40} fill="rgba(255,10,10,0.02)" />
-              <text x={0} y={6} textAnchor="middle" style={{ fontSize: 16, fill: "#ffdddd" }}>
-                HemoHive
+              {/* Outer soft glowing rings */}
+              <circle r={75} fill="rgba(255,30,30,0.02)" className="animate-pulse" style={{ animationDuration: '4s' }} pointerEvents="none" />
+              <circle r={55} fill="rgba(255,30,30,0.03)" className="animate-pulse" style={{ animationDuration: '3s' }} pointerEvents="none" />
+              
+              <text 
+                x={0} 
+                y={6} 
+                textAnchor="middle" 
+                className="font-['Outfit'] font-bold tracking-[0.25em] select-none"
+                style={{ 
+                  fontSize: 16, 
+                  fill: "#ffffff", 
+                  opacity: 0.9, 
+                  filter: "drop-shadow(0 0 12px rgba(255,30,30,0.6)) drop-shadow(0 0 4px rgba(255,255,255,0.4))" 
+                }}
+              >
+                HEMOHIVE
               </text>
             </g>
           </svg>
 
-          {/* tooltip overlay (HTML) */}
+          {/* tooltip overlay (HTML) with deep glassmorphism */}
           {tooltip.visible && (
-            <div
-              className="absolute pointer-events-none bg-zinc-900/90 backdrop-blur-sm border border-zinc-700 rounded-md px-3 py-2 text-xs text-white shadow-lg"
-              style={{ left: tooltip.x, top: tooltip.y, transform: "translate(6px, -6px)", minWidth: 120 }}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="absolute pointer-events-none z-50 rounded-xl border border-white/10 text-white shadow-[0_10px_40px_rgba(0,0,0,0.8)] overflow-hidden"
+              style={{
+                left: tooltip.x,
+                top: tooltip.y,
+                transform: "translate(12px, -12px)",
+                minWidth: 200,
+                background: 'linear-gradient(135deg, rgba(20,20,24,0.95) 0%, rgba(10,10,12,0.98) 100%)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)'
+              }}
             >
-              <div className="font-medium">{tooltip.text}</div>
-              <div className="text-gray-300 text-[11px] mt-1">
-                Donates to: <span className="text-sm">{(COMPATIBILITY[tooltip.text as BloodType] || []).join(", ")}</span>
+              <div className="border-b border-white/5 bg-white/5 px-4 py-3 flex items-center gap-3">
+                <div className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)] animate-pulse"></div>
+                <span className="font-bold text-lg font-['Outfit'] tracking-wide">{tooltip.text}</span>
               </div>
-              <div className="text-gray-300 text-[11px] mt-0.5">
-                Receives from: <span className="text-sm">{(RECEIVERS[tooltip.text as BloodType] || []).join(", ")}</span>
+              <div className="p-4 space-y-4">
+                <div>
+                  <div className="text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-1.5 font-semibold">Provides Life To</div>
+                  <div className="text-sm font-medium text-gray-200 flex items-center flex-wrap gap-1">
+                    <span className="text-red-500 mr-1.5">→</span>
+                    {(COMPATIBILITY[tooltip.text as BloodType] || []).map(bt => (
+                      <span key={bt} className="bg-red-500/10 text-red-200 px-1.5 py-0.5 rounded text-xs border border-red-500/20">{bt}</span>
+                    ))}
+                  </div>
+                </div>
+                <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+                <div>
+                  <div className="text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-1.5 font-semibold">Receives Life From</div>
+                  <div className="text-sm font-medium text-gray-200 flex items-center flex-wrap gap-1">
+                    <span className="text-blue-400 mr-1.5">←</span>
+                    {(RECEIVERS[tooltip.text as BloodType] || []).map(bt => (
+                      <span key={bt} className="bg-blue-500/10 text-blue-200 px-1.5 py-0.5 rounded text-xs border border-blue-500/20">{bt}</span>
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
+            </motion.div>
           )}
 
-          {/* small legend */}
-          <div className="absolute right-4 bottom-4 flex flex-col items-end gap-2 text-xs text-gray-300">
-            <div className="px-3 py-2 bg-zinc-900/70 rounded-md border border-zinc-700">
-              <div><strong className="text-white">Tips</strong></div>
-              <div className="text-[12px]">Hover a blood group to reveal connections. Use mode to focus.</div>
-            </div>
-          </div>
+
         </div>
       </div>
     </div>

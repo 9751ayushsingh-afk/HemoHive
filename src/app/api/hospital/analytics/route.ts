@@ -6,6 +6,8 @@ import InventoryChangeLog from '@/models/InventoryChangeLog';
 import Inventory from '@/models/Inventory';
 import mongoose from 'mongoose';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
     await dbConnect();
 
