@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion, Variants, AnimatePresence } from "framer-motion";
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const socialLinks = [
   {
@@ -85,11 +85,11 @@ const itemVariants: Variants = {
 };
 
 
-// --- Highly Optimized Sub-Components for zero-lag UI ---
+// --- Optimized Sub-Components for Performance ---
 
 const ScrambleText = ({ targetText, isHovered }: { targetText: string, isHovered: boolean }) => {
   const [displayText, setDisplayText] = useState(targetText);
-  const letters = useMemo(() => "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*", []);
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -114,14 +114,14 @@ const ScrambleText = ({ targetText, isHovered }: { targetText: string, isHovered
         clearInterval(intervalRef.current!);
         setDisplayText(currentTarget);
       }
-      iteration += 1 / 3; // Slightly slower resolution for smoother visual
-    }, 40);
+      iteration += 1 / 2;
+    }, 30);
 
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [isHovered, letters]);
+  }, [isHovered]);
 
   return (
-    <span className="text-slate-300 group-hover:text-white transition-colors duration-300 drop-shadow-sm group-hover:drop-shadow-[0_0_8px_rgba(56,189,248,0.8)] font-mono min-w-[150px] inline-block transform-gpu will-change-contents">
+    <span className="text-slate-300 group-hover:text-white transition-colors duration-300 drop-shadow-sm group-hover:drop-shadow-[0_0_8px_rgba(56,189,248,0.8)] font-mono min-w-[150px] inline-block transform-gpu">
       {displayText}
     </span>
   );
@@ -131,12 +131,11 @@ const TypewriterText = ({ text }: { text: string }) => {
   return (
     <div className="text-xs text-sky-200/80 mt-1 font-medium italic min-h-[16px] transform-gpu">
       {text.split('').map((char, i) => (
-        char === ' ' ? <span key={i}>&nbsp;</span> :
         <motion.span 
           key={i} 
           initial={{ opacity: 0 }} 
           animate={{ opacity: 1 }} 
-          transition={{ duration: 0.1, delay: i * 0.03 + 0.2 }}
+          transition={{ duration: 0.1, delay: i * 0.04 + 0.3 }}
           className="will-change-[opacity]"
         >
           {char}
@@ -146,7 +145,7 @@ const TypewriterText = ({ text }: { text: string }) => {
   );
 };
 
-// --- Isolated Developer Badge with CSS-Powered scanner for performance ---
+// --- Isolated Developer Badge for Performance ---
 
 const DeveloperBadge = ({ teaCount }: { teaCount: number }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -157,74 +156,66 @@ const DeveloperBadge = ({ teaCount }: { teaCount: number }) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <style jsx>{`
-        @keyframes hologramScan {
-          0% { top: 0%; opacity: 0; }
-          10% { opacity: 1; }
-          90% { opacity: 1; }
-          100% { top: 100%; opacity: 0; }
-        }
-        .scanner-line {
-          animation: hologramScan 3s linear infinite;
-        }
-      `}</style>
-      
       <AnimatePresence>
         {isHovered && (
           <motion.div
-            initial={{ opacity: 0, y: 0, scale: 0.9, rotateX: 10 }}
-            animate={{ opacity: 1, y: -90, scale: 1, rotateX: 0 }}
-            exit={{ opacity: 0, y: 0, scale: 0.9, rotateX: 10 }}
-            transition={{ type: "spring", stiffness: 250, damping: 25 }}
-            className="absolute bottom-full left-1/2 -translate-x-1/2 px-4 py-3 mb-4 w-72 max-w-[calc(100vw-40px)] rounded-xl bg-black/95 border border-sky-500/30 backdrop-blur-2xl shadow-[0_0_40px_rgba(14,165,233,0.25)] flex flex-col z-50 pointer-events-none transform-gpu will-change-transform perspective-[1000px] overflow-hidden"
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: -80, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 200, damping: 20 }}
+            className="absolute bottom-full left-1/2 -translate-x-1/2 px-4 py-3 mb-2 w-72 max-w-[calc(100vw-40px)] rounded-xl bg-black/95 border border-sky-500/30 backdrop-blur-xl shadow-[0_0_30px_rgba(14,165,233,0.3)] flex flex-col z-50 pointer-events-none transform-gpu will-change-transform"
           >
-            {/* CSS Powered Scanner Line - Zero JS overhead during hover */}
-            <div className="scanner-line absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-sky-400 to-transparent shadow-[0_0_15px_rgba(56,189,248,0.9)] z-10" />
-            
-            <div className="flex items-center gap-4 w-full relative z-0">
-              <div className="relative w-12 h-12 rounded-full border border-sky-400/30 bg-sky-900/20 flex items-center justify-center overflow-hidden shrink-0 shadow-[0_0_10px_rgba(56,189,248,0.2)]">
+            <motion.div
+              animate={{ top: ["0%", "100%", "0%"] }}
+              transition={{ duration: 3, ease: "linear", repeat: Infinity }}
+              className="absolute left-0 right-0 h-[1px] bg-sky-400/50 shadow-[0_0_10px_rgba(56,189,248,0.8)] z-10"
+            />
+            <div className="flex items-center gap-4 w-full">
+              <div className="relative w-12 h-12 rounded-full border border-sky-400/50 bg-sky-900/40 flex items-center justify-center overflow-hidden shrink-0">
                 <Image
                   src="https://res.cloudinary.com/drwfe1mhk/image/upload/v1773218306/hemohive_profile/ayush_profile.jpg"
                   alt="Ayush Singh"
                   fill
-                  sizes="48px"
-                  className="object-cover opacity-90 mix-blend-screen mix-blend-luminosity grayscale hover:grayscale-0 transition-all duration-700"
+                  className="object-cover opacity-90 mix-blend-screen mix-blend-luminosity grayscale hover:grayscale-0 transition-all duration-500"
                 />
               </div>
-              <div className="flex flex-col text-left justify-center flex-1 min-w-0">
-                <div className="text-[10px] font-mono text-sky-400/80 mb-0.5 tracking-[0.15em]">&lt; SYSTEM_OP /&gt;</div>
-                <div className="text-sm font-bold text-white tracking-wide truncate">Ayush Singh</div>
-                <TypewriterText text="Architecting the blood-flow network..." />
+              <div className="flex flex-col text-left justify-center">
+                <div className="text-xs font-mono text-sky-400/80 mb-0.5 tracking-wider">&lt; CREATOR /&gt;</div>
+                <div className="text-sm font-bold text-white tracking-wide">Ayush Singh</div>
+                <TypewriterText text="Building the future of blood donation..." />
               </div>
             </div>
-
-            <div className="w-full h-px bg-sky-500/10 my-3" />
-
-            <div className="w-full text-left space-y-2.5">
-              <div className="flex justify-between items-center text-[10px] font-mono text-sky-200/60 h-4">
-                <span>RESOURCES_BUILT:</span>
-                <span className="text-sky-400 font-bold">128+ TB</span>
+            <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-sky-500/30 to-transparent my-1"></div>
+            <div className="w-full text-left space-y-2.5 mt-2">
+              <div className="flex justify-between items-center text-[10px] font-mono text-sky-200/70 group/stat relative overflow-hidden h-4">
+                <span className="opacity-100">LINES_OF_CODE:</span>
+                <span className="text-sky-400">1.2M+</span>
               </div>
-              <div className="flex justify-between items-center text-[10px] font-mono text-sky-200/60 relative h-4 w-full overflow-hidden">
+              <div className="flex justify-between items-center text-[10px] font-mono text-sky-200/70 relative h-4 w-full">
                 <div className="relative flex-1 h-full">
                   <div className="absolute inset-0 flex items-center gap-2 pointer-events-none">
-                    <svg className="w-3.5 h-3.5 text-amber-500/80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path d="M20 8h-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v2H2v4h2v6a2 2 0 002 2h8a2 2 0 002-2v-6h2v-4zm-4 0v4H6V8h10z" />
-                    </svg>
+                    <div className="relative pt-[2px]">
+                      <svg className="w-3.5 h-3.5 text-amber-500 opacity-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path d="M20 8h-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v2H2v4h2v6a2 2 0 002 2h8a2 2 0 002-2v-6h2v-4zm-4 0v4H6V8h10z" />
+                      </svg>
+                      <motion.div animate={{ opacity: [0, 0, 1, 1, 0] }} transition={{ duration: 7, repeat: Infinity, times: [0, 0.15, 0.2, 0.85, 1] }}>
+                        <motion.div className="absolute -top-[4px] left-1 w-[1px] h-1.5 bg-amber-400 rounded-full" animate={{ y: [0, -4, 0], opacity: [0, 1, 0] }} transition={{ duration: 1.5, repeat: Infinity }} />
+                      </motion.div>
+                    </div>
                   </div>
-                  <motion.div 
-                    animate={{ width: ["100%", "100%", "0%", "0%", "100%"] }} 
-                    transition={{ duration: 7, repeat: Infinity, times: [0, 0.1, 0.25, 0.85, 1], ease: "easeInOut" }} 
-                    className="absolute inset-y-0 left-0 bg-black overflow-hidden whitespace-nowrap pl-5"
-                  >
+                  <motion.div animate={{ width: ["100%", "100%", "0%", "0%", "100%"] }} transition={{ duration: 6, repeat: Infinity, times: [0, 0.1, 0.25, 0.85, 1] }} className="absolute inset-y-0 left-0 bg-black/80 overflow-hidden whitespace-nowrap">
                     TEA_CONSUMED:
                   </motion.div>
                 </div>
-                <span className="text-sky-400 font-bold tabular-nums">{teaCount.toLocaleString()}</span>
+                <span className="text-sky-400 z-10">{teaCount.toLocaleString()} CUPS</span>
               </div>
-              <div className="flex justify-between items-center text-[10px] font-mono text-sky-200/60 h-4">
-                <span>SECURITY_LEVEL:</span>
-                <span className="text-emerald-400 flex items-center gap-1.5"><span className="w-1 h-1 rounded-full bg-emerald-400 shadow-[0_0_5px_rgba(52,211,153,1)]" /> ENCRYPTED</span>
+              <div className="flex justify-between items-center text-[10px] font-mono text-sky-200/70 h-4">
+                <span>SYSTEM_UPTIME:</span>
+                <span className="text-sky-400 animate-pulse">99.99%</span>
+              </div>
+              <div className="flex justify-between items-center text-[10px] font-mono text-sky-200/70 h-4">
+                <span>NETWORK_STATUS:</span>
+                <span className="text-emerald-400 flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> SECURE</span>
               </div>
             </div>
           </motion.div>
@@ -233,13 +224,13 @@ const DeveloperBadge = ({ teaCount }: { teaCount: number }) => {
 
       <Link
         href="/developer"
-        className="relative inline-flex items-center justify-center px-6 py-2.5 font-medium tracking-wide text-white transition-all duration-300 rounded-full bg-slate-950 border border-slate-800 hover:border-sky-500 group overflow-hidden transform-gpu translate-z-0"
+        className="relative inline-flex items-center justify-center px-6 py-2.5 font-medium tracking-wide text-white transition-all duration-300 rounded-full bg-slate-900 border border-slate-700/50 hover:bg-slate-800 hover:border-sky-400 hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(14,165,233,0.1)] hover:shadow-[0_0_25px_rgba(14,165,233,0.4)] overflow-hidden transform-gpu"
       >
-        <span className="absolute -inset-[100%] animate-[spin_6s_linear_infinite] bg-[conic-gradient(from_0deg,transparent,rgba(56,189,248,0.2),transparent)] pointer-events-none" />
+        <span className="absolute -inset-[100%] animate-[spin_4s_linear_infinite] bg-gradient-to-r from-transparent via-sky-400/20 to-transparent pointer-events-none"></span>
         <span className="relative z-10 flex items-center gap-2">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-50" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500 shadow-[0_0_5px_rgba(56,189,248,1)]" />
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-sky-500"></span>
           </span>
           <ScrambleText targetText="Meet the Developer" isHovered={isHovered} />
         </span>
@@ -274,7 +265,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-black text-white pt-16 pb-8 border-t border-white/5 relative transition-colors duration-700">
+    <footer className="bg-black text-white pt-16 pb-8 border-t border-white/5 relative overflow-hidden transition-colors duration-700">
       <motion.div
         animate={{
           backgroundColor: getAuraColor(activeAura),
