@@ -198,6 +198,28 @@ const InputField = ({ name, type, placeholder, icon: Icon, errors, register, rol
     );
 };
 
+const SubmitLoader = ({ name }: { name?: string }) => {
+    // Extract first name for a friendlier greeting
+    const firstName = name ? name.split(' ')[0] : '';
+    const greeting = firstName ? `${firstName}, आपका हेमोहाइव में स्वागत है` : 'आपका हेमोहाइव में स्वागत है';
+
+    return (
+        <div className="flex items-center justify-center gap-3">
+            {/* Circular HemoHive Spinner */}
+            <div className="relative w-6 h-6 flex items-center justify-center">
+                <svg className="animate-spin w-full h-full text-white/20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="text-white" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                {/* Inner dot representing the hive center */}
+                <div className="absolute w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+            </div>
+            
+            <span className="font-bold tracking-wide">{greeting}</span>
+        </div>
+    );
+};
+
 const donorSteps = [
     { title: 'Personal Info', fields: ['fullName', 'gender', 'mobile', 'email'] },
     { title: 'Contact', fields: ['address', 'city', 'state', 'pincode'] },
@@ -583,7 +605,7 @@ const RegistrationForm = () => {
                                                 whileHover={isSubmitting || donorSteps[currentStep].fields.some(f => !!errors[f]) || (showCamera && !capturedImage) ? {} : { scale: 1.05, y: -2, boxShadow: `0 10px 20px ${roles[selectedRole].color}40` }}
                                                 whileTap={isSubmitting || donorSteps[currentStep].fields.some(f => !!errors[f]) || (showCamera && !capturedImage) ? {} : { scale: 0.98 }}
                                             >
-                                                {isSubmitting ? 'Creating Account...' : 'Finish'}
+                                                {isSubmitting ? <SubmitLoader name={watch('fullName')} /> : 'Finish'}
                                             </motion.button>
                                         )}
                                     </div>
@@ -640,7 +662,7 @@ const RegistrationForm = () => {
                                     whileHover={isSubmitting || !isValid ? {} : { scale: 1.05, y: -2, boxShadow: `0 10px 20px ${roles[selectedRole].color}40` }}
                                     whileTap={isSubmitting || !isValid ? {} : { scale: 0.98 }}
                                 >
-                                    {isSubmitting ? 'Registering...' : 'Register Hospital'}
+                                    {isSubmitting ? <SubmitLoader name={watch('fullName')} /> : 'Register Hospital'}
                                 </motion.button>
                             </>
                         ) : (
@@ -656,7 +678,7 @@ const RegistrationForm = () => {
                                     whileHover={isSubmitting || Object.keys(errors).length > 0 ? {} : { scale: 1.05, y: -2, boxShadow: `0 10px 20px ${roles[selectedRole].color}40` }}
                                     whileTap={isSubmitting || Object.keys(errors).length > 0 ? {} : { scale: 0.98 }}
                                 >
-                                    {isSubmitting ? 'Registering...' : 'Create Account'}
+                                    {isSubmitting ? <SubmitLoader name={watch('fullName')} /> : 'Create Account'}
                                 </motion.button>
                             </>
                         )}
