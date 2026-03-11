@@ -159,11 +159,11 @@ const DeveloperBadge = ({ teaCount }: { teaCount: number }) => {
       <AnimatePresence>
         {isHovered && (
           <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-            animate={{ opacity: 1, y: -80, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 200, damping: 20 }}
-            className="absolute bottom-full left-1/2 -translate-x-1/2 px-4 py-3 mb-2 w-72 max-w-[calc(100vw-40px)] rounded-xl bg-black/95 border border-sky-500/30 backdrop-blur-xl shadow-[0_0_30px_rgba(14,165,233,0.3)] flex flex-col z-50 pointer-events-none transform-gpu will-change-transform"
+            initial={{ opacity: 0, x: 20, scale: 0.95 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: 20, scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 250, damping: 25 }}
+            className="absolute bottom-full left-1/2 -translate-x-1/2 mb-6 md:mb-0 md:bottom-0 md:right-[calc(100%+1.5rem)] md:left-auto md:translate-x-0 px-4 py-3 w-72 max-w-[calc(100vw-40px)] rounded-xl bg-black/95 border border-sky-500/30 backdrop-blur-xl shadow-[0_0_40px_rgba(14,165,233,0.3)] flex flex-col z-50 pointer-events-none transform-gpu will-change-transform"
           >
             <motion.div
               animate={{ top: ["0%", "100%", "0%"] }}
@@ -265,7 +265,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-black text-white pt-16 pb-8 border-t border-white/5 relative overflow-hidden transition-colors duration-700">
+    <footer className="bg-black text-white pt-16 pb-8 border-t border-white/5 relative transition-colors duration-700">
       <motion.div
         animate={{
           backgroundColor: getAuraColor(activeAura),
