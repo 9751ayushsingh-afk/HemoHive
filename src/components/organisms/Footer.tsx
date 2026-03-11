@@ -84,80 +84,188 @@ const itemVariants: Variants = {
   }
 };
 
-const Footer = () => {
-  // Track which social link is currently hovered to create the ambient aura
-  const [activeAura, setActiveAura] = useState<string | null>(null);
 
-  // Developer Link Hover States for God-Level Holographic / Scramble UX
-  const [isDevHovered, setIsDevHovered] = useState(false);
-  const defaultText = "Meet the Developer";
-  const hoveredText = "Ayush Singh";
-  const [scrambledText, setScrambledText] = useState(defaultText);
-  const scrambleIntervalRef = useRef<NodeJS.Timeout | null>(null);
+// --- Optimized Sub-Components for Performance ---
 
-  // Progressive Tea Count State
-  const [teaCount, setTeaCount] = useState(0);
+const ScrambleText = ({ targetText, isHovered }: { targetText: string, isHovered: boolean }) => {
+  const [displayText, setDisplayText] = useState(targetText);
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    // Target date from the user: August 1, 2025
-    const START_DATE = new Date("2025-08-01T00:00:00Z").getTime();
-    const now = new Date().getTime();
-    
-    // Calculate total days elapsed positively.
-    const millisecondsPassed = Math.max(0, now - START_DATE);
-    const daysSince = Math.floor(millisecondsPassed / (1000 * 60 * 60 * 24));
-    
-    setTeaCount(daysSince * 3);
-  }, []);
-
-  // Terminal Text Scramble Effect
   useEffect(() => {
     let iteration = 0;
-    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
-    const targetText = isDevHovered ? hoveredText : defaultText;
-    const startingText = isDevHovered ? defaultText : hoveredText;
+    const currentTarget = isHovered ? "Ayush Singh" : "Meet the Developer";
+    const startingLength = displayText.length;
+    
+    if (intervalRef.current) clearInterval(intervalRef.current);
 
-    clearInterval(scrambleIntervalRef.current as any);
-
-    scrambleIntervalRef.current = setInterval(() => {
-      setScrambledText(
-        targetText
+    intervalRef.current = setInterval(() => {
+      setDisplayText(
+        currentTarget
           .split("")
           .map((letter, index) => {
-            if (index < iteration) {
-              return targetText[index];
-            }
-            // Add padding if target is longer, or just scramble
+            if (index < iteration) return currentTarget[index];
             return letters[Math.floor(Math.random() * letters.length)];
           })
           .join("")
       );
 
-      if (iteration >= Math.max(targetText.length, startingText.length)) {
-        clearInterval(scrambleIntervalRef.current as any);
-        setScrambledText(targetText); // lock exactly to target
+      if (iteration >= Math.max(currentTarget.length, startingLength)) {
+        clearInterval(intervalRef.current!);
+        setDisplayText(currentTarget);
       }
-
-      iteration += 1 / 2; // Controls speed of scramble resolution
+      iteration += 1 / 2;
     }, 30);
 
-    return () => clearInterval(scrambleIntervalRef.current as any);
-  }, [isDevHovered]);
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, [isHovered]);
 
-  // Map the text colors back to raw rgba values for the aura so Framer Motion can smoothly interpolate it
+  return (
+    <span className="text-slate-300 group-hover:text-white transition-colors duration-300 drop-shadow-sm group-hover:drop-shadow-[0_0_8px_rgba(56,189,248,0.8)] font-mono min-w-[150px] inline-block transform-gpu">
+      {displayText}
+    </span>
+  );
+};
+
+const TypewriterText = ({ text }: { text: string }) => {
+  return (
+    <div className="text-xs text-sky-200/80 mt-1 font-medium italic min-h-[16px] transform-gpu">
+      {text.split('').map((char, i) => (
+        <motion.span 
+          key={i} 
+          initial={{ opacity: 0 }} 
+          animate={{ opacity: 1 }} 
+          transition={{ duration: 0.1, delay: i * 0.04 + 0.3 }}
+          className="will-change-[opacity]"
+        >
+          {char}
+        </motion.span>
+      ))}
+    </div>
+  );
+};
+
+// --- Isolated Developer Badge for Performance ---
+
+const DeveloperBadge = ({ teaCount }: { teaCount: number }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div
+      className="group relative inline-flex"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <AnimatePresence>
+        {isHovered && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: -80, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 200, damping: 20 }}
+            className="absolute bottom-full left-1/2 -translate-x-1/2 px-4 py-3 mb-2 w-72 max-w-[calc(100vw-40px)] rounded-xl bg-black/95 border border-sky-500/30 backdrop-blur-xl shadow-[0_0_30px_rgba(14,165,233,0.3)] flex flex-col z-50 pointer-events-none transform-gpu will-change-transform"
+          >
+            <motion.div
+              animate={{ top: ["0%", "100%", "0%"] }}
+              transition={{ duration: 3, ease: "linear", repeat: Infinity }}
+              className="absolute left-0 right-0 h-[1px] bg-sky-400/50 shadow-[0_0_10px_rgba(56,189,248,0.8)] z-10"
+            />
+            <div className="flex items-center gap-4 w-full">
+              <div className="relative w-12 h-12 rounded-full border border-sky-400/50 bg-sky-900/40 flex items-center justify-center overflow-hidden shrink-0">
+                <Image
+                  src="https://res.cloudinary.com/drwfe1mhk/image/upload/v1773218306/hemohive_profile/ayush_profile.jpg"
+                  alt="Ayush Singh"
+                  fill
+                  className="object-cover opacity-90 mix-blend-screen mix-blend-luminosity grayscale hover:grayscale-0 transition-all duration-500"
+                />
+              </div>
+              <div className="flex flex-col text-left justify-center">
+                <div className="text-xs font-mono text-sky-400/80 mb-0.5 tracking-wider">&lt; CREATOR /&gt;</div>
+                <div className="text-sm font-bold text-white tracking-wide">Ayush Singh</div>
+                <TypewriterText text="Building the future of blood donation..." />
+              </div>
+            </div>
+            <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-sky-500/30 to-transparent my-1"></div>
+            <div className="w-full text-left space-y-2.5 mt-2">
+              <div className="flex justify-between items-center text-[10px] font-mono text-sky-200/70 group/stat relative overflow-hidden h-4">
+                <span className="opacity-100">LINES_OF_CODE:</span>
+                <span className="text-sky-400">1.2M+</span>
+              </div>
+              <div className="flex justify-between items-center text-[10px] font-mono text-sky-200/70 relative h-4 w-full">
+                <div className="relative flex-1 h-full">
+                  <div className="absolute inset-0 flex items-center gap-2 pointer-events-none">
+                    <div className="relative pt-[2px]">
+                      <svg className="w-3.5 h-3.5 text-amber-500 opacity-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path d="M20 8h-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v2H2v4h2v6a2 2 0 002 2h8a2 2 0 002-2v-6h2v-4zm-4 0v4H6V8h10z" />
+                      </svg>
+                      <motion.div animate={{ opacity: [0, 0, 1, 1, 0] }} transition={{ duration: 7, repeat: Infinity, times: [0, 0.15, 0.2, 0.85, 1] }}>
+                        <motion.div className="absolute -top-[4px] left-1 w-[1px] h-1.5 bg-amber-400 rounded-full" animate={{ y: [0, -4, 0], opacity: [0, 1, 0] }} transition={{ duration: 1.5, repeat: Infinity }} />
+                      </motion.div>
+                    </div>
+                  </div>
+                  <motion.div animate={{ width: ["100%", "100%", "0%", "0%", "100%"] }} transition={{ duration: 6, repeat: Infinity, times: [0, 0.1, 0.25, 0.85, 1] }} className="absolute inset-y-0 left-0 bg-black/80 overflow-hidden whitespace-nowrap">
+                    TEA_CONSUMED:
+                  </motion.div>
+                </div>
+                <span className="text-sky-400 z-10">{teaCount.toLocaleString()} CUPS</span>
+              </div>
+              <div className="flex justify-between items-center text-[10px] font-mono text-sky-200/70 h-4">
+                <span>SYSTEM_UPTIME:</span>
+                <span className="text-sky-400 animate-pulse">99.99%</span>
+              </div>
+              <div className="flex justify-between items-center text-[10px] font-mono text-sky-200/70 h-4">
+                <span>NETWORK_STATUS:</span>
+                <span className="text-emerald-400 flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> SECURE</span>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <Link
+        href="/developer"
+        className="relative inline-flex items-center justify-center px-6 py-2.5 font-medium tracking-wide text-white transition-all duration-300 rounded-full bg-slate-900 border border-slate-700/50 hover:bg-slate-800 hover:border-sky-400 hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(14,165,233,0.1)] hover:shadow-[0_0_25px_rgba(14,165,233,0.4)] overflow-hidden transform-gpu"
+      >
+        <span className="absolute -inset-[100%] animate-[spin_4s_linear_infinite] bg-gradient-to-r from-transparent via-sky-400/20 to-transparent pointer-events-none"></span>
+        <span className="relative z-10 flex items-center gap-2">
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-sky-500"></span>
+          </span>
+          <ScrambleText targetText="Meet the Developer" isHovered={isHovered} />
+        </span>
+      </Link>
+    </div>
+  );
+};
+
+const Footer = () => {
+  // Track which social link is currently hovered to create the ambient aura
+  const [activeAura, setActiveAura] = useState<string | null>(null);
+
+  // Progressive Tea Count State
+  const [teaCount, setTeaCount] = useState(0);
+
+  useEffect(() => {
+    const START_DATE = new Date("2025-08-01T00:00:00Z").getTime();
+    const now = new Date().getTime();
+    const millisecondsPassed = Math.max(0, now - START_DATE);
+    const daysSince = Math.floor(millisecondsPassed / (1000 * 60 * 60 * 24));
+    setTeaCount(daysSince * 3);
+  }, []);
+
   const getAuraColor = (colorClass: string | null) => {
-    if (!colorClass) return 'rgba(236, 72, 153, 0.05)'; // subtle secondary default
-    if (colorClass.includes('pink-500')) return 'rgba(236, 72, 153, 0.35)'; // Instagram
-    if (colorClass.includes('#3b5998')) return 'rgba(59, 89, 152, 0.45)'; // Facebook
-    if (colorClass.includes('#FF0000')) return 'rgba(255, 0, 0, 0.35)'; // YouTube
-    if (colorClass.includes('#0077b5')) return 'rgba(0, 119, 181, 0.45)'; // LinkedIn
-    if (colorClass.includes('#25D366')) return 'rgba(37, 211, 102, 0.35)'; // WhatsApp
+    if (!colorClass) return 'rgba(236, 72, 153, 0.05)';
+    if (colorClass.includes('pink-500')) return 'rgba(236, 72, 153, 0.35)';
+    if (colorClass.includes('#3b5998')) return 'rgba(59, 89, 152, 0.45)';
+    if (colorClass.includes('#FF0000')) return 'rgba(255, 0, 0, 0.35)';
+    if (colorClass.includes('#0077b5')) return 'rgba(0, 119, 181, 0.45)';
+    if (colorClass.includes('#25D366')) return 'rgba(37, 211, 102, 0.35)';
     return 'rgba(236, 72, 153, 0.05)';
   };
 
   return (
     <footer className="bg-black text-white pt-16 pb-8 border-t border-white/5 relative overflow-hidden transition-colors duration-700">
-      {/* Dynamic Background ambient aura lighting */}
       <motion.div
         animate={{
           backgroundColor: getAuraColor(activeAura),
@@ -169,7 +277,7 @@ const Footer = () => {
       />
 
       <div className="container mx-auto px-4 text-center relative z-10">
-        <h2 className="text-3xl md:text-5xl font-bold mb-6 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-300 to-gray-500 drop-shadow-sm">
+        <h2 className="text-3xl md:text-5xl font-bold mb-6 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-300 to-gray-500">
           Ready to make a difference?
         </h2>
         <p className="mb-10 text-lg md:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
@@ -187,7 +295,6 @@ const Footer = () => {
           <span className="relative invisible tracking-wider">Join the Hive</span>
         </Link>
 
-        {/* --- Innovative Social Media Dock --- */}
         <div className="mt-8 mb-12">
           <p className="text-sm text-gray-500 uppercase tracking-[0.2em] mb-6 font-semibold">Connect With Us</p>
           <motion.div
@@ -201,22 +308,15 @@ const Footer = () => {
               <motion.a
                 key={social.name}
                 href={social.href}
-                target="_blank"
-                rel="noopener noreferrer"
                 variants={itemVariants}
                 whileHover={{ y: -8, scale: 1.15 }}
-                whileTap={{ scale: 0.9 }}
-                className={`group relative flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white/5 border border-white/10 backdrop-blur-lg overflow-hidden transition-all duration-500 hover:bg-white/10 hover:border-white/20`}
+                className="group relative flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white/5 border border-white/10 backdrop-blur-lg overflow-hidden transition-all duration-500 hover:bg-white/10 hover:border-white/20"
                 onMouseEnter={() => setActiveAura(social.color)}
                 onMouseLeave={() => setActiveAura(null)}
               >
-                {/* The icon */}
                 <div className={`relative z-10 text-gray-500 transition-all duration-300 mt-0.5 ${social.color} ${social.shadow}`}>
                   {social.icon}
                 </div>
-
-                {/* Hidden label for screen readers */}
-                <span className="sr-only">{social.name}</span>
               </motion.a>
             ))}
           </motion.div>
@@ -224,170 +324,7 @@ const Footer = () => {
 
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between text-sm text-gray-500 gap-6 md:gap-4">
           <div>&copy; {new Date().getFullYear()} HemoHive. All rights reserved.</div>
-
-          <div
-            className="group relative inline-flex"
-            onMouseEnter={() => setIsDevHovered(true)}
-            onMouseLeave={() => setIsDevHovered(false)}
-          >
-            {/* Holographic Profile Card (Option 1) */}
-            <AnimatePresence>
-              {isDevHovered && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10, scale: 0.95, filter: "blur(10px)" }}
-                  animate={{ opacity: 1, y: -80, scale: 1, filter: "blur(0px)" }}
-                  exit={{ opacity: 0, y: 10, scale: 0.95, filter: "blur(10px)" }}
-                  transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                  className="absolute bottom-full left-1/2 -translate-x-1/2 px-4 py-3 mb-2 w-72 rounded-xl bg-black/80 border border-sky-500/30 backdrop-blur-xl shadow-[0_0_30px_rgba(14,165,233,0.3)] flex flex-col z-50 pointer-events-none"
-                >
-                  {/* Hologram Scanner Line */}
-                  <motion.div
-                    animate={{ top: ["0%", "100%", "0%"] }}
-                    transition={{ duration: 3, ease: "linear", repeat: Infinity }}
-                    className="absolute left-0 right-0 h-[1px] bg-sky-400/50 shadow-[0_0_10px_rgba(56,189,248,0.8)] z-10"
-                  />
-
-                  {/* Header Row: Avatar & ID */}
-                  <div className="flex items-center gap-4 w-full">
-                    <div className="relative w-12 h-12 rounded-full border border-sky-400/50 bg-sky-900/40 flex items-center justify-center overflow-hidden shrink-0 shadow-[0_0_15px_inset_rgba(56,189,248,0.4)]">
-                      <Image
-                        src="https://res.cloudinary.com/drwfe1mhk/image/upload/v1773218306/hemohive_profile/ayush_profile.jpg"
-                        alt="Ayush Singh"
-                        fill
-                        className="object-cover opacity-90 mix-blend-screen mix-blend-luminosity grayscale hover:grayscale-0 transition-all duration-500"
-                      />
-                      <div className="absolute inset-0 bg-sky-500/20 mix-blend-overlay"></div>
-                    </div>
-
-                    <div className="flex flex-col text-left justify-center">
-                      <div className="text-xs font-mono text-sky-400/80 mb-0.5 tracking-wider">&lt; CREATOR /&gt;</div>
-                      <div className="text-sm font-bold text-white tracking-wide">Ayush Singh</div>
-                      <div className="text-xs text-sky-200/80 mt-1 font-medium italic min-h-[16px]">
-                        {"Building the future of blood donation...".split('').map((char, i) => (
-                          <motion.span key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.1, delay: i * 0.05 + 0.5 }}>{char}</motion.span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Divider */}
-                  <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-sky-500/30 to-transparent my-1"></div>
-
-                  {/* Option 2: System Diagnostics (Livable Hover Icons) */}
-                  <div className="w-full text-left space-y-2.5 mt-2">
-                    {/* Lines of Code */}
-                    <div className="flex justify-between items-center text-[10px] font-mono text-sky-200/70 group/stat relative overflow-hidden h-4">
-                      <div className="flex items-center">
-                        <span className="absolute transition-all duration-300 transform translate-y-0 group-hover/stat:-translate-y-4 group-hover/stat:opacity-0 opacity-100">
-                          LINES_OF_CODE:
-                        </span>
-                        <div className="absolute transition-all duration-300 transform translate-y-4 group-hover/stat:translate-y-0 opacity-0 group-hover/stat:opacity-100 flex items-center gap-2">
-                          <motion.svg className="w-3.5 h-3.5 text-sky-400 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor" animate={{ rotate: 360 }} transition={{ duration: 4, ease: "linear", repeat: Infinity }}>
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                          </motion.svg>
-                          <span className="text-sky-300">Code Output</span>
-                        </div>
-                      </div>
-                      <span className="text-sky-400">1.2M+</span>
-                    </div>
-
-                    {/* Tea Consumed Variant (Horizontal Wipe) */}
-                    <div className="flex justify-between items-center text-[10px] font-mono text-sky-200/70 relative h-4 w-full">
-                      <div className="relative flex-1 h-full">
-
-                        {/* Base Layer: Amber Tea Icon (Text removed to unify concept) */}
-                        <div className="absolute inset-0 flex items-center gap-2 pointer-events-none">
-                          <div className="relative pt-[2px]">
-                            <svg className="w-3.5 h-3.5 text-amber-500 opacity-90 drop-shadow-[0_0_5px_rgba(245,158,11,0.6)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 8h-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v2H2v4h2v6a2 2 0 002 2h8a2 2 0 002-2v-6h2v-4zm-4 0v4H6V8h10z" />
-                            </svg>
-                            {/* Animated Steam Parent: Opacity strictly synced to wipe opening */}
-                            <motion.div
-                              animate={{ opacity: [0, 0, 1, 1, 0] }}
-                              transition={{ duration: 8, ease: "linear", repeat: Infinity, times: [0, 0.15, 0.2, 0.85, 1] }}
-                            >
-                              <motion.div className="absolute -top-[4px] left-1 w-[2px] h-1.5 bg-amber-400 rounded-full drop-shadow-[0_0_3px_rgba(251,191,36,0.8)]" animate={{ y: [0, -4, 0], opacity: [0, 1, 0] }} transition={{ duration: 1.5, repeat: Infinity, delay: 0 }} />
-                              <motion.div className="absolute -top-[6px] left-[7px] w-[2px] h-1.5 bg-amber-400 rounded-full drop-shadow-[0_0_3px_rgba(251,191,36,0.8)]" animate={{ y: [0, -5, 0], opacity: [0, 1, 0] }} transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }} />
-                            </motion.div>
-                          </div>
-                        </div>
-
-                        {/* Top Layer: Cyan Text (Wipes away to reveal Tea) */}
-                        <motion.div
-                          animate={{ width: ["100%", "100%", "0%", "0%", "100%"] }}
-                          transition={{ duration: 6, ease: "easeOut", repeat: Infinity, times: [0, 0.1, 0.25, 0.85, 1] }}
-                          className="absolute inset-y-0 left-0 flex items-center overflow-hidden whitespace-nowrap bg-black/80"
-                        >
-                          TEA_CONSUMED:
-                        </motion.div>
-
-                      </div>
-                      <span className="text-sky-400 relative z-10 pl-2 bg-black/80 shadow-[-10px_0_10px_rgba(0,0,0,0.8)]">{teaCount.toLocaleString()} CUPS</span>
-                    </div>
-
-                    {/* System Uptime */}
-                    <div className="flex justify-between items-center text-[10px] font-mono text-sky-200/70 group/stat relative overflow-hidden h-4">
-                      <div className="flex items-center">
-                        <span className="absolute transition-all duration-300 transform translate-y-0 group-hover/stat:-translate-y-4 group-hover/stat:opacity-0 opacity-100">
-                          SYSTEM_UPTIME:
-                        </span>
-                        <div className="absolute transition-all duration-300 transform translate-y-4 group-hover/stat:translate-y-0 opacity-0 group-hover/stat:opacity-100 flex items-center gap-2">
-                          <svg className="w-3.5 h-3.5 text-sky-400 opacity-80 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          <span className="text-sky-300">Uptime</span>
-                        </div>
-                      </div>
-                      <span className="text-sky-400 animate-pulse">99.99%</span>
-                    </div>
-
-                    {/* Network Status */}
-                    <div className="flex justify-between items-center text-[10px] font-mono text-sky-200/70 pt-1 group/stat relative overflow-hidden h-4">
-                      <div className="flex items-center">
-                        <span className="absolute transition-all duration-300 transform translate-y-0 group-hover/stat:-translate-y-4 group-hover/stat:opacity-0 opacity-100">
-                          NETWORK_STATUS:
-                        </span>
-                        <div className="absolute transition-all duration-300 transform translate-y-4 group-hover/stat:translate-y-0 opacity-0 group-hover/stat:opacity-100 flex items-center gap-2">
-                          <svg className="w-3.5 h-3.5 text-emerald-400 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                          </svg>
-                          <span className="text-emerald-300">Status</span>
-                        </div>
-                      </div>
-                      <span className="text-emerald-400 animate-pulse flex items-center gap-1.5 relative">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 absolute -left-3 shadow-[0_0_8px_rgba(52,211,153,0.8)]"></span> SECURE
-                      </span>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* The Main Button */}
-            <Link
-              href="/developer"
-              className="relative inline-flex items-center justify-center px-6 py-2.5 font-medium tracking-wide text-white transition-all duration-300 rounded-full bg-slate-900 border border-slate-700/50 hover:bg-slate-800 hover:border-sky-400 hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(14,165,233,0.1)] hover:shadow-[0_0_25px_rgba(14,165,233,0.4)] overflow-hidden"
-            >
-              {/* Blue Moon Ambient Background Glow */}
-              <span className="absolute inset-0 w-full h-full bg-gradient-to-tr from-cyan-500/0 via-sky-500/10 to-blue-600/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></span>
-
-              {/* Spinning/Moving Light Edge */}
-              <span className="absolute -inset-[100%] animate-[spin_4s_linear_infinite] bg-gradient-to-r from-transparent via-sky-400/20 to-transparent group-hover:via-sky-400/50 transition-colors duration-500 pointer-events-none"></span>
-
-              {/* Content Container */}
-              <span className="relative z-10 flex items-center gap-2">
-                <span className="relative flex h-2.5 w-2.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-sky-500 shadow-[0_0_8px_rgba(56,189,248,0.8)]"></span>
-                </span>
-
-                {/* Option 2: Scrambled Text Terminal Effect */}
-                <span className="text-slate-300 group-hover:text-white transition-colors duration-300 drop-shadow-sm group-hover:drop-shadow-[0_0_8px_rgba(56,189,248,0.8)] font-mono min-w-[150px]">
-                  {scrambledText}
-                </span>
-              </span>
-            </Link>
-          </div>
+          <DeveloperBadge teaCount={teaCount} />
         </div>
       </div>
     </footer>
