@@ -251,7 +251,7 @@ const Footer = () => {
                   <div className="flex items-center gap-4 w-full">
                     <div className="relative w-12 h-12 rounded-full border border-sky-400/50 bg-sky-900/40 flex items-center justify-center overflow-hidden shrink-0 shadow-[0_0_15px_inset_rgba(56,189,248,0.4)]">
                       <Image
-                        src="/images/ayush.jpeg"
+                        src="https://res.cloudinary.com/drwfe1mhk/image/upload/v1773218306/hemohive_profile/ayush_profile.jpg"
                         alt="Ayush Singh"
                         fill
                         className="object-cover opacity-90 mix-blend-screen mix-blend-luminosity grayscale hover:grayscale-0 transition-all duration-500"
