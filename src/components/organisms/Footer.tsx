@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { motion, Variants } from "framer-motion";
-import { useState } from "react";
+import Image from "next/image";
+import { motion, Variants, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
 
 const socialLinks = [
   {
@@ -75,9 +76,9 @@ const containerVariants: Variants = {
 
 const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20, scale: 0.8 },
-  visible: { 
-    opacity: 1, 
-    y: 0, 
+  visible: {
+    opacity: 1,
+    y: 0,
     scale: 1,
     transition: { type: "spring" as const, stiffness: 300, damping: 20 }
   }
@@ -86,6 +87,62 @@ const itemVariants: Variants = {
 const Footer = () => {
   // Track which social link is currently hovered to create the ambient aura
   const [activeAura, setActiveAura] = useState<string | null>(null);
+
+  // Developer Link Hover States for God-Level Holographic / Scramble UX
+  const [isDevHovered, setIsDevHovered] = useState(false);
+  const defaultText = "Meet the Developer";
+  const hoveredText = "Ayush Singh";
+  const [scrambledText, setScrambledText] = useState(defaultText);
+  const scrambleIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Progressive Tea Count State
+  const [teaCount, setTeaCount] = useState(0);
+
+  useEffect(() => {
+    // Target date from the user: August 1, 2025
+    const START_DATE = new Date("2025-08-01T00:00:00Z").getTime();
+    const now = new Date().getTime();
+    
+    // Calculate total days elapsed positively.
+    const millisecondsPassed = Math.max(0, now - START_DATE);
+    const daysSince = Math.floor(millisecondsPassed / (1000 * 60 * 60 * 24));
+    
+    setTeaCount(daysSince * 3);
+  }, []);
+
+  // Terminal Text Scramble Effect
+  useEffect(() => {
+    let iteration = 0;
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
+    const targetText = isDevHovered ? hoveredText : defaultText;
+    const startingText = isDevHovered ? defaultText : hoveredText;
+
+    clearInterval(scrambleIntervalRef.current as any);
+
+    scrambleIntervalRef.current = setInterval(() => {
+      setScrambledText(
+        targetText
+          .split("")
+          .map((letter, index) => {
+            if (index < iteration) {
+              return targetText[index];
+            }
+            // Add padding if target is longer, or just scramble
+            return letters[Math.floor(Math.random() * letters.length)];
+          })
+          .join("")
+      );
+
+      if (iteration >= Math.max(targetText.length, startingText.length)) {
+        clearInterval(scrambleIntervalRef.current as any);
+        setScrambledText(targetText); // lock exactly to target
+      }
+
+      iteration += 1 / 2; // Controls speed of scramble resolution
+    }, 30);
+
+    return () => clearInterval(scrambleIntervalRef.current as any);
+  }, [isDevHovered]);
 
   // Map the text colors back to raw rgba values for the aura so Framer Motion can smoothly interpolate it
   const getAuraColor = (colorClass: string | null) => {
@@ -101,14 +158,14 @@ const Footer = () => {
   return (
     <footer className="bg-black text-white pt-16 pb-8 border-t border-white/5 relative overflow-hidden transition-colors duration-700">
       {/* Dynamic Background ambient aura lighting */}
-      <motion.div 
-        animate={{ 
+      <motion.div
+        animate={{
           backgroundColor: getAuraColor(activeAura),
           opacity: activeAura ? 1 : 0.6,
           scale: activeAura ? 1.2 : 1
         }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-48 sm:h-64 blur-[100px] sm:blur-[140px] rounded-[100%] pointer-events-none" 
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-48 sm:h-64 blur-[100px] sm:blur-[140px] rounded-[100%] pointer-events-none"
       />
 
       <div className="container mx-auto px-4 text-center relative z-10">
@@ -118,7 +175,7 @@ const Footer = () => {
         <p className="mb-10 text-lg md:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
           Join HemoHive today and be a part of the solution to India's blood crisis.
         </p>
-        
+
         <Link
           href="/register"
           className="glowing-edge relative inline-flex items-center justify-center p-4 px-6 py-3 overflow-hidden font-medium text-white transition duration-300 ease-out bg-secondary rounded-full shadow-md group mb-16"
@@ -133,7 +190,7 @@ const Footer = () => {
         {/* --- Innovative Social Media Dock --- */}
         <div className="mt-8 mb-12">
           <p className="text-sm text-gray-500 uppercase tracking-[0.2em] mb-6 font-semibold">Connect With Us</p>
-          <motion.div 
+          <motion.div
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
@@ -157,7 +214,7 @@ const Footer = () => {
                 <div className={`relative z-10 text-gray-500 transition-all duration-300 mt-0.5 ${social.color} ${social.shadow}`}>
                   {social.icon}
                 </div>
-                
+
                 {/* Hidden label for screen readers */}
                 <span className="sr-only">{social.name}</span>
               </motion.a>
@@ -165,12 +222,172 @@ const Footer = () => {
           </motion.div>
         </div>
 
-        <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between text-sm text-gray-500 gap-4">
+        <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between text-sm text-gray-500 gap-6 md:gap-4">
           <div>&copy; {new Date().getFullYear()} HemoHive. All rights reserved.</div>
-          <Link href="/developer" className="hover:text-white transition-colors relative group">
-            Meet the Developer
-            <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-white transition-all duration-300 group-hover:w-full"></span>
-          </Link>
+
+          <div
+            className="group relative inline-flex"
+            onMouseEnter={() => setIsDevHovered(true)}
+            onMouseLeave={() => setIsDevHovered(false)}
+          >
+            {/* Holographic Profile Card (Option 1) */}
+            <AnimatePresence>
+              {isDevHovered && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.95, filter: "blur(10px)" }}
+                  animate={{ opacity: 1, y: -80, scale: 1, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95, filter: "blur(10px)" }}
+                  transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                  className="absolute bottom-full left-1/2 -translate-x-1/2 px-4 py-3 mb-2 w-72 rounded-xl bg-black/80 border border-sky-500/30 backdrop-blur-xl shadow-[0_0_30px_rgba(14,165,233,0.3)] flex flex-col z-50 pointer-events-none"
+                >
+                  {/* Hologram Scanner Line */}
+                  <motion.div
+                    animate={{ top: ["0%", "100%", "0%"] }}
+                    transition={{ duration: 3, ease: "linear", repeat: Infinity }}
+                    className="absolute left-0 right-0 h-[1px] bg-sky-400/50 shadow-[0_0_10px_rgba(56,189,248,0.8)] z-10"
+                  />
+
+                  {/* Header Row: Avatar & ID */}
+                  <div className="flex items-center gap-4 w-full">
+                    <div className="relative w-12 h-12 rounded-full border border-sky-400/50 bg-sky-900/40 flex items-center justify-center overflow-hidden shrink-0 shadow-[0_0_15px_inset_rgba(56,189,248,0.4)]">
+                      <Image
+                        src="/images/ayush.jpeg"
+                        alt="Ayush Singh"
+                        fill
+                        className="object-cover opacity-90 mix-blend-screen mix-blend-luminosity grayscale hover:grayscale-0 transition-all duration-500"
+                      />
+                      <div className="absolute inset-0 bg-sky-500/20 mix-blend-overlay"></div>
+                    </div>
+
+                    <div className="flex flex-col text-left justify-center">
+                      <div className="text-xs font-mono text-sky-400/80 mb-0.5 tracking-wider">&lt; CREATOR /&gt;</div>
+                      <div className="text-sm font-bold text-white tracking-wide">Ayush Singh</div>
+                      <div className="text-xs text-sky-200/80 mt-1 font-medium italic min-h-[16px]">
+                        {"Building the future of blood donation...".split('').map((char, i) => (
+                          <motion.span key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.1, delay: i * 0.05 + 0.5 }}>{char}</motion.span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Divider */}
+                  <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-sky-500/30 to-transparent my-1"></div>
+
+                  {/* Option 2: System Diagnostics (Livable Hover Icons) */}
+                  <div className="w-full text-left space-y-2.5 mt-2">
+                    {/* Lines of Code */}
+                    <div className="flex justify-between items-center text-[10px] font-mono text-sky-200/70 group/stat relative overflow-hidden h-4">
+                      <div className="flex items-center">
+                        <span className="absolute transition-all duration-300 transform translate-y-0 group-hover/stat:-translate-y-4 group-hover/stat:opacity-0 opacity-100">
+                          LINES_OF_CODE:
+                        </span>
+                        <div className="absolute transition-all duration-300 transform translate-y-4 group-hover/stat:translate-y-0 opacity-0 group-hover/stat:opacity-100 flex items-center gap-2">
+                          <motion.svg className="w-3.5 h-3.5 text-sky-400 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor" animate={{ rotate: 360 }} transition={{ duration: 4, ease: "linear", repeat: Infinity }}>
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                          </motion.svg>
+                          <span className="text-sky-300">Code Output</span>
+                        </div>
+                      </div>
+                      <span className="text-sky-400">1.2M+</span>
+                    </div>
+
+                    {/* Tea Consumed Variant (Horizontal Wipe) */}
+                    <div className="flex justify-between items-center text-[10px] font-mono text-sky-200/70 relative h-4 w-full">
+                      <div className="relative flex-1 h-full">
+
+                        {/* Base Layer: Amber Tea Icon (Text removed to unify concept) */}
+                        <div className="absolute inset-0 flex items-center gap-2 pointer-events-none">
+                          <div className="relative pt-[2px]">
+                            <svg className="w-3.5 h-3.5 text-amber-500 opacity-90 drop-shadow-[0_0_5px_rgba(245,158,11,0.6)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 8h-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v2H2v4h2v6a2 2 0 002 2h8a2 2 0 002-2v-6h2v-4zm-4 0v4H6V8h10z" />
+                            </svg>
+                            {/* Animated Steam Parent: Opacity strictly synced to wipe opening */}
+                            <motion.div
+                              animate={{ opacity: [0, 0, 1, 1, 0] }}
+                              transition={{ duration: 8, ease: "linear", repeat: Infinity, times: [0, 0.15, 0.2, 0.85, 1] }}
+                            >
+                              <motion.div className="absolute -top-[4px] left-1 w-[2px] h-1.5 bg-amber-400 rounded-full drop-shadow-[0_0_3px_rgba(251,191,36,0.8)]" animate={{ y: [0, -4, 0], opacity: [0, 1, 0] }} transition={{ duration: 1.5, repeat: Infinity, delay: 0 }} />
+                              <motion.div className="absolute -top-[6px] left-[7px] w-[2px] h-1.5 bg-amber-400 rounded-full drop-shadow-[0_0_3px_rgba(251,191,36,0.8)]" animate={{ y: [0, -5, 0], opacity: [0, 1, 0] }} transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }} />
+                            </motion.div>
+                          </div>
+                        </div>
+
+                        {/* Top Layer: Cyan Text (Wipes away to reveal Tea) */}
+                        <motion.div
+                          animate={{ width: ["100%", "100%", "0%", "0%", "100%"] }}
+                          transition={{ duration: 6, ease: "easeOut", repeat: Infinity, times: [0, 0.1, 0.25, 0.85, 1] }}
+                          className="absolute inset-y-0 left-0 flex items-center overflow-hidden whitespace-nowrap bg-black/80"
+                        >
+                          TEA_CONSUMED:
+                        </motion.div>
+
+                      </div>
+                      <span className="text-sky-400 relative z-10 pl-2 bg-black/80 shadow-[-10px_0_10px_rgba(0,0,0,0.8)]">{teaCount.toLocaleString()} CUPS</span>
+                    </div>
+
+                    {/* System Uptime */}
+                    <div className="flex justify-between items-center text-[10px] font-mono text-sky-200/70 group/stat relative overflow-hidden h-4">
+                      <div className="flex items-center">
+                        <span className="absolute transition-all duration-300 transform translate-y-0 group-hover/stat:-translate-y-4 group-hover/stat:opacity-0 opacity-100">
+                          SYSTEM_UPTIME:
+                        </span>
+                        <div className="absolute transition-all duration-300 transform translate-y-4 group-hover/stat:translate-y-0 opacity-0 group-hover/stat:opacity-100 flex items-center gap-2">
+                          <svg className="w-3.5 h-3.5 text-sky-400 opacity-80 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span className="text-sky-300">Uptime</span>
+                        </div>
+                      </div>
+                      <span className="text-sky-400 animate-pulse">99.99%</span>
+                    </div>
+
+                    {/* Network Status */}
+                    <div className="flex justify-between items-center text-[10px] font-mono text-sky-200/70 pt-1 group/stat relative overflow-hidden h-4">
+                      <div className="flex items-center">
+                        <span className="absolute transition-all duration-300 transform translate-y-0 group-hover/stat:-translate-y-4 group-hover/stat:opacity-0 opacity-100">
+                          NETWORK_STATUS:
+                        </span>
+                        <div className="absolute transition-all duration-300 transform translate-y-4 group-hover/stat:translate-y-0 opacity-0 group-hover/stat:opacity-100 flex items-center gap-2">
+                          <svg className="w-3.5 h-3.5 text-emerald-400 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                          </svg>
+                          <span className="text-emerald-300">Status</span>
+                        </div>
+                      </div>
+                      <span className="text-emerald-400 animate-pulse flex items-center gap-1.5 relative">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 absolute -left-3 shadow-[0_0_8px_rgba(52,211,153,0.8)]"></span> SECURE
+                      </span>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* The Main Button */}
+            <Link
+              href="/developer"
+              className="relative inline-flex items-center justify-center px-6 py-2.5 font-medium tracking-wide text-white transition-all duration-300 rounded-full bg-slate-900 border border-slate-700/50 hover:bg-slate-800 hover:border-sky-400 hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(14,165,233,0.1)] hover:shadow-[0_0_25px_rgba(14,165,233,0.4)] overflow-hidden"
+            >
+              {/* Blue Moon Ambient Background Glow */}
+              <span className="absolute inset-0 w-full h-full bg-gradient-to-tr from-cyan-500/0 via-sky-500/10 to-blue-600/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></span>
+
+              {/* Spinning/Moving Light Edge */}
+              <span className="absolute -inset-[100%] animate-[spin_4s_linear_infinite] bg-gradient-to-r from-transparent via-sky-400/20 to-transparent group-hover:via-sky-400/50 transition-colors duration-500 pointer-events-none"></span>
+
+              {/* Content Container */}
+              <span className="relative z-10 flex items-center gap-2">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-sky-500 shadow-[0_0_8px_rgba(56,189,248,0.8)]"></span>
+                </span>
+
+                {/* Option 2: Scrambled Text Terminal Effect */}
+                <span className="text-slate-300 group-hover:text-white transition-colors duration-300 drop-shadow-sm group-hover:drop-shadow-[0_0_8px_rgba(56,189,248,0.8)] font-mono min-w-[150px]">
+                  {scrambledText}
+                </span>
+              </span>
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
