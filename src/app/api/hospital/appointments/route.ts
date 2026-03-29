@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 import dbConnect from '../../../../lib/dbConnect';
 import DonationAppointment from '../../../../models/DonationAppointment';
+import User from '../../../../models/User';
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../lib/auth";
 
@@ -45,18 +46,40 @@ export async function PATCH(req: Request) {
             return NextResponse.json({ message: 'Invalid status' }, { status: 400 });
         }
 
-        const updateData: any = { status: status };
-        if (cancellationReason) updateData.cancellationReason = cancellationReason;
-
         // Verify the appointment belongs to this center before updating
-        const appointment = await DonationAppointment.findOneAndUpdate(
-            { _id: id, center: userId },
-            updateData,
-            { new: true }
-        );
+        const appointment = await DonationAppointment.findOne({ _id: id, center: userId });
 
         if (!appointment) {
             return NextResponse.json({ message: 'Appointment not found or unauthorized' }, { status: 404 });
+        }
+
+        // Prevent double processing if already completed
+        if (appointment.status === 'completed' && status === 'completed') {
+            return NextResponse.json(appointment);
+        }
+
+        appointment.status = status;
+        if (cancellationReason) appointment.cancellationReason = cancellationReason;
+
+        await appointment.save();
+
+        // If completed, update the donor's profile
+        if (status === 'completed') {
+            // Determine wait period
+            let daysToAdd = 90; // Default for Whole Blood
+            if (appointment.donation_type === 'Plasma') daysToAdd = 28;
+            if (appointment.donation_type === 'Platelets') daysToAdd = 14;
+
+            const nextEligibleDate = new Date();
+            nextEligibleDate.setDate(nextEligibleDate.getDate() + daysToAdd);
+
+            // Update dates - no credit needed, total_donations unlock features dynamically
+            await User.findByIdAndUpdate(appointment.user, {
+                $set: { 
+                    lastDonationDate: new Date(),
+                    next_eligible_date: nextEligibleDate 
+                }
+            });
         }
 
         return NextResponse.json(appointment);

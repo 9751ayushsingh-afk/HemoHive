@@ -142,6 +142,7 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({ onBack, onConfirm }) => {
                 <input
                   type="date"
                   required
+                  min={new Date().toISOString().split('T')[0]}
                   value={form.date}
                   onChange={(e) => setForm({ ...form, date: e.target.value })}
                   className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-red-500 outline-none"
