@@ -126,6 +126,7 @@ export default function DriverDashboard() {
         startGPS();
         return () => {
             if ((window as any).gpsWatchId) navigator.geolocation.clearWatch((window as any).gpsWatchId);
+            if ((window as any).gpsIntervalId) clearInterval((window as any).gpsIntervalId);
         };
     }, []);
 
@@ -188,22 +189,44 @@ export default function DriverDashboard() {
 
         const error = async (err: GeolocationPositionError) => {
             console.error('GPS Error:', err);
-            if (!window.isSecureContext) {
-                setManualLocationMode(true);
-            } else {
+            if (!window.isSecureContext || process.env.NODE_ENV === 'development') {
+                toast("Simulation Mode: Simulating GPS Movement", { icon: '🚘' });
                 try {
                     const res = await fetch('https://ipapi.co/json/');
                     const data = await res.json();
                     if (data.latitude && data.longitude) {
-                        setCurrentLocation([data.latitude, data.longitude]);
+                        let currentLat = data.latitude;
+                        let currentLng = data.longitude;
+                        setCurrentLocation([currentLat, currentLng]);
+
+                        // Simulate driving movement for testing
+                        setInterval(() => {
+                            currentLat += (Math.random() - 0.2) * 0.0005;
+                            currentLng += (Math.random() - 0.2) * 0.0005;
+                            setCurrentLocation([currentLat, currentLng]);
+                        }, 3000);
                     }
                 } catch (e) { console.error(e); }
+            } else {
+                setManualLocationMode(true);
             }
         };
 
         const options = { enableHighAccuracy: true, maximumAge: 0, timeout: 60000 };
         if ((window as any).gpsWatchId) navigator.geolocation.clearWatch((window as any).gpsWatchId);
         (window as any).gpsWatchId = navigator.geolocation.watchPosition(success, error, options);
+
+        // [NEW] AGGRESSIVE MICRO-MOVEMENT POLLING
+        // Forces the GPS hardware to report position every 2.5 seconds,
+        // bypassing the browser's battery-saving distance filters for minute location tracking!
+        if ((window as any).gpsIntervalId) clearInterval((window as any).gpsIntervalId);
+        (window as any).gpsIntervalId = setInterval(() => {
+            navigator.geolocation.getCurrentPosition(success, () => {}, { 
+                enableHighAccuracy: true, 
+                maximumAge: 0, 
+                timeout: 2000 
+            });
+        }, 2500);
     };
 
     useEffect(() => {
@@ -250,7 +273,10 @@ export default function DriverDashboard() {
                 setIsOnline(data.profile.isOnline);
 
                 if (data.profile.id && !socketRef.current) {
-                    const newSocket = io({ path: '/api/socket' });
+                    const newSocket = io({ 
+                        path: '/api/socket',
+                        transports: ['websocket', 'polling']
+                    });
                     socketRef.current = newSocket;
                     newSocket.on('connect', () => {
                         newSocket.emit('join_driver_room', data.profile.id);

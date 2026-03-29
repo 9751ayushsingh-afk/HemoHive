@@ -131,6 +131,7 @@ export default function DeliveryTracking({ deliveryId, initialData }: DeliveryTr
         // Connect to custom server socket
         const newSocket = io({
             path: '/api/socket',
+            transports: ['websocket', 'polling']
         });
 
         newSocket.on('connect', () => {
