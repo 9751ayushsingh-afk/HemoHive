@@ -224,7 +224,7 @@ export default function DriverDashboard() {
             navigator.geolocation.getCurrentPosition(success, () => {}, { 
                 enableHighAccuracy: true, 
                 maximumAge: 0, 
-                timeout: 2000 
+                timeout: 10000 // Give the hardware 10s to find satellites instead of failing silently after 2s
             });
         }, 2500);
     };
