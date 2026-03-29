@@ -14,18 +14,24 @@ import { toast } from 'react-hot-toast';
 const iconPerson = new L.Icon({
     iconUrl: 'https://cdn-icons-png.flaticon.com/512/6833/6833591.png',
     iconSize: [40, 40],
+    iconAnchor: [20, 40],
+    popupAnchor: [0, -40],
     className: 'leaflet-venue-icon'
 });
 
 const iconDriver = new L.Icon({
     iconUrl: 'https://cdn-icons-png.flaticon.com/512/7541/7541900.png',
     iconSize: [45, 45],
+    iconAnchor: [22, 45],
+    popupAnchor: [0, -45],
     className: 'leaflet-venue-icon'
 });
 
 const iconHospital = new L.Icon({
     iconUrl: 'https://cdn-icons-png.flaticon.com/512/4320/4320371.png',
     iconSize: [45, 45],
+    iconAnchor: [22, 45],
+    popupAnchor: [0, -45],
     className: 'leaflet-venue-icon'
 });
 
@@ -34,10 +40,14 @@ interface DeliveryTrackingProps {
     initialData?: any;
 }
 
-// Internal component to handle map movement
+// Internal component to handle map movement gracefully
 function MapController({ driver, pickup, dropoff }: { driver?: { lat: number, lng: number } | null, pickup?: [number, number] | null, dropoff?: [number, number] | null }) {
     const map = useMap();
+    const hasInitialized = useRef(false);
+
     useEffect(() => {
+        if (hasInitialized.current) return; // Only fit bounds once to prevent layout snapping
+
         const points: [number, number][] = [];
         if (driver) points.push([driver.lat, driver.lng]);
         if (pickup) points.push(pickup);
@@ -46,8 +56,22 @@ function MapController({ driver, pickup, dropoff }: { driver?: { lat: number, ln
         if (points.length > 0) {
             const bounds = L.latLngBounds(points);
             map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+            if (pickup || dropoff) {
+                hasInitialized.current = true;
+            }
         }
-    }, [driver, pickup, dropoff]);
+    }, [driver, pickup, dropoff, map]);
+
+    // Pan sequentially only if driver goes out of map view
+    useEffect(() => {
+        if (hasInitialized.current && driver) {
+            const driverLatLng = L.latLng(driver.lat, driver.lng);
+            if (!map.getBounds().contains(driverLatLng)) {
+                map.panTo(driverLatLng, { animate: true });
+            }
+        }
+    }, [driver, map]);
+
     return null;
 }
 
