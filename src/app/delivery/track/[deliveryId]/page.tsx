@@ -1,8 +1,14 @@
-
-import DeliveryTracking from '../../../../components/delivery/DeliveryTracking';
+import dynamic from 'next/dynamic';
 import dbConnect from '../../../../lib/dbConnect';
 import Delivery from '../../../../models/Delivery';
 import Driver from '../../../../models/Driver';
+
+// Dynamically import the DeliveryTracking component with SSR disabled
+// This is critical because Leaflet relies on the browser's `window` object
+const DeliveryTracking = dynamic(
+    () => import('../../../../components/delivery/DeliveryTracking'),
+    { ssr: false, loading: () => <div className="h-full w-full flex items-center justify-center bg-gray-100">Loading tracking map...</div> }
+);
 
 export default async function TrackDeliveryPage({ params }: { params: { deliveryId: string } }) {
     await dbConnect();
