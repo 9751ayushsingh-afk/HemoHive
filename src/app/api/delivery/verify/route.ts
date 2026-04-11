@@ -27,7 +27,7 @@ export async function POST(request: Request) {
         try {
             const BloodRequest = (await import('../../../../models/BloodRequest')).default;
             await BloodRequest.findByIdAndUpdate(delivery.requestId, { status: 'Fulfilled' });
-        } catch (e) {
+        } catch (e: any) {
             console.error('Failed to update BloodRequest status:', e.message);
         }
 
