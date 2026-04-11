@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import dbConnect from '../../../../lib/dbConnect';
 import BloodRequest from '../../../../models/BloodRequest';
 import Inventory from '../../../../models/Inventory';
+import User from '../../../../models/User'; // Ensure User model is registered for populate
 import { getAuth } from '../../../../lib/auth';
 
 export async function GET(request: NextRequest) {

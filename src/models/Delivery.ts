@@ -81,11 +81,6 @@ const DeliverySchema: Schema<IDelivery> = new Schema(
     { timestamps: true }
 );
 
-// Force recompilation to ensure schema updates apply (Fix for 'verificationCode' ghost error)
-if (mongoose.models.Delivery) {
-    delete mongoose.models.Delivery;
-}
-
-const Delivery: Model<IDelivery> = mongoose.model<IDelivery>('Delivery', DeliverySchema);
+const Delivery: Model<IDelivery> = mongoose.models.Delivery || mongoose.model<IDelivery>('Delivery', DeliverySchema);
 
 export default Delivery;

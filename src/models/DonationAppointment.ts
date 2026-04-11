@@ -50,11 +50,6 @@ const DonationAppointmentSchema: Schema = new Schema({
   timestamps: true,
 });
 
-// Force re-compilation of the model if it exists to pick up Schema changes (dev environment fix)
-if (mongoose.models.DonationAppointment) {
-  delete mongoose.models.DonationAppointment;
-}
-
-const DonationAppointment: Model<IDonationAppointment> = mongoose.model<IDonationAppointment>('DonationAppointment', DonationAppointmentSchema);
+const DonationAppointment: Model<IDonationAppointment> = mongoose.models.DonationAppointment || mongoose.model<IDonationAppointment>('DonationAppointment', DonationAppointmentSchema);
 
 export default DonationAppointment;

@@ -90,9 +90,4 @@ const BloodRequestSchema: Schema = new Schema({
     }
 }, { timestamps: true });
 
-// Force recompilation for Dev (Schema Changes)
-if (mongoose.models.BloodRequest) {
-    delete mongoose.models.BloodRequest;
-}
-
 export default mongoose.models.BloodRequest || mongoose.model<IBloodRequest>('BloodRequest', BloodRequestSchema);

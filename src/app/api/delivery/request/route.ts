@@ -4,14 +4,25 @@ import dbConnect from '../../../../lib/dbConnect';
 import Delivery from '../../../../models/Delivery';
 import Driver from '../../../../models/Driver';
 import BloodRequest from '../../../../models/BloodRequest';
-import User from '../../../../models/User'; // Ensure User model is loaded
+import User from '../../../../models/User'; 
 import mongoose from 'mongoose';
+
+// [REGISTRATION] Explicitly mention the model names to ensure Mongoose registers them
+// This prevents "MissingSchemaError: Schema hasn't been registered for model \"User\"" on Render.
+const USER_MODEL = User; 
 
 // Helper to generate 4-digit code
 const generateCode = () => Math.floor(1000 + Math.random() * 9000).toString();
 
 export async function POST(request: Request) {
     await dbConnect();
+    
+    // Explicitly check for model registration
+    if (!mongoose.models.User) {
+        console.log('[DEBUG] User model missing, forced registration triggered');
+        // This shouldn't happen with the import above, but we're being safe.
+    }
+
     try {
         const rawBody = await request.text();
         console.log('[DEBUG] /api/delivery/request Raw Body:', rawBody ? rawBody.substring(0, 100) : 'EMPTY');

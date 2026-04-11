@@ -185,8 +185,4 @@ UserSchema.pre('save', async function (next) {
     next();
 });
 
-if (mongoose.models.User) {
-    delete mongoose.models.User;
-}
-
 export default mongoose.models.User || mongoose.model('User', UserSchema);
