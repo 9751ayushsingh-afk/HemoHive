@@ -132,18 +132,18 @@ export default function DriverDashboard() {
 
     useEffect(() => {
         if (currentLocation && activeDelivery && socketRef.current) {
-            const deliveryId = activeDelivery._id || activeDelivery.id;
+            const deliveryId = String(activeDelivery._id || activeDelivery.id);
 
             // 1. Instant Socket Update
-            console.log('[Socket] Emitting location for:', deliveryId, currentLocation);
+            console.log(`[Socket] Emitting location for delivery_${deliveryId}:`, currentLocation);
             socketRef.current.emit('update_location', {
                 deliveryId,
                 location: { lat: currentLocation[0], lng: currentLocation[1] }
             });
 
-            // 2. Throttled DB Update (every 30 seconds)
+            // 2. Throttled DB Update (every 20 seconds)
             const now = Date.now();
-            if (now - lastDbUpdateRef.current > 30000) {
+            if (now - lastDbUpdateRef.current > 20000) {
                 lastDbUpdateRef.current = now;
                 console.log('[API] Saving location to DB...');
                 fetch('/api/delivery/location', {

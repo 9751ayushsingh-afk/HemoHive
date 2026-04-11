@@ -40,19 +40,18 @@ export async function POST(request: Request) {
 
         if (requestId) {
             // [IDEMPOTENCY CHECK] Check if a delivery already exists for this request
-            existingDelivery = await Delivery.findOne({
-                requestId: requestId,
-                status: { $in: ['ASSIGNED', 'PICKED_UP', 'IN_TRANSIT', 'SEARCHING'] } // Check SEARCHING too?
-            });
+            // We search for ANY delivery first to see if it's already finished.
+            existingDelivery = await Delivery.findOne({ requestId: requestId });
 
-            if (existingDelivery && existingDelivery.status !== 'SEARCHING') {
-                // If it is already ASSIGNED+ return it.
-                // If it is SEARCHING, we proceed to re-search/expand search (logic below handles this)
-                return NextResponse.json({
-                    success: true,
-                    delivery: existingDelivery,
-                    message: 'Delivery already in progress'
-                });
+            if (existingDelivery) {
+                if (['ASSIGNED', 'PICKED_UP', 'IN_TRANSIT', 'DELIVERED', 'CANCELLED'].includes(existingDelivery.status)) {
+                    return NextResponse.json({
+                        success: true,
+                        delivery: existingDelivery,
+                        message: existingDelivery.status === 'DELIVERED' ? 'Delivery already completed' : 'Delivery already in progress'
+                    });
+                }
+                // If status is 'SEARCHING', we proceed to re-search/expand search (continuation logic)
             }
         }
 
@@ -72,6 +71,14 @@ export async function POST(request: Request) {
             if (!bloodRequest) {
                 console.log('[Error] BloodRequest not found:', requestId);
                 return NextResponse.json({ message: 'Blood Request not found' }, { status: 404 });
+            }
+
+            // [NEW] If already fulfilled, do not start delivery
+            if (bloodRequest.status === 'Fulfilled') {
+                return NextResponse.json({
+                    success: true,
+                    message: 'Blood Request already fulfilled.'
+                });
             }
 
             const hospital = bloodRequest.hospitalId;

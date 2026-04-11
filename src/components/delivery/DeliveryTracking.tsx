@@ -135,23 +135,26 @@ export default function DeliveryTracking({ deliveryId, initialData }: DeliveryTr
         });
 
         newSocket.on('connect', () => {
-            console.log('Connected to socket server');
-            newSocket.emit('join_delivery_room', deliveryId);
+            console.log('[Socket] Connected to server. Joining room:', String(deliveryId));
+            newSocket.emit('join_delivery_room', String(deliveryId));
         });
 
         newSocket.on('driver_moved', (location) => {
-            console.log('[Socket] driver_moved:', location);
-            setDriverLocation(location);
-            setMapCenter([location.lat, location.lng]);
+            console.log('[Socket] Received driver_moved:', location);
+            if (location && typeof location.lat === 'number' && typeof location.lng === 'number') {
+                setDriverLocation(location);
+                // Gradually move map if needed, but don't force snap center
+                // setMapCenter([location.lat, location.lng]); 
+            }
         });
 
         // [FIX] Request latest location immediately upon joining
-        console.log('[Socket] Requesting driver location for:', deliveryId);
-        newSocket.emit('request_driver_location', deliveryId);
+        console.log('[Socket] Requesting initial driver location for:', String(deliveryId));
+        newSocket.emit('request_driver_location', String(deliveryId));
 
         newSocket.on('current_driver_location', (location) => {
             console.log('[Socket] Received current_driver_location:', location);
-            if (location) {
+            if (location && typeof location.lat === 'number' && typeof location.lng === 'number') {
                 setDriverLocation(location);
                 setMapCenter([location.lat, location.lng]);
             }
@@ -165,31 +168,33 @@ export default function DeliveryTracking({ deliveryId, initialData }: DeliveryTr
 
         setSocket(newSocket);
 
-        // [NEW] Polling Fallback (every 5s)
+        // [NEW] Polling Fallback (every 5s) for Status & Location
         const pollInterval = setInterval(async () => {
             try {
-                // We can reuse the invoice/request endpoint or a dedicated delivery status endpoint
-                // Since we don't have a simple GET /api/delivery/[id], we can use the verify endpoint or similar?
-                // Actually Request ID is in initialData, let's use the track endpoint or just assume the server endpoint exists.
-                // Let's create a simple check using the existing 'active-delivery' logic or just rely on the invoice polling?
-                // Better: Use a dedicated check. For now, let's trust the socket + initialData. 
-                // BUT if user says "stuck", polling is the answer.
-                // Let's query the SAME endpoint the invoice page uses if possible, but we only have deliveryId.
-                // We need a way to get status by deliveryId.
-                // Let's use the creation endpoint if it supports GET? No.
-                // Let's skip polling for now to avoid creating new APIs, but log errors if socket disconnects.
-                // actually, let's keep it simple: Re-emit 'request_driver_location' periodically to keep connection alive?
-
-                // WAIT, I can just fetch the Invoice API if I have requestId?
                 if (initialData?.requestId) {
                     const res = await fetch(`/api/donor/invoice/${initialData.requestId}`);
                     if (res.ok) {
                         const data = await res.json();
-                        if (data.activeDelivery?.status) {
-                            const polledStatus = data.activeDelivery.status;
-                            if (polledStatus !== deliveryStatus) {
-                                console.log('[Poll] Status Differs:', polledStatus);
-                                setDeliveryStatus(polledStatus);
+                        
+                        // Sync Status
+                        if (data.activeDelivery?.status && data.activeDelivery.status !== deliveryStatus) {
+                            console.log('[Poll] Status updated from DB:', data.activeDelivery.status);
+                            setDeliveryStatus(data.activeDelivery.status);
+                        }
+
+                        // Sync Location [NEW SILENT SYNC]
+                        // If socket fails, this provides a fallback every 5s from the latest DB update
+                        if (data.activeDelivery?.driverId?.currentLocation?.coordinates) {
+                            const coords = data.activeDelivery.driverId.currentLocation.coordinates;
+                            if (coords[0] !== 0 && coords[1] !== 0) {
+                                const newLoc = { lat: coords[1], lng: coords[0] };
+                                // Only update if significantly different to avoid flickering (approx 10m)
+                                if (!driverLocation || 
+                                    Math.abs(newLoc.lat - driverLocation.lat) > 0.0001 || 
+                                    Math.abs(newLoc.lng - driverLocation.lng) > 0.0001) {
+                                    console.log('[Poll] Driver location synced from DB fallback');
+                                    setDriverLocation(newLoc);
+                                }
                             }
                         }
                     }

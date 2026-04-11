@@ -23,6 +23,14 @@ export async function POST(request: Request) {
         delivery.endTime = new Date();
         await delivery.save();
 
+        // [NEW] Update BloodRequest Status to Fulfilled
+        try {
+            const BloodRequest = (await import('../../../../models/BloodRequest')).default;
+            await BloodRequest.findByIdAndUpdate(delivery.requestId, { status: 'Fulfilled' });
+        } catch (e) {
+            console.error('Failed to update BloodRequest status:', e.message);
+        }
+
         // Free up driver
         if (delivery.driverId) {
             await Driver.findByIdAndUpdate(delivery.driverId, { status: 'ONLINE', $inc: { totalDeliveries: 1 } });
