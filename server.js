@@ -180,6 +180,24 @@ app.prepare().then(() => {
     });
   });
 
+  // --- SERVER-SIDE BACKGROUND CLEANUP ---
+  // Periodically check for expired delivery proposals
+  setInterval(async () => {
+    try {
+      const apiUrl = `http://localhost:${port}/api/delivery/cleanup`;
+      const res = await fetch(apiUrl, { method: 'POST' });
+      const data = await res.json();
+      if (data.processed > 0) {
+        console.log(`[BACKGROUND JOB] Cleaned up ${data.processed} expired deliveries.`);
+      }
+    } catch (err) {
+      // Silence background errors to avoid log spam, but log critical ones
+      if (err.code !== 'ECONNREFUSED') {
+        // console.error('[BACKGROUND JOB ERROR]:', err.message);
+      }
+    }
+  }, 15000); // Check every 15 seconds
+
   server.listen(port, (err) => {
     if (err) throw err;
     console.log(`> Ready on http://${hostname}:${port}`);

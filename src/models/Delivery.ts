@@ -20,7 +20,7 @@ export interface IDelivery extends Document {
         timestamp: Date;
     }[];
     rejectedDrivers: mongoose.Types.ObjectId[];
-    proposedDriverId?: mongoose.Types.ObjectId;
+    proposedDriverIds: mongoose.Types.ObjectId[];
     acceptanceDeadline?: Date;
     pickupCode: string;
     dropoffCode: string;
@@ -68,7 +68,7 @@ const DeliverySchema: Schema<IDelivery> = new Schema(
             },
         ],
         rejectedDrivers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Driver' }],
-        proposedDriverId: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver' },
+        proposedDriverIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Driver' }],
         acceptanceDeadline: Date,
         pickupCode: { type: String, required: true },
         dropoffCode: { type: String, required: true },

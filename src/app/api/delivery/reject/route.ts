@@ -18,10 +18,10 @@ export async function POST(request: Request) {
             return NextResponse.json({ message: 'Request already processed' }, { status: 400 });
         }
 
-        // Add current proposed driver to rejected list
-        if (delivery.proposedDriverId) {
-            delivery.rejectedDrivers.push(delivery.proposedDriverId);
-            delivery.proposedDriverId = undefined;
+        // Add current proposed drivers to rejected list
+        if (delivery.proposedDriverIds && delivery.proposedDriverIds.length > 0) {
+            delivery.rejectedDrivers.push(...delivery.proposedDriverIds);
+            delivery.proposedDriverIds = [];
             delivery.acceptanceDeadline = undefined;
             await delivery.save();
         }

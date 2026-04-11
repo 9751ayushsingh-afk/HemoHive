@@ -20,14 +20,15 @@ export async function POST(request: Request) {
         }
 
         // Verify Proposal
-        if (delivery.proposedDriverId && delivery.proposedDriverId.toString() !== driverId) {
+        const isProposed = delivery.proposedDriverIds?.some(id => id.toString() === driverId);
+        if (!isProposed) {
             return NextResponse.json({ message: 'Offer expired or assigned to another driver' }, { status: 400 });
         }
 
         // Assign Driver
         delivery.status = 'ASSIGNED';
         delivery.driverId = new mongoose.Types.ObjectId(driverId);
-        delivery.proposedDriverId = undefined;
+        delivery.proposedDriverIds = []; // Clear proposals
         delivery.acceptanceDeadline = undefined;
         await delivery.save();
 

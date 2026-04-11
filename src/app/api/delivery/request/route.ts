@@ -118,15 +118,15 @@ export async function POST(request: Request) {
         // Ensure Indexes (Safety Check)
         try { await Driver.syncIndexes(); } catch (e) { }
 
-        // 1. Find Nearest Online Driver (Excluding Rejected)
+        // 1. Find Nearest Online Drivers (Parallel Search - Limit 3)
         const rejectedDrivers = existingDelivery ? existingDelivery.rejectedDrivers : [];
 
-        console.log(`[DEBUG] Searching for Driver near: ${finalPickup.address} [${finalPickup.location.coordinates[1]}, ${finalPickup.location.coordinates[0]}]`);
+        console.log(`[DEBUG] Searching for Drivers near: ${finalPickup.address}`);
 
-        const nearestDriver = await Driver.findOne({
+        const foundDrivers = await Driver.find({
             status: 'ONLINE',
             isBlocked: { $ne: true },
-            _id: { $nin: rejectedDrivers }, // Exclude rejected
+            _id: { $nin: rejectedDrivers },
             currentLocation: {
                 $near: {
                     $geometry: {
@@ -136,9 +136,9 @@ export async function POST(request: Request) {
                     $maxDistance: 5000000
                 }
             }
-        });
+        }).limit(3);
 
-        if (!nearestDriver) {
+        if (!foundDrivers || foundDrivers.length === 0) {
             return NextResponse.json({
                 success: false,
                 message: 'No online drivers found nearby.'
@@ -147,19 +147,21 @@ export async function POST(request: Request) {
 
         // 2. Create or Update Delivery (Proposal Mode)
         let delivery;
-        const deadline = new Date(Date.now() + 60 * 1000); // 60 Seconds from now
+        const deadline = new Date(Date.now() + 40 * 1000); // Shorter Deadline: 40 Seconds
+
+        const proposedDriverIds = foundDrivers.map(d => d._id) as unknown as mongoose.Types.ObjectId[];
 
         if (existingDelivery) {
             delivery = existingDelivery;
-            delivery.proposedDriverId = nearestDriver._id as mongoose.Types.ObjectId;
+            delivery.proposedDriverIds = proposedDriverIds;
             delivery.acceptanceDeadline = deadline;
             delivery.status = 'SEARCHING';
             await delivery.save();
         } else {
             delivery = await Delivery.create({
                 requestId: requestId || new mongoose.Types.ObjectId(),
-                driverId: undefined, // Not assigned yet
-                proposedDriverId: nearestDriver._id,
+                driverId: undefined,
+                proposedDriverIds: proposedDriverIds,
                 acceptanceDeadline: deadline,
                 rejectedDrivers: [],
                 pickup: finalPickup,
@@ -171,41 +173,36 @@ export async function POST(request: Request) {
             });
         }
 
-        // 3. Broadcast Proposal to Driver via Socket
+        // 3. Parallel Broadcast Proposal to Drivers via Socket
         try {
-            // Internal call to local server to emit socket event
             const protocol = request.headers.get('x-forwarded-proto') || 'http';
             const host = request.headers.get('host');
             const apiUrl = `${protocol}://${host}/api/internal/broadcast-proposal`;
 
-            console.log(`[DEBUG] Broadcasting to ${apiUrl} for Driver: ${nearestDriver._id}`);
-
-            const broadcastRes = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    driverId: nearestDriver._id,
-                    data: {
-                        deliveryId: delivery._id,
-                        pickup: finalPickup,
-                        dropoff: finalDropoff,
-                        earnings: '₹ 100', // Mock Calculation
-                        distance: '5 km', // Mock
-                        time: '15 min', // Mock,
-                        deadline: deadline // Send deadline to client
-                    }
+            // Parallel Broadcast
+            await Promise.all(foundDrivers.map(driver => (
+                fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        driverId: driver._id,
+                        data: {
+                            deliveryId: delivery._id,
+                            pickup: finalPickup,
+                            dropoff: finalDropoff,
+                            earnings: '₹ 100', // Mock Calculation
+                            distance: '5 km', // Mock
+                            time: '15 min', // Mock
+                            deadline: deadline // Send deadline to client
+                        }
+                    })
                 })
-            });
+            )));
 
-            if (!broadcastRes.ok) {
-                console.error('[DEBUG] Broadcast Failed:', await broadcastRes.text());
-            } else {
-                console.log('[DEBUG] Broadcast Success');
-            }
+            console.log(`[DEBUG] Parallel Broadcast Success to ${foundDrivers.length} drivers`);
 
         } catch (socketError) {
             console.error('Socket Broadcast Failed:', socketError);
-            // Continue anyway, driver might refresh and see it (if we add pulling)
         }
 
         return NextResponse.json({
